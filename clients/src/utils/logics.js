@@ -62,14 +62,18 @@ export const getSender = (activeUser, users) => {
   return activeUser.id === users[0]._id ? users[1].name : users[0].name;
 };
 export const getChatName = (activeChat, activeUser) => {
-  return activeChat?.isGroup
+  return activeChat?.isGlobal
+    ? activeChat.chatName
+    : activeChat?.isGroup
     ? activeChat?.chatName
     : activeChat?.users[0]?._id === activeUser.id
     ? activeChat?.users[1]?.name
     : activeChat?.users[0]?.name;
 };
 export const getChatPhoto = (activeChat, activeUser) => {
-  return activeChat?.isGroup
+  return activeChat?.isGlobal
+    ? activeChat.photo
+    : activeChat?.isGroup
     ? activeChat.photo
     : activeChat?.users[0]?._id === activeUser?.id
     ? activeChat?.users[1]?.profilePic

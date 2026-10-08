@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
+const serverUrl = process.env.REACT_APP_SERVER_URL || '';
 const API = (token) =>
   axios.create({
-    baseURL: process.env.REACT_APP_SERVER_URL,
+    baseURL: serverUrl,
     headers: { Authorization: token },
   });
 export const acessCreate = async (body) => {

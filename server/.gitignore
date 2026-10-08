@@ -1,2 +1,4 @@
 /node_modules
 /.env
+/data/database.json
+/data/database.json.tmp

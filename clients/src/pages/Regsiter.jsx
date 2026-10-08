@@ -1,10 +1,9 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { GoogleLogin } from "react-google-login"
-import { gapi } from "gapi-script"
 import { useEffect } from 'react'
-import { googleAuth, registerUser } from '../apis/auth'
+import { registerUser } from '../apis/auth'
 import { useState } from 'react'
+import GoogleSignIn from '../components/GoogleSignIn'
 import { BsEmojiLaughing, BsEmojiExpressionless } from "react-icons/bs"
 import { toast } from 'react-toastify';
 import { validUser } from '../apis/auth'
@@ -25,7 +24,8 @@ function Regsiter() {
   const handleOnSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
-    if (formData.email.includes("@") && formData.password.length > 6) {
+    if (formData.firstname.trim() && formData.lastname.trim() && /^\S+@\S+\.\S+$/.test(formData.email.trim()) && formData.password.length > 6) {
+      try {
       const { data } = await registerUser(formData)
       if (data?.token) {
         localStorage.setItem("userToken", data.token)
@@ -36,40 +36,23 @@ function Regsiter() {
       }
       else {
         setIsLoading(false)
-        toast.error("Invalid Credentials!")
+        toast.error(data?.message || "Unable to register!")
+      }
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Unable to register. Please try again.")
+      } finally {
+        setIsLoading(false)
       }
     }
     else {
       setIsLoading(false)
-      toast.warning("Provide valid Credentials!")
+      toast.warning("Enter your first name, last name, a valid email, and a password of at least 7 characters.")
       setFormData({ ...formData, password: "" })
     }
 
   }
 
-  const googleSuccess = async (res) => {
-    if (res?.profileObj) {
-      setIsLoading(true)
-      const response = await googleAuth({ tokenId: res.tokenId })
-      setIsLoading(false)
-      if (response.data.token) {
-        localStorage.setItem("userToken", response.data.token)
-        pageRoute("/chats")
-      }
-    }
-  }
-  const googleFailure = (error) => {
-    toast.error("Something Went Wrong.Try Agian!")
-  }
-
   useEffect(() => {
-    const initClient = () => {
-      gapi.client.init({
-        clientId: process.env.REACT_APP_CLIENT_ID,
-        scope: ''
-      });
-    };
-    gapi.load('client:auth2', initClient);
     const isValid = async () => {
       const data = await validUser()
       if (data?.user) {
@@ -114,18 +97,7 @@ function Regsiter() {
             <p style={{ display: isLoading ? "none" : "block" }} className='test-[#fff]'>Regsiter</p>
           </button>
           <p className='text-[#fff] text-center sm:-ml-8'>/</p>
-          <GoogleLogin
-            clientId={process.env.REACT_APP_CLIENT_ID}
-            render={(renderProps) => (
-              <button style={{ borderImage: "linear-gradient(to right, rgba(0,195,154,1) 50%, rgba(224,205,115,1) 80%)", borderImageSlice: "1" }} onClick={renderProps.onClick} disabled={renderProps.disabled} aria-label="Continue with google" className="focus:ring-2 focus:ring-offset-1   py-3.5 px-4 border rounded-lg  flex items-center w-[100%]  sm:w-[96.3%]" disableElevation={true} disableFocusRipple={true}>
-                <img src="https://tuk-cdn.s3.amazonaws.com/can-uploader/sign_in-svg2.svg" alt="google" />
-                <p className="text-[base] font-medium ml-4 text-[#fff]">Continue with Google</p>
-              </button>
-            )}
-            onSuccess={googleSuccess}
-            onFailure={googleFailure}
-            cookiePolicy={'single_host_origin'}
-          />
+          <GoogleSignIn onSignedIn={() => pageRoute("/chats")} />
         </form>
       </div>
     </div>

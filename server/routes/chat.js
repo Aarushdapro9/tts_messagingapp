@@ -4,6 +4,7 @@ const router = express.Router();
 
 import {
   accessChats,
+  accessGlobalChat,
   fetchAllChats,
   creatGroup,
   renameGroup,
@@ -12,6 +13,7 @@ import {
 } from '../controllers/chatControllers.js';
 router.post('/', Auth, accessChats);
 router.get('/', Auth, fetchAllChats);
+router.get('/global', Auth, accessGlobalChat);
 router.post('/group', Auth, creatGroup);
 router.patch('/group/rename', Auth, renameGroup);
 router.patch('/groupAdd', Auth, addToGroup);

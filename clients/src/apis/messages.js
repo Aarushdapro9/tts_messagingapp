@@ -1,7 +1,8 @@
 import axios from 'axios';
+const serverUrl = process.env.REACT_APP_SERVER_URL || '';
 const API = (token) =>
   axios.create({
-    baseURL: process.env.REACT_APP_SERVER_URL,
+    baseURL: serverUrl,
     headers: { Authorization: token },
   });
 export const sendMessage = async (body) => {

@@ -14,7 +14,7 @@ import Picker from '@emoji-mart/react'
 import { getChatName } from '../utils/logics';
 import Typing from '../components/ui/Typing';
 import { validUser } from '../apis/auth';
-const ENDPOINT = process.env.REACT_APP_SERVER_URL
+const ENDPOINT = process.env.REACT_APP_SERVER_URL || window.location.origin
 let socket, selectedChatCompare;
 
 function Chat(props) {
@@ -110,7 +110,7 @@ function Chat(props) {
                 </div>
               </div>
               <div>
-                <Model />
+                {!activeChat.isGlobal && <Model />}
               </div>
             </div>
             <div className='scrollbar-hide w-[100%] h-[70vh] md:h-[66vh] lg:h-[69vh] flex flex-col overflow-y-scroll p-4'>

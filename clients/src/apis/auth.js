@@ -1,33 +1,20 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
+const serverUrl = process.env.REACT_APP_SERVER_URL || '';
 const API = (token) =>
   axios.create({
-    baseURL: process.env.REACT_APP_SERVER_URL,
+    baseURL: serverUrl,
     headers: { Authorization: token },
   });
-let url = process.env.REACT_APP_SERVER_URL;
+let url = serverUrl;
 export const loginUser = async (body) => {
-  try {
-    return await axios.post(`${url}/auth/login`, body);
-  } catch (error) {
-    console.log('error in loginuser api');
-    return { data: error.response?.data };
-  }
+  return axios.post(`${url}/auth/login`, body);
 };
 export const googleAuth = async (body) => {
-  try {
-    return await axios.post(`${url}/api/google`, body);
-  } catch (error) {
-    console.log(error);
-  }
+  return axios.post(`${url}/api/google`, body);
 };
 export const registerUser = async (body) => {
-  try {
-    return await axios.post(`${url}/auth/register`, body);
-  } catch (error) {
-    console.log('error in register api');
-    return { data: error.response?.data };
-  }
+  return axios.post(`${url}/auth/register`, body);
 };
 export const validUser = async () => {
   try {

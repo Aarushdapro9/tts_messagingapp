@@ -1,10 +1,8 @@
 import React from 'react'
 import { useEffect } from 'react'
-import { GoogleLogin } from "react-google-login"
-import { gapi } from "gapi-script"
-import { googleAuth } from '../apis/auth'
 import { useState } from 'react'
 import { loginUser } from '../apis/auth'
+import GoogleSignIn from '../components/GoogleSignIn'
 import { Link, useNavigate } from 'react-router-dom'
 import { BsEmojiLaughing, BsEmojiExpressionless } from "react-icons/bs"
 import { toast } from 'react-toastify';
@@ -18,60 +16,37 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
   const pageRoute = useNavigate()
-  const googleSuccess = async (res) => {
-    if (res?.profileObj) {
-      console.log(res.profileObj)
-      setIsLoading(true)
-      const response = await googleAuth({ tokenId: res.tokenId })
-      setIsLoading(false)
-
-      console.log("response :" + res)
-      if (response.data.token) {
-        localStorage.setItem("userToken", response.data.token)
-        pageRoute("/chats")
-
-      }
-    }
-  }
-  const googleFailure = (error) => {
-    // toast.error("Something went Wrong.Try Again!")
-  }
   const handleOnChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
   const formSubmit = async (e) => {
     e.preventDefault()
-    if (formData.email.includes("@") && formData.password.length > 6) {
-      setIsLoading(true)
+    if (!formData.email.includes("@") || formData.password.length <= 6) {
+      toast.warning("Provide a valid email and password of at least 7 characters!")
+      return
+    }
+
+    setIsLoading(true)
+    try {
       const { data } = await loginUser(formData)
       if (data?.token) {
         localStorage.setItem("userToken", data.token)
         toast.success("Succesfully Login!")
-        setIsLoading(false)
         pageRoute("/chats")
+        return
       }
-      else {
-        setIsLoading(false)
-        toast.error("Invalid Credentials!")
-        setFormData({ ...formData, password: "" })
-      }
-    }
-    else {
-      setIsLoading(false)
-      toast.warning("Provide valid Credentials!")
-      setFormData(defaultData)
 
+      toast.error(data?.message || "Invalid credentials!")
+      setFormData({ ...formData, password: "" })
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to log in. Please try again.")
+      setFormData({ ...formData, password: "" })
+    } finally {
+      setIsLoading(false)
     }
   }
   useEffect(() => {
-    const initClient = () => {
-      gapi.client.init({
-        clientId: process.env.REACT_APP_CLIENT_ID,
-        scope: ''
-      });
-    };
-    gapi.load('client:auth2', initClient);
     const isValid = async () => {
       const data = await validUser()
       if (data?.user) {
@@ -114,19 +89,7 @@ function Login() {
             </button>
             {/* <div className='border-t-[1px] w-[100%] sm:w-[80%] my-3' ></div> */}
             <p className='text-[#fff] text-center sm:-ml-20'>/</p>
-            <GoogleLogin
-              clientId={process.env.REACT_APP_CLIENT_ID}
-              render={(renderProps) => (
-                <button style={{ borderImage: "linear-gradient(to right, rgba(0,195,154,1) 50%, rgba(224,205,115,1) 80%)", borderImageSlice: "1" }} onClick={renderProps.onClick} disabled={renderProps.disabled} aria-label="Continue with google" className="focus:ring-2 focus:ring-offset-1  py-3.5 px-4 border rounded-lg  flex items-center w-[100%]  sm:w-[80%]" disableElevation={true} disablefocusRipple={true}>
-                  <img src="https://tuk-cdn.s3.amazonaws.com/can-uploader/sign_in-svg2.svg" alt="google" />
-                  <p className="text-[base] font-medium ml-4 text-[#fff]">Continue with Google</p>
-                </button>
-              )}
-              onSuccess={googleSuccess}
-              onFailure={googleFailure}
-              cookiePolicy={'single_host_origin'}
-              scope="profile email https://www.googleapis.com/auth/user.birthday.read"
-            />
+            <GoogleSignIn onSignedIn={() => pageRoute("/chats")} />
 
 
           </form>

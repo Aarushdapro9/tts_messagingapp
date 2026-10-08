@@ -6,15 +6,24 @@ import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import store from './store';
 import { ToastContainer } from 'react-toastify';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import 'react-toastify/dist/ReactToastify.css';
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+const app = (
   <React.StrictMode>
     <Provider store={store}>
       <App />
       <ToastContainer position="top-right" />
     </Provider>
   </React.StrictMode>
+);
+
+root.render(
+  process.env.REACT_APP_CLIENT_ID ? (
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID}>{app}</GoogleOAuthProvider>
+  ) : (
+    app
+  )
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -1,10 +1,10 @@
 import React from 'react'
 import SkeletonLoading from '../ui/SkeletonLoading'
 import "../../pages/home.css"
-function Search({ type, isLoading, searchResults, handleClick, search }) {
+function Search({ type, isLoading, searchResults, handleClick, search, alwaysVisible = false }) {
 
   return (
-    <div className={`${search ? "scrollbar-hide overflow-y-scroll h-[250px] mb-5 bg-[#fff] flex flex-col gap-y-3 pt-3" : "hidden"}`}>
+    <div className={`${search || alwaysVisible ? "scrollbar-hide overflow-y-scroll h-[250px] mb-5 bg-[#fff] flex flex-col gap-y-3 pt-3" : "hidden"}`}>
 
       {
         isLoading ? <SkeletonLoading height={55} count={3} /> : (

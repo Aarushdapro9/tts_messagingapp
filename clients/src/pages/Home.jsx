@@ -29,6 +29,7 @@ function Home() {
   const [searchResults, setSearchResults] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = useState("")
+  const [showUsers, setShowUsers] = useState(false)
 
   const handleSearch = async (e) => {
     setSearch(e.target.value)
@@ -37,6 +38,7 @@ function Home() {
     await acessCreate({ userId: e._id })
     dispatch(fetchChats())
     setSearch("")
+    setShowUsers(false)
   }
   useEffect(() => {
     const searchChange = async () => {
@@ -108,7 +110,11 @@ function Home() {
 
                             }} key={index} className='text-[12.5px] text-black px-2 cursor-pointer' >
 
-                              {e.chatId.isGroup ? `New Message in ${e.chatId.chatName}` : `New Message from ${getSender(activeUser, e.chatId.users)}`}
+                              {e.chatId.isGlobal
+                                ? `New message in ${e.chatId.chatName}`
+                                : e.chatId.isGroup
+                                ? `New Message in ${e.chatId.chatName}`
+                                : `New Message from ${getSender(activeUser, e.chatId.users)}`}
                             </div>
 
                           )
@@ -135,10 +141,19 @@ function Home() {
                     <div className='absolute top-[36px] left-[27px]'>
                       <BsSearch style={{ color: "#c4c4c5" }} />
                     </div>
-                    <Group />
+                    <div className='flex items-center justify-between pr-1'>
+                      <Group />
+                      <button onClick={() => setShowUsers(!showUsers)} className='mt-3 text-[11px] font-normal tracking-wide bg-[#f6f6f6] text-[#1f2228] py-1 px-2'>
+                        {showUsers ? "Hide users" : "All users"}
+                      </button>
+                    </div>
 
-                    <div style={{ display: search ? "" : "none" }} className='h-[100vh] absolute z-10 w-[100%] left-[0px] top-[70px] bg-[#fff] flex flex-col gap-y-3 pt-3 px-4'>
-                      <Search searchResults={searchResults} isLoading={isLoading} handleClick={handleClick} search={search} />
+                    <div style={{ display: search || showUsers ? "" : "none" }} className='h-[100vh] absolute z-10 w-[100%] left-[0px] top-[70px] bg-[#fff] flex flex-col gap-y-3 pt-3 px-4'>
+                      <div className='flex items-center justify-between'>
+                        <h4 className='text-[13px] font-semibold text-[#1f2228]'>{search ? "Search results" : "All users"}</h4>
+                        <button onClick={() => { setSearch(""); setShowUsers(false) }} className='text-[12px] text-[#0086ea]'>Close</button>
+                      </div>
+                      <Search alwaysVisible={showUsers} searchResults={searchResults} isLoading={isLoading} handleClick={handleClick} search={search} />
 
                     </div>
                   </div>

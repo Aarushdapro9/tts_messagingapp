@@ -1,131 +1,194 @@
-import Chat from '../models/chatModel.js';
-import user from '../models/userModel.js';
+import {
+  createId,
+  expandChat,
+  findUser,
+  updateDatabase,
+} from '../storage/store.js';
+
+const defaultGroupPhoto = 'https://cdn-icons-png.flaticon.com/512/9790/9790561.png';
+
+function canAccess(chat, userId) {
+  return chat && (chat.isGlobal || chat.users.includes(userId));
+}
+
+export const accessGlobalChat = async (_req, res) => {
+  const globalChat = await updateDatabase((database) => {
+    let chat = database.chats.find((item) => item.isGlobal);
+    if (!chat) {
+      const now = new Date().toISOString();
+      chat = {
+        _id: createId(),
+        chatName: 'Global Chat',
+        photo: defaultGroupPhoto,
+        isGroup: false,
+        isGlobal: true,
+        users: [],
+        latestMessage: null,
+        groupAdmin: null,
+        createdAt: now,
+        updatedAt: now,
+      };
+      database.chats.push(chat);
+    }
+    return expandChat(database, chat);
+  });
+  return res.status(200).json(globalChat);
+};
 
 export const accessChats = async (req, res) => {
   const { userId } = req.body;
-  if (!userId) res.send({ message: "Provide User's Id" });
-  let chatExists = await Chat.find({
-    isGroup: false,
-    $and: [
-      { users: { $elemMatch: { $eq: userId } } },
-      { users: { $elemMatch: { $eq: req.rootUserId } } },
-    ],
-  })
-    .populate('users', '-password')
-    .populate('latestMessage');
-  chatExists = await user.populate(chatExists, {
-    path: 'latestMessage.sender',
-    select: 'name email profilePic',
-  });
-  if (chatExists.length > 0) {
-    res.status(200).send(chatExists[0]);
-  } else {
-    let data = {
-      chatName: 'sender',
-      users: [userId, req.rootUserId],
-      isGroup: false,
-    };
-    try {
-      const newChat = await Chat.create(data);
-      const chat = await Chat.find({ _id: newChat._id }).populate(
-        'users',
-        '-password'
-      );
-      res.status(200).json(chat);
-    } catch (error) {
-      res.status(500).send(error);
+  if (!userId) return res.status(400).json({ message: "Provide user's ID" });
+  if (userId === req.rootUserId) {
+    return res.status(400).json({ message: 'You cannot create a chat with yourself' });
+  }
+
+  const chat = await updateDatabase((database) => {
+    if (!findUser(database, userId)) return null;
+    let existing = database.chats.find(
+      (item) =>
+        !item.isGroup &&
+        !item.isGlobal &&
+        item.users.length === 2 &&
+        item.users.includes(userId) &&
+        item.users.includes(req.rootUserId)
+    );
+    if (!existing) {
+      const now = new Date().toISOString();
+      existing = {
+        _id: createId(),
+        chatName: 'sender',
+        photo: defaultGroupPhoto,
+        isGroup: false,
+        users: [req.rootUserId, userId],
+        latestMessage: null,
+        groupAdmin: null,
+        createdAt: now,
+        updatedAt: now,
+      };
+      database.chats.push(existing);
     }
-  }
+    return expandChat(database, existing);
+  });
+  if (!chat) return res.status(404).json({ message: 'User not found' });
+  return res.status(200).json(chat);
 };
+
 export const fetchAllChats = async (req, res) => {
-  try {
-    const chats = await Chat.find({
-      users: { $elemMatch: { $eq: req.rootUserId } },
-    })
-      .populate('users')
-      .populate('latestMessage')
-      .populate('groupAdmin')
-      .sort({ updatedAt: -1 });
-    const finalChats = await user.populate(chats, {
-      path: 'latestMessage.sender',
-      select: 'name email profilePic',
-    });
-    res.status(200).json(finalChats);
-  } catch (error) {
-    res.status(500).send(error);
-    console.log(error);
-  }
+  const chats = await updateDatabase((database) => {
+    if (!database.chats.some((chat) => chat.isGlobal)) {
+      const now = new Date().toISOString();
+      database.chats.push({
+        _id: createId(),
+        chatName: 'Global Chat',
+        photo: defaultGroupPhoto,
+        isGroup: false,
+        isGlobal: true,
+        users: [],
+        latestMessage: null,
+        groupAdmin: null,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+    return database.chats
+      .filter((chat) => chat.isGlobal || chat.users.includes(req.rootUserId))
+      .sort((first, second) => {
+        if (first.isGlobal) return -1;
+        if (second.isGlobal) return 1;
+        return new Date(second.updatedAt) - new Date(first.updatedAt);
+      })
+      .map((chat) => expandChat(database, chat));
+  });
+  return res.status(200).json(chats);
 };
+
 export const creatGroup = async (req, res) => {
   const { chatName, users } = req.body;
-  if (!chatName || !users) {
-    res.status(400).json({ message: 'Please fill the fields' });
+  if (!chatName?.trim() || !users) {
+    return res.status(400).json({ message: 'Please fill the fields' });
   }
-  const parsedUsers = JSON.parse(users);
-  if (parsedUsers.length < 2)
-    res.send(400).send('Group should contain more than 2 users');
-  parsedUsers.push(req.rootUser);
+  let selectedUsers;
   try {
-    const chat = await Chat.create({
-      chatName: chatName,
-      users: parsedUsers,
-      isGroup: true,
-      groupAdmin: req.rootUserId,
-    });
-    const createdChat = await Chat.findOne({ _id: chat._id })
-      .populate('users', '-password')
-      .populate('groupAdmin', '-password');
-    // res.status(200).json(createdChat);
-    res.send(createdChat);
-  } catch (error) {
-    res.sendStatus(500);
+    selectedUsers = Array.isArray(users) ? users : JSON.parse(users);
+  } catch {
+    return res.status(400).json({ message: 'Users must be a valid list' });
   }
+  const uniqueUserIds = [...new Set([...selectedUsers, req.rootUserId])];
+  if (uniqueUserIds.length < 3) {
+    return res.status(400).json({ message: 'A group needs at least three members' });
+  }
+
+  const chat = await updateDatabase((database) => {
+    if (uniqueUserIds.some((id) => !findUser(database, id))) return null;
+    const now = new Date().toISOString();
+    const newChat = {
+      _id: createId(),
+      chatName: chatName.trim(),
+      photo: defaultGroupPhoto,
+      isGroup: true,
+      users: uniqueUserIds,
+      latestMessage: null,
+      groupAdmin: req.rootUserId,
+      createdAt: now,
+      updatedAt: now,
+    };
+    database.chats.push(newChat);
+    return expandChat(database, newChat);
+  });
+  if (!chat) return res.status(404).json({ message: 'One or more users no longer exist' });
+  return res.status(201).json(chat);
 };
+
 export const renameGroup = async (req, res) => {
   const { chatId, chatName } = req.body;
-  if (!chatId || !chatName)
-    res.status(400).send('Provide Chat id and Chat name');
-  try {
-    const chat = await Chat.findByIdAndUpdate(chatId, {
-      $set: { chatName },
-    })
-      .populate('users', '-password')
-      .populate('groupAdmin', '-password');
-    if (!chat) res.status(404);
-    res.status(200).send(chat);
-  } catch (error) {
-    res.status(500).send(error);
-    console.log(error);
+  if (!chatId || !chatName?.trim()) {
+    return res.status(400).json({ message: 'Provide a chat ID and chat name' });
   }
+  const chat = await updateDatabase((database) => {
+    const storedChat = database.chats.find((item) => item._id === chatId);
+    if (!canAccess(storedChat, req.rootUserId) || !storedChat.isGroup || storedChat.isGlobal) return null;
+    storedChat.chatName = chatName.trim();
+    storedChat.updatedAt = new Date().toISOString();
+    return expandChat(database, storedChat);
+  });
+  if (!chat) return res.status(404).json({ message: 'Group not found' });
+  return res.status(200).json(chat);
 };
+
 export const addToGroup = async (req, res) => {
   const { userId, chatId } = req.body;
-  const existing = await Chat.findOne({ _id: chatId });
-  if (!existing.users.includes(userId)) {
-    const chat = await Chat.findByIdAndUpdate(chatId, {
-      $push: { users: userId },
-    })
-      .populate('groupAdmin', '-password')
-      .populate('users', '-password');
-    if (!chat) res.status(404);
-    res.status(200).send(chat);
-  } else {
-    res.status(409).send('user already exists');
-  }
+  const chat = await updateDatabase((database) => {
+    const storedChat = database.chats.find((item) => item._id === chatId);
+    if (!canAccess(storedChat, req.rootUserId) || !storedChat.isGroup || storedChat.isGlobal || !findUser(database, userId)) {
+      return null;
+    }
+    if (storedChat.users.includes(userId)) return 'exists';
+    storedChat.users.push(userId);
+    storedChat.updatedAt = new Date().toISOString();
+    return expandChat(database, storedChat);
+  });
+  if (chat === 'exists') return res.status(409).json({ message: 'User already exists in this group' });
+  if (!chat) return res.status(404).json({ message: 'Group or user not found' });
+  return res.status(200).json(chat);
 };
+
 export const removeFromGroup = async (req, res) => {
   const { userId, chatId } = req.body;
-  const existing = await Chat.findOne({ _id: chatId });
-  if (existing.users.includes(userId)) {
-    Chat.findByIdAndUpdate(chatId, {
-      $pull: { users: userId },
-    })
-      .populate('groupAdmin', '-password')
-      .populate('users', '-password')
-      .then((e) => res.status(200).send(e))
-      .catch((e) => res.status(404));
-  } else {
-    res.status(409).send('user doesnt exists');
-  }
+  const chat = await updateDatabase((database) => {
+    const storedChat = database.chats.find((item) => item._id === chatId);
+    if (!canAccess(storedChat, req.rootUserId) || !storedChat.isGroup || storedChat.isGlobal) return null;
+    if (!storedChat.users.includes(userId)) return 'missing';
+    if (userId === storedChat.groupAdmin && storedChat.users.length > 1) {
+      storedChat.groupAdmin = storedChat.users.find((id) => id !== userId);
+    }
+    storedChat.users = storedChat.users.filter((id) => id !== userId);
+    storedChat.updatedAt = new Date().toISOString();
+    return expandChat(database, storedChat);
+  });
+  if (chat === 'missing') return res.status(409).json({ message: 'User does not exist in this group' });
+  if (!chat) return res.status(404).json({ message: 'Group not found' });
+  return res.status(200).json(chat);
 };
-export const removeContact = async (req, res) => {};
+
+export const removeContact = async (_req, res) =>
+  res.status(501).json({ message: 'Not implemented' });
