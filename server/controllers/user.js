@@ -21,7 +21,7 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const valid = await user.findOne({ email });
-    if (!valid) res.status(200).json({ message: 'User dont exist' });
+    if (!valid) return res.status(404).json({ message: 'User does not exist' });
     const validPassword = await bcrypt.compare(password, valid.password);
     if (!validPassword) {
       res.status(200).json({ message: 'Invalid Credentials' });
