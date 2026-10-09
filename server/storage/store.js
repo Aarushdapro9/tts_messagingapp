@@ -2,15 +2,32 @@ import { randomUUID } from 'crypto';
 import { mkdir, readFile, rename, writeFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { get as getBlob, put as putBlob } from '@vercel/blob';
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const defaultDataFile = path.join(moduleDirectory, '..', 'data', 'database.json');
 const dataFile = process.env.DATA_FILE || defaultDataFile;
+const blobPath = 'chat/database.json';
+const usesBlobStore = Boolean(
+  process.env.BLOB_READ_WRITE_TOKEN ||
+    (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN)
+);
 const emptyDatabase = () => ({ users: [], chats: [], messages: [] });
 
 let writeQueue = Promise.resolve();
 
 async function readDatabase() {
+  if (usesBlobStore) {
+    const result = await getBlob(blobPath, { access: 'private', useCache: false });
+    if (!result || result.statusCode === 304 || !result.stream) return emptyDatabase();
+    const parsed = JSON.parse(await new Response(result.stream).text());
+    return {
+      users: Array.isArray(parsed.users) ? parsed.users : [],
+      chats: Array.isArray(parsed.chats) ? parsed.chats : [],
+      messages: Array.isArray(parsed.messages) ? parsed.messages : [],
+    };
+  }
+
   try {
     const raw = await readFile(dataFile, 'utf8');
     const parsed = JSON.parse(raw);
@@ -26,6 +43,15 @@ async function readDatabase() {
 }
 
 async function writeDatabase(database) {
+  if (usesBlobStore) {
+    await putBlob(blobPath, JSON.stringify(database), {
+      access: 'private',
+      allowOverwrite: true,
+      contentType: 'application/json',
+    });
+    return;
+  }
+
   await mkdir(path.dirname(dataFile), { recursive: true });
   const temporaryFile = `${dataFile}.tmp`;
   await writeFile(temporaryFile, `${JSON.stringify(database, null, 2)}\n`, 'utf8');
@@ -34,8 +60,10 @@ async function writeDatabase(database) {
 
 export async function initializeStore() {
   const database = await readDatabase();
-  await writeDatabase(database);
-  console.log(`File database ready at ${dataFile}`);
+  if (!usesBlobStore) await writeDatabase(database);
+  console.log(
+    usesBlobStore ? 'Vercel Blob database ready' : `File database ready at ${dataFile}`
+  );
 }
 
 export async function getDatabase() {
