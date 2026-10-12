@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import { isAdminEmail } from '../middleware/user.js';
 import {
   createId,
   findUser,
@@ -83,7 +84,10 @@ export const login = async (req, res) => {
 };
 
 export const validUser = async (req, res) =>
-  res.status(200).json({ user: withoutPassword(req.rootUser), token: req.token });
+  res.status(200).json({
+    user: { ...withoutPassword(req.rootUser), isAdmin: isAdminEmail(req.rootUser.email) },
+    token: req.token,
+  });
 
 export const googleAuth = async (req, res) => {
   try {

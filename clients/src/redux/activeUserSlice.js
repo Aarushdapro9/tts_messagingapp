@@ -6,6 +6,7 @@ const initialState = {
   profilePic: '',
   bio: '',
   name: '',
+  isAdmin: false,
 };
 
 const activeUserSlice = createSlice({
@@ -18,6 +19,7 @@ const activeUserSlice = createSlice({
       state.profilePic = payload.profilePic;
       state.bio = payload.bio;
       state.name = payload.name;
+      state.isAdmin = Boolean(payload.isAdmin);
     },
     setUserNameAndBio: (state, { payload }) => {
       state.name = payload.name;

@@ -45,13 +45,17 @@ export const Auth = async (req, res, next) => {
   }
 };
 
-export const Admin = (req, res, next) => {
+export const isAdminEmail = (email) => {
   const allowedEmails = (process.env.ADMIN_EMAILS || '')
     .split(',')
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
 
-  if (!allowedEmails.includes(req.rootUser?.email?.toLowerCase())) {
+  return allowedEmails.includes(email?.toLowerCase());
+};
+
+export const Admin = (req, res, next) => {
+  if (!isAdminEmail(req.rootUser?.email)) {
     return res.status(403).json({ error: 'Administrator access is required' });
   }
   return next();
