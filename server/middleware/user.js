@@ -44,3 +44,15 @@ export const Auth = async (req, res, next) => {
     return res.status(401).json({ error: 'Invalid token' });
   }
 };
+
+export const Admin = (req, res, next) => {
+  const allowedEmails = (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (!allowedEmails.includes(req.rootUser?.email?.toLowerCase())) {
+    return res.status(403).json({ error: 'Administrator access is required' });
+  }
+  return next();
+};

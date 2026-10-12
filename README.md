@@ -81,3 +81,10 @@ Contributions to this project are welcome! If you find a bug or want to add a fe
 4. Push your branch to your forked repository: `git push origin my-new-feature`
 5. Create a Pull Request
 
+# TTS Messaging
+
+## Administrator access
+
+The protected moderation panel is available at `/admin`. It can list user accounts and load messages for a selected conversation, but it never exposes passwords.
+
+Set `ADMIN_EMAILS` on the server (or as a Vercel Production environment variable) to a comma-separated list of the email addresses that may use the panel, for example `ADMIN_EMAILS=owner@example.com`. Do not put this value in the client environment.
