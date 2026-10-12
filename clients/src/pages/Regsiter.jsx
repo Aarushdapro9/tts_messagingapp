@@ -62,7 +62,7 @@ function Regsiter() {
     isValid()
   }, [])
   return (
-    <div className='bg-[#121418] w-[100vw] h-[100vh] flex justify-center items-center'>
+    <div className='bg-[#121418] w-[100vw] min-h-[100dvh] flex justify-center items-center'>
       <div className='w-[90%] sm:w-[400px] pl-0 ml-0 h-[400px] sm:pl-0 sm:ml-9 mt-10 relative'>
         <div className='absolute -top-7 left-0'>
           <h3 className=' text-[25px] font-bold tracking-wider text-[#fff]'>Register</h3>

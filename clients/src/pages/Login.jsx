@@ -59,7 +59,7 @@ function Login() {
   return (
     <>
 
-      <div className='bg-[#121418] w-[100vw] h-[100vh] flex justify-center items-center'>
+      <div className='bg-[#121418] w-[100vw] min-h-[100dvh] flex justify-center items-center'>
         <div className='w-[90%] sm:w-[400px] pl-0 ml-0 h-[400px] sm:pl-0 sm:ml-9 mt-20 relative'>
           {/* <img className='w-[100px] absolute -top-16 left-28' src="https://mir-s3-cdn-cf.behance.net/project_modules/fs/78c4af118001599.608076cf95739.jpg" alt="" /> */}
           <div className='absolute -top-5 left-0'>

@@ -24,7 +24,7 @@ import Search from '../components/group/Search'
 function Home() {
   const dispatch = useDispatch()
   const { showProfile, showNotifications } = useSelector((state) => state.profile)
-  const { notifications } = useSelector((state) => state.chats)
+  const { notifications, activeChat } = useSelector((state) => state.chats)
   const { activeUser } = useSelector((state) => state)
   const [searchResults, setSearchResults] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -70,12 +70,12 @@ function Home() {
   return (
     <>
 
-      <div className="bg-[#282C35!] scrollbar-hide z-10 h-[100vh]  lg:w-[90%] lg:mx-auto overflow-y-hidden shadow-2xl">
+      <div className="bg-[#282C35!] scrollbar-hide z-10 h-[100dvh] lg:w-[90%] lg:mx-auto overflow-hidden shadow-2xl">
 
-        <div className='flex'>
+        <div className='flex h-full'>
           {
             !showProfile ?
-              <div className="md:flex md:flex-col min-w-[360px] h-[100vh] md:h-[98.6vh] bg-[#ffff] relative">
+              <div className={`${activeChat ? 'hidden md:flex' : 'flex'} chat-sidebar flex-col w-full md:min-w-[360px] md:max-w-[420px] h-[100dvh] md:h-[98.6vh] bg-[#ffff] relative`}>
 
                 <div className='h-[61px] px-4'>
                   <div className='flex'>
@@ -148,7 +148,7 @@ function Home() {
                       </button>
                     </div>
 
-                    <div style={{ display: search || showUsers ? "" : "none" }} className='h-[100vh] absolute z-10 w-[100%] left-[0px] top-[70px] bg-[#fff] flex flex-col gap-y-3 pt-3 px-4'>
+                    <div style={{ display: search || showUsers ? "" : "none" }} className='h-[calc(100dvh-70px)] absolute z-10 w-[100%] left-[0px] top-[70px] bg-[#fff] flex flex-col gap-y-3 pt-3 px-4'>
                       <div className='flex items-center justify-between'>
                         <h4 className='text-[13px] font-semibold text-[#1f2228]'>{search ? "Search results" : "All users"}</h4>
                         <button onClick={() => { setSearch(""); setShowUsers(false) }} className='text-[12px] text-[#0086ea]'>Close</button>
@@ -167,7 +167,7 @@ function Home() {
 
               </div> : <Profile className="min-w-[100%] sm:min-w-[360px] h-[100vh] bg-[#fafafa] shodow-xl relative" />
           }
-          <Chat className="chat-page relative lg:w-[100%] h-[100vh] bg-[#fafafa]" />
+          <Chat className={`${activeChat ? 'block' : 'hidden md:block'} chat-page relative w-full min-w-0 h-[100dvh] bg-[#fafafa]`} />
 
 
 

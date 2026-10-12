@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Model from '../components/Model';
 import { BsEmojiSmile, BsFillEmojiSmileFill } from "react-icons/bs"
+import { BiArrowBack } from "react-icons/bi"
 import { fetchMessages, sendMessage } from '../apis/messages';
 import { useEffect } from 'react';
 import MessageHistory from '../components/MessageHistory';
@@ -102,8 +103,11 @@ function Chat(props) {
       {
         activeChat ?
           <div className={props.className}>
-            <div className='flex justify-between items-center px-5 bg-[#ffff] w-[100%]'>
+            <div className='flex justify-between items-center px-4 md:px-5 h-[61px] bg-[#ffff] w-[100%]'>
               <div className='flex items-center gap-x-[10px]'>
+                <button onClick={() => dispatch(setActiveChat(null))} className='md:hidden text-[#319268] p-1 -ml-1' aria-label='Back to chats'>
+                  <BiArrowBack className='w-6 h-6' />
+                </button>
                 <div className='flex flex-col items-start justify-center'>
                   <h5 className='text-[17px] text-[#2b2e33] font-bold tracking-wide'>{getChatName(activeChat, activeUser)}</h5>
                   {/* <p className='text-[11px] text-[#aabac8]'>Last seen 5 min ago</p> */}
@@ -113,7 +117,7 @@ function Chat(props) {
                 {!activeChat.isGlobal && <Model />}
               </div>
             </div>
-            <div className='scrollbar-hide w-[100%] h-[70vh] md:h-[66vh] lg:h-[69vh] flex flex-col overflow-y-scroll p-4'>
+            <div className='scrollbar-hide w-[100%] h-[calc(100dvh-165px)] md:h-[calc(100dvh-112px)] flex flex-col overflow-y-scroll p-3 md:p-4'>
               <MessageHistory typing={isTyping} messages={messages} />
               <div className='ml-7 -mb-10'>
                 {
@@ -123,11 +127,11 @@ function Chat(props) {
 
               </div>
             </div>
-            <div className='absolute left-[31%] bottom-[8%]'>
+            <div className='absolute left-3 right-3 bottom-3 md:left-[31%] md:right-auto md:bottom-[8%]'>
               {
                 showPicker && <Picker data={data} onEmojiSelect={(e) => setMessage(message + e.native)} />
               }
-              <div className='border-[1px] border-[#aabac8] px-6 py-3 w-[360px] sm:w-[400px] md:w-[350px] h-[50px] lg:w-[400px] rounded-t-[10px]'>
+              <div className='border-[1px] border-[#aabac8] px-4 md:px-6 py-3 w-full md:w-[350px] lg:w-[400px] h-[50px] rounded-t-[10px]'>
 
                 <form onKeyDown={(e) => keyDownFunction(e)} onSubmit={(e) => e.preventDefault()}>
                   <input onChange={(e) => {
@@ -152,7 +156,7 @@ function Chat(props) {
 
               </div>
 
-              <div className='border-x-[1px] border-b-[1px] bg-[#f8f9fa] border-[#aabac8] px-6 py-3 w-[360px] sm:w-[400px] md:w-[350px] lg:w-[400px] rounded-b-[10px] h-[50px]'>
+              <div className='border-x-[1px] border-b-[1px] bg-[#f8f9fa] border-[#aabac8] px-4 md:px-6 py-3 w-full md:w-[350px] lg:w-[400px] rounded-b-[10px] h-[50px]'>
                 {/* {
                   isTyping ? <div>Loading</div> : ""
                 } */}
@@ -167,12 +171,10 @@ function Chat(props) {
               </div>
             </div>
           </div> :
-          <div className={props.className}>
-            <div className='relative'>
-              <div className='absolute top-[40vh] left-[44%] flex flex-col items-center justify-center gap-y-3'>
-                <img className='w-[50px] h-[50px] rounded-[25px]' alt="User profile" src={activeUser.profilePic} />
-                <h3 className='text-[#111b21] text-[20px] font-medium tracking-wider'>Welcome <span className='text-[#166e48] text-[19px] font-bold'> {activeUser.name}</span></h3>
-              </div>
+          <div className={`${props.className} flex items-center justify-center`}>
+            <div className='flex flex-col items-center justify-center gap-y-3 px-5 text-center'>
+              <img className='w-[50px] h-[50px] rounded-[25px]' alt="User profile" src={activeUser.profilePic} />
+              <h3 className='text-[#111b21] text-[20px] font-medium tracking-wider'>Welcome <span className='text-[#166e48] text-[19px] font-bold'> {activeUser.name}</span></h3>
             </div>
           </div>
 
