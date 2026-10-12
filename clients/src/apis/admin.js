@@ -5,7 +5,7 @@ const serverUrl = process.env.REACT_APP_SERVER_URL || '';
 function adminApi() {
   return axios.create({
     baseURL: serverUrl,
-    headers: { Authorization: `Bearer ${localStorage.getItem('userToken') || ''}` },
+    headers: { Authorization: localStorage.getItem('userToken') || '' },
   });
 }
 
