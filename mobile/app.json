@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "TTS Messaging",
+    "slug": "tts-messaging",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "ttsmessaging",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aarush.ttsmessaging"
+    },
+    "extra": {
+      "apiUrl": "https://tts-messagingapp-brown.vercel.app"
+    }
+  }
+}

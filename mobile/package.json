@@ -1,0 +1,20 @@
+{
+  "name": "tts-messaging-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo start --ios",
+    "android": "expo start --android",
+    "web": "expo start --web",
+    "check": "expo export --platform ios --output-dir dist-ios"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^3.1.1",
+    "expo": "~57.0.27",
+    "expo-secure-store": "~15.0.8",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  }
+}
