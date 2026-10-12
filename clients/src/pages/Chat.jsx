@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import MessageHistory from '../components/MessageHistory';
 import io from "socket.io-client"
 import "./home.css"
-import { fetchChats, setNotifications } from '../redux/chatsSlice';
+import { fetchChats, setActiveChat, setNotifications } from '../redux/chatsSlice';
 import Loading from '../components/ui/Loading';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
