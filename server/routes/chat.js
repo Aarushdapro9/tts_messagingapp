@@ -10,10 +10,14 @@ import {
   renameGroup,
   addToGroup,
   removeFromGroup,
+  getChatFolders,
+  setChatFolder,
 } from '../controllers/chatControllers.js';
 router.post('/', Auth, accessChats);
 router.get('/', Auth, fetchAllChats);
 router.get('/global', Auth, accessGlobalChat);
+router.get('/folders', Auth, getChatFolders);
+router.patch('/folders', Auth, setChatFolder);
 router.post('/group', Auth, creatGroup);
 router.patch('/group/rename', Auth, renameGroup);
 router.patch('/groupAdd', Auth, addToGroup);

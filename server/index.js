@@ -10,8 +10,13 @@ import * as Server from 'socket.io';
 import { initializeStore } from './storage/store.js';
 
 const app = express();
+const allowedOrigins = [
+  process.env.BASE_URL,
+  'http://localhost:3000',
+  'http://localhost:3001',
+].filter(Boolean);
 const corsConfig = {
-  origin: process.env.BASE_URL || true,
+  origin: allowedOrigins,
   credentials: true,
 };
 const PORT=process.env.PORT || 8000
@@ -30,7 +35,7 @@ const server = app.listen(PORT, () => {
 const io = new Server.Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: process.env.BASE_URL || true,
+    origin: allowedOrigins,
   },
 });
 io.on('connection', (socket) => {

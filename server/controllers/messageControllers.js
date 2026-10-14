@@ -1,12 +1,16 @@
 import {
   createId,
   expandMessage,
-  getDatabase,
+  publishAndPruneMessages,
   updateDatabase,
 } from '../storage/store.js';
 
+function canAccess(chat, userId) {
+  return chat && (chat.isGlobal || chat.users.includes(userId));
+}
+
 export const sendMessage = async (req, res) => {
-  const { chatId, message } = req.body;
+  const { chatId, message, expiresInMinutes, scheduledFor } = req.body;
   if (!chatId || !message?.trim()) {
     return res.status(400).json({ message: 'A chat and message are required' });
   }
@@ -14,8 +18,13 @@ export const sendMessage = async (req, res) => {
   try {
     const savedMessage = await updateDatabase((database) => {
       const chat = database.chats.find((item) => item._id === chatId);
-      if (!chat || (!chat.isGlobal && !chat.users.includes(req.rootUserId))) return null;
+      if (!canAccess(chat, req.rootUserId)) return null;
       const now = new Date().toISOString();
+      const scheduledTime = scheduledFor ? new Date(scheduledFor) : null;
+      if (scheduledTime && Number.isNaN(scheduledTime.getTime())) return 'invalidSchedule';
+      if (scheduledTime && scheduledTime.getTime() <= Date.now() + 60_000) return 'invalidSchedule';
+      const expiry = Number(expiresInMinutes);
+      const isScheduled = Boolean(scheduledTime);
       const newMessage = {
         _id: createId(),
         sender: req.rootUserId,
@@ -23,12 +32,21 @@ export const sendMessage = async (req, res) => {
         chatId,
         createdAt: now,
         updatedAt: now,
+        deliveredAt: isScheduled ? null : now,
+        scheduledFor: isScheduled ? scheduledTime.toISOString() : null,
+        expiresInMinutes: Number.isFinite(expiry) && expiry > 0 ? expiry : null,
+        expiresAt: !isScheduled && Number.isFinite(expiry) && expiry > 0
+          ? new Date(Date.now() + expiry * 60_000).toISOString()
+          : null,
       };
       database.messages.push(newMessage);
-      chat.latestMessage = newMessage._id;
+      if (!isScheduled) chat.latestMessage = newMessage._id;
       chat.updatedAt = now;
       return expandMessage(database, newMessage);
     });
+    if (savedMessage === 'invalidSchedule') {
+      return res.status(400).json({ message: 'Choose a future time at least one minute from now.' });
+    }
     if (!savedMessage) return res.status(404).json({ message: 'Chat not found' });
     return res.status(201).json(savedMessage);
   } catch (error) {
@@ -39,14 +57,77 @@ export const sendMessage = async (req, res) => {
 
 export const getMessages = async (req, res) => {
   const { chatId } = req.params;
-  const database = await getDatabase();
-  const chat = database.chats.find((item) => item._id === chatId);
-  if (!chat || (!chat.isGlobal && !chat.users.includes(req.rootUserId))) {
-    return res.status(404).json({ message: 'Chat not found' });
-  }
-  const messages = database.messages
-    .filter((message) => message.chatId === chatId)
-    .sort((first, second) => new Date(first.createdAt) - new Date(second.createdAt))
-    .map((message) => expandMessage(database, message));
+  const messages = await updateDatabase((database) => {
+    publishAndPruneMessages(database);
+    const chat = database.chats.find((item) => item._id === chatId);
+    if (!canAccess(chat, req.rootUserId)) return null;
+    return database.messages
+      .filter((message) => message.chatId === chatId && (message.deliveredAt || message.sender === req.rootUserId))
+      .sort((first, second) => new Date(first.createdAt) - new Date(second.createdAt))
+      .map((message) => expandMessage(database, message));
+  });
+  if (!messages) return res.status(404).json({ message: 'Chat not found' });
   return res.status(200).json(messages);
+};
+
+export const createPoll = async (req, res) => {
+  const { chatId, question, options } = req.body;
+  const cleanedOptions = Array.isArray(options) ? options.map((option) => option?.trim()).filter(Boolean) : [];
+  if (!chatId || !question?.trim() || cleanedOptions.length < 2) {
+    return res.status(400).json({ message: 'A poll needs a question and at least two options.' });
+  }
+
+  const savedMessage = await updateDatabase((database) => {
+    const chat = database.chats.find((item) => item._id === chatId);
+    if (!canAccess(chat, req.rootUserId) || !chat.isGroup || chat.isGlobal) return null;
+    const now = new Date().toISOString();
+    const newMessage = {
+      _id: createId(), sender: req.rootUserId, chatId, message: question.trim(), type: 'poll',
+      poll: { question: question.trim(), options: cleanedOptions.map((text) => ({ id: createId(), text, votes: [] })) },
+      createdAt: now, updatedAt: now, deliveredAt: now,
+    };
+    database.messages.push(newMessage);
+    chat.latestMessage = newMessage._id;
+    chat.updatedAt = now;
+    return expandMessage(database, newMessage);
+  });
+  if (!savedMessage) return res.status(400).json({ message: 'Polls can only be created in a group you belong to.' });
+  return res.status(201).json(savedMessage);
+};
+
+export const voteOnPoll = async (req, res) => {
+  const { optionId } = req.body;
+  const result = await updateDatabase((database) => {
+    const message = database.messages.find((item) => item._id === req.params.messageId);
+    const chat = message && database.chats.find((item) => item._id === message.chatId);
+    if (!message || !canAccess(chat, req.rootUserId) || message.type !== 'poll') return null;
+    const choice = message.poll?.options.find((option) => option.id === optionId);
+    if (!choice) return 'missingOption';
+    message.poll.options.forEach((option) => {
+      option.votes = (option.votes || []).filter((id) => id !== req.rootUserId);
+    });
+    choice.votes.push(req.rootUserId);
+    message.updatedAt = new Date().toISOString();
+    return expandMessage(database, message);
+  });
+  if (result === 'missingOption') return res.status(400).json({ message: 'Poll option not found.' });
+  if (!result) return res.status(404).json({ message: 'Poll not found.' });
+  return res.status(200).json(result);
+};
+
+export const togglePin = async (req, res) => {
+  const result = await updateDatabase((database) => {
+    publishAndPruneMessages(database);
+    const message = database.messages.find((item) => item._id === req.params.messageId);
+    const chat = message && database.chats.find((item) => item._id === message.chatId);
+    if (!message || !canAccess(chat, req.rootUserId) || !message.deliveredAt) return null;
+    chat.pinnedMessageIds ||= [];
+    const isPinned = chat.pinnedMessageIds.includes(message._id);
+    chat.pinnedMessageIds = isPinned
+      ? chat.pinnedMessageIds.filter((id) => id !== message._id)
+      : [...chat.pinnedMessageIds, message._id];
+    return { message: expandMessage(database, message), pinned: !isPinned };
+  });
+  if (!result) return res.status(404).json({ message: 'Message not found.' });
+  return res.status(200).json(result);
 };

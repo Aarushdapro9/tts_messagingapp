@@ -63,3 +63,15 @@ export const removeUser = async (body) => {
     console.log('error in remove user api');
   }
 };
+
+export const getChatFolders = async () => {
+  const token = localStorage.getItem('userToken');
+  const { data } = await API(token).get('/api/chat/folders');
+  return data.folders;
+};
+
+export const updateChatFolder = async (chatId, folder) => {
+  const token = localStorage.getItem('userToken');
+  const { data } = await API(token).patch('/api/chat/folders', { chatId, folder });
+  return data.folders;
+};

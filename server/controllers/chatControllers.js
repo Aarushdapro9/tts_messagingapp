@@ -2,6 +2,7 @@ import {
   createId,
   expandChat,
   findUser,
+  publishAndPruneMessages,
   updateDatabase,
 } from '../storage/store.js';
 
@@ -24,7 +25,8 @@ export const accessGlobalChat = async (_req, res) => {
         isGlobal: true,
         users: [],
         latestMessage: null,
-        groupAdmin: null,
+      groupAdmin: null,
+      pinnedMessageIds: [],
         createdAt: now,
         updatedAt: now,
       };
@@ -62,6 +64,7 @@ export const accessChats = async (req, res) => {
         users: [req.rootUserId, userId],
         latestMessage: null,
         groupAdmin: null,
+        pinnedMessageIds: [],
         createdAt: now,
         updatedAt: now,
       };
@@ -75,6 +78,7 @@ export const accessChats = async (req, res) => {
 
 export const fetchAllChats = async (req, res) => {
   const chats = await updateDatabase((database) => {
+    publishAndPruneMessages(database);
     if (!database.chats.some((chat) => chat.isGlobal)) {
       const now = new Date().toISOString();
       database.chats.push({
@@ -86,6 +90,7 @@ export const fetchAllChats = async (req, res) => {
         users: [],
         latestMessage: null,
         groupAdmin: null,
+        pinnedMessageIds: [],
         createdAt: now,
         updatedAt: now,
       });
@@ -129,6 +134,7 @@ export const creatGroup = async (req, res) => {
       users: uniqueUserIds,
       latestMessage: null,
       groupAdmin: req.rootUserId,
+      pinnedMessageIds: [],
       createdAt: now,
       updatedAt: now,
     };
@@ -192,3 +198,39 @@ export const removeFromGroup = async (req, res) => {
 
 export const removeContact = async (_req, res) =>
   res.status(501).json({ message: 'Not implemented' });
+
+const emptyFolders = () => ({ personal: [], work: [] });
+
+export const getChatFolders = async (req, res) => {
+  const database = await updateDatabase((data) => {
+    const user = findUser(data, req.rootUserId);
+    if (!user) return null;
+    user.chatFolders ||= emptyFolders();
+    return user.chatFolders;
+  });
+  if (!database) return res.status(404).json({ message: 'User not found' });
+  return res.status(200).json({ folders: database });
+};
+
+export const setChatFolder = async (req, res) => {
+  const { chatId, folder } = req.body;
+  if (!chatId || !['personal', 'work', 'none'].includes(folder)) {
+    return res.status(400).json({ message: 'Choose Personal, Work, or no folder.' });
+  }
+  const folders = await updateDatabase((database) => {
+    const user = findUser(database, req.rootUserId);
+    const chat = database.chats.find((item) => item._id === chatId);
+    if (!user || !canAccess(chat, req.rootUserId)) return null;
+    user.chatFolders ||= emptyFolders();
+    user.chatFolders.personal ||= [];
+    user.chatFolders.work ||= [];
+    Object.keys(user.chatFolders).forEach((key) => {
+      user.chatFolders[key] = user.chatFolders[key].filter((id) => id !== chatId);
+    });
+    if (folder !== 'none') user.chatFolders[folder].push(chatId);
+    user.updatedAt = new Date().toISOString();
+    return user.chatFolders;
+  });
+  if (!folders) return res.status(404).json({ message: 'Chat not found' });
+  return res.status(200).json({ folders });
+};

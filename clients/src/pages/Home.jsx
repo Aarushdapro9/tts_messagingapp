@@ -65,7 +65,13 @@ function Home() {
     }
     isValid()
 
-  }, [dispatch, activeUser])
+  }, [dispatch])
+
+  useEffect(() => {
+    const syncChats = () => dispatch(fetchChats())
+    const interval = window.setInterval(syncChats, 20_000)
+    return () => window.clearInterval(interval)
+  }, [dispatch])
 
 
   return (

@@ -6,21 +6,30 @@ const API = (token) =>
     headers: { Authorization: token },
   });
 export const sendMessage = async (body) => {
-  try {
-    const token = localStorage.getItem('userToken');
-    const { data } = await API(token).post('/api/message/', body);
-    return data;
-  } catch (error) {
-    console.log('error in sendmessage api' + error);
-  }
+  const token = localStorage.getItem('userToken');
+  const { data } = await API(token).post('/api/message/', body);
+  return data;
 };
 export const fetchMessages = async (id) => {
-  try {
-    const token = localStorage.getItem('userToken');
+  const token = localStorage.getItem('userToken');
+  const { data } = await API(token).get(`/api/message/${id}`);
+  return data;
+};
 
-    const { data } = await API(token).get(`/api/message/${id}`);
-    return data;
-  } catch (error) {
-    console.log('error in fetch Message API ' + error);
-  }
+export const createPoll = async (body) => {
+  const token = localStorage.getItem('userToken');
+  const { data } = await API(token).post('/api/message/poll', body);
+  return data;
+};
+
+export const voteOnPoll = async (messageId, optionId) => {
+  const token = localStorage.getItem('userToken');
+  const { data } = await API(token).post(`/api/message/${messageId}/poll/vote`, { optionId });
+  return data;
+};
+
+export const togglePinnedMessage = async (messageId) => {
+  const token = localStorage.getItem('userToken');
+  const { data } = await API(token).patch(`/api/message/${messageId}/pin`);
+  return data;
 };

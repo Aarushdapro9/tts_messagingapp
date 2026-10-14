@@ -99,9 +99,7 @@ export function findUser(database, id) {
 
 export function expandChat(database, chat) {
   if (!chat) return null;
-  const latestMessage = database.messages.find(
-    (message) => message._id === chat.latestMessage
-  );
+  const latestMessage = database.messages.find((message) => message._id === chat.latestMessage);
   return {
     ...chat,
     users: (chat.isGlobal ? database.users.map((user) => user._id) : chat.users)
@@ -116,9 +114,37 @@ export function expandMessage(database, message) {
   if (!message) return null;
   return {
     ...message,
+    pinned: Boolean(database.chats.find((chat) => chat._id === message.chatId)?.pinnedMessageIds?.includes(message._id)),
     sender: withoutPassword(findUser(database, message.sender)),
     chatId: expandChatWithoutLatestMessage(database, message.chatId),
   };
+}
+
+export function publishAndPruneMessages(database, now = new Date()) {
+  const nowTime = now.getTime();
+  for (const message of database.messages) {
+    if (!message.deliveredAt && message.scheduledFor && new Date(message.scheduledFor).getTime() <= nowTime) {
+      message.deliveredAt = now.toISOString();
+      if (message.expiresInMinutes) {
+        message.expiresAt = new Date(nowTime + message.expiresInMinutes * 60_000).toISOString();
+      }
+    }
+  }
+
+  const pinnedMessageIds = new Set(database.chats.flatMap((chat) => chat.pinnedMessageIds || []));
+  database.messages = database.messages.filter(
+    (message) => pinnedMessageIds.has(message._id) || !message.expiresAt || new Date(message.expiresAt).getTime() > nowTime
+  );
+
+  for (const chat of database.chats) {
+    const visibleMessages = database.messages
+      .filter((message) => message.chatId === chat._id && message.deliveredAt)
+      .sort((first, second) => new Date(second.deliveredAt) - new Date(first.deliveredAt));
+    chat.latestMessage = visibleMessages[0]?._id || null;
+    chat.pinnedMessageIds = (chat.pinnedMessageIds || []).filter((id) =>
+      database.messages.some((message) => message._id === id)
+    );
+  }
 }
 
 function expandChatWithoutLatestMessage(database, chatId) {
