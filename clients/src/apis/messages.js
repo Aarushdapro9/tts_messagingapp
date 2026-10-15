@@ -33,3 +33,9 @@ export const togglePinnedMessage = async (messageId) => {
   const { data } = await API(token).patch(`/api/message/${messageId}/pin`);
   return data;
 };
+
+export const deleteMessage = async (messageId) => {
+  const token = localStorage.getItem('userToken');
+  const { data } = await API(token).delete(`/api/message/${messageId}`);
+  return data;
+};

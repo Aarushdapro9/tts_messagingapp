@@ -1,10 +1,11 @@
 import express from "express";
 const router = express.Router();
-import { createPoll, getMessages, sendMessage, togglePin, voteOnPoll } from "../controllers/messageControllers.js";
-import { Auth } from "../middleware/user.js";
+import { createPoll, deleteMessage, getMessages, sendMessage, togglePin, voteOnPoll } from "../controllers/messageControllers.js";
+import { Admin, Auth } from "../middleware/user.js";
 router.post("/", Auth, sendMessage);
 router.post("/poll", Auth, createPoll);
 router.post("/:messageId/poll/vote", Auth, voteOnPoll);
 router.patch("/:messageId/pin", Auth, togglePin);
+router.delete("/:messageId", Auth, Admin, deleteMessage);
 router.get("/:chatId", Auth, getMessages);
 export default router;

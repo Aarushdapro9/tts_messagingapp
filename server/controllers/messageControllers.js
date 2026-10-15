@@ -131,3 +131,17 @@ export const togglePin = async (req, res) => {
   if (!result) return res.status(404).json({ message: 'Message not found.' });
   return res.status(200).json(result);
 };
+
+export const deleteMessage = async (req, res) => {
+  const removed = await updateDatabase((database) => {
+    const messageIndex = database.messages.findIndex((item) => item._id === req.params.messageId);
+    if (messageIndex < 0) return null;
+    const [message] = database.messages.splice(messageIndex, 1);
+    const chat = database.chats.find((item) => item._id === message.chatId);
+    if (chat) chat.updatedAt = new Date().toISOString();
+    publishAndPruneMessages(database);
+    return { _id: message._id, chatId: message.chatId };
+  });
+  if (!removed) return res.status(404).json({ message: 'Message not found.' });
+  return res.status(200).json({ message: 'Message deleted.', removed });
+};

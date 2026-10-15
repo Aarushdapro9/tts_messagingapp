@@ -45,18 +45,44 @@ export const Auth = async (req, res, next) => {
   }
 };
 
-export const isAdminEmail = (email) => {
-  const allowedEmails = (process.env.ADMIN_EMAILS || '')
+function configuredEmails(variableName) {
+  return (process.env[variableName] || '')
     .split(',')
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
+}
+
+export const isAdminEmail = (email) => {
+  const allowedEmails = configuredEmails('ADMIN_EMAILS');
 
   return allowedEmails.includes(email?.toLowerCase());
 };
 
+export const isOwnerEmail = (email) => {
+  const ownerEmail = configuredEmails('OWNER_EMAIL')[0] || configuredEmails('ADMIN_EMAILS')[0];
+  return Boolean(ownerEmail && ownerEmail === email?.toLowerCase());
+};
+
+export const isAdminUser = (user) =>
+  Boolean(user && (isOwnerEmail(user.email) || isAdminEmail(user.email) || user.isAdmin));
+
+export const getUserTitle = (user) => {
+  if (isOwnerEmail(user?.email)) return 'Owner';
+  const customTitle = typeof user?.title === 'string' ? user.title.trim() : '';
+  if (customTitle) return customTitle;
+  return isAdminUser(user) ? 'Administrator' : 'Member';
+};
+
 export const Admin = (req, res, next) => {
-  if (!isAdminEmail(req.rootUser?.email)) {
+  if (!isAdminUser(req.rootUser)) {
     return res.status(403).json({ error: 'Administrator access is required' });
+  }
+  return next();
+};
+
+export const Owner = (req, res, next) => {
+  if (!isOwnerEmail(req.rootUser?.email)) {
+    return res.status(403).json({ error: 'Owner access is required' });
   }
   return next();
 };

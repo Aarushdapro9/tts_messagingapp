@@ -10,7 +10,7 @@ import Model from '../components/Model'
 import MessageHistory from '../components/MessageHistory'
 import Loading from '../components/ui/Loading'
 import Typing from '../components/ui/Typing'
-import { createPoll, fetchMessages, sendMessage, togglePinnedMessage, voteOnPoll } from '../apis/messages'
+import { createPoll, deleteMessage, fetchMessages, sendMessage, togglePinnedMessage, voteOnPoll } from '../apis/messages'
 import { fetchChats, setActiveChat, setNotifications } from '../redux/chatsSlice'
 import { getChatName } from '../utils/logics'
 import './home.css'
@@ -152,6 +152,17 @@ function Chat({ className }) {
     }
   }
 
+  const onDeleteMessage = async (messageId) => {
+    if (!window.confirm('Delete this message for everyone?')) return
+    try {
+      await deleteMessage(messageId)
+      setMessages((current) => current.filter((item) => item._id !== messageId))
+      dispatch(fetchChats())
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to delete the message.')
+    }
+  }
+
   const onType = (event) => {
     setMessage(event.target.value)
     if (!socketRef.current || typing || !activeChat?._id) return
@@ -167,7 +178,7 @@ function Chat({ className }) {
   if (loading) return <div className={className}><Loading /></div>
 
   if (!activeChat) {
-    return <div className={`${className} flex items-center justify-center`}><div className='flex flex-col items-center justify-center gap-y-3 px-5 text-center'><img className='w-[50px] h-[50px] rounded-[25px]' alt='User profile' src={activeUser.profilePic} /><h3 className='text-[#111b21] text-[20px] font-medium tracking-wider'>Welcome <span className='text-[#166e48] text-[19px] font-bold'>{activeUser.name}</span></h3><p className='max-w-sm text-sm text-[#607166]'>Your chats, folders, pins, and scheduled messages sync with this account on every device.</p></div></div>
+    return <div className={`${className} flex items-center justify-center`}><div className='flex flex-col items-center justify-center gap-y-3 px-5 text-center'><img className='w-[50px] h-[50px] rounded-[25px]' alt='User profile' src={activeUser.profilePic} /><h3 className='text-[#111b21] text-[20px] font-medium tracking-wider'>Welcome <span className='text-[#166e48] text-[19px] font-bold'>{activeUser.name}</span></h3>{activeUser.title && <span className='rounded-full bg-[#e8f7ef] px-3 py-1 text-xs font-bold text-[#166e48]'>{activeUser.title}</span>}<p className='max-w-sm text-sm text-[#607166]'>Your chats, folders, pins, and scheduled messages sync with this account on every device.</p></div></div>
   }
 
   return <div className={className}>
@@ -177,7 +188,7 @@ function Chat({ className }) {
     </div>
     {pinnedMessages.length > 0 && <div className='mx-3 mt-2 rounded-lg border border-[#cfe7dc] bg-[#f1fbf6] px-3 py-2 text-xs text-[#295743]'><b>📌 Pinned</b> · {pinnedMessages.map((item) => item.type === 'poll' ? 'Poll' : item.message).join(' · ')}</div>}
     <div className='scrollbar-hide w-full h-[calc(100dvh-205px)] md:h-[calc(100dvh-155px)] flex flex-col overflow-y-scroll p-3 md:p-4'>
-      <MessageHistory messages={messages} onVote={onVote} onTogglePin={onTogglePin} />
+      <MessageHistory messages={messages} onVote={onVote} onTogglePin={onTogglePin} canDelete={activeUser.isAdmin} onDelete={onDeleteMessage} />
       <div className='ml-7 -mb-10'>{isTyping ? <Typing width='100' height='100' /> : null}</div>
     </div>
     <div className='absolute left-3 right-3 bottom-3 md:left-[31%] md:right-auto md:bottom-[8%]'>

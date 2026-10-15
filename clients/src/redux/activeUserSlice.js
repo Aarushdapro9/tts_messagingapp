@@ -7,6 +7,8 @@ const initialState = {
   bio: '',
   name: '',
   isAdmin: false,
+  isOwner: false,
+  title: 'Member',
 };
 
 const activeUserSlice = createSlice({
@@ -20,6 +22,8 @@ const activeUserSlice = createSlice({
       state.bio = payload.bio;
       state.name = payload.name;
       state.isAdmin = Boolean(payload.isAdmin);
+      state.isOwner = Boolean(payload.isOwner);
+      state.title = payload.title || (payload.isAdmin ? 'Administrator' : 'Member');
     },
     setUserNameAndBio: (state, { payload }) => {
       state.name = payload.name;

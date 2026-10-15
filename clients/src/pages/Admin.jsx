@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { getAdminChatMessages, getAdminOverview } from '../apis/admin';
+import { getAdminChatMessages, getAdminOverview, updateUserRole } from '../apis/admin';
 
 function chatName(chat) {
   if (chat.isGlobal) return 'Global Chat';
@@ -21,6 +21,8 @@ function Admin() {
   const [loading, setLoading] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [query, setQuery] = useState('');
+  const [roleDrafts, setRoleDrafts] = useState({});
+  const [savingUserId, setSavingUserId] = useState('');
 
   const loadOverview = useCallback(async () => {
     setLoading(true);
@@ -62,34 +64,76 @@ function Admin() {
     }
   }, []);
 
+  const changeRoleDraft = (user, changes) => {
+    setRoleDrafts((current) => ({
+      ...current,
+      [user._id]: {
+        title: user.title || 'Member',
+        isAdmin: Boolean(user.isAdmin),
+        ...current[user._id],
+        ...changes,
+      },
+    }));
+  };
+
+  const saveRole = async (user) => {
+    const role = roleDrafts[user._id] || {
+      title: user.title || 'Member',
+      isAdmin: Boolean(user.isAdmin),
+    };
+    setSavingUserId(user._id);
+    try {
+      const data = await updateUserRole(user._id, role);
+      setOverview((current) => ({
+        ...current,
+        users: current.users.map((item) => item._id === user._id ? data.user : item),
+      }));
+      setRoleDrafts((current) => {
+        const next = { ...current };
+        delete next[user._id];
+        return next;
+      });
+      toast.success('Role updated.');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to update this role.');
+    } finally {
+      setSavingUserId('');
+    }
+  };
+
   if (loading) {
-    return <div className="min-h-[100dvh] bg-[#121418] text-white flex items-center justify-center">Loading admin panel…</div>;
+    return <div className="flex min-h-[100dvh] items-center justify-center bg-[#121418] text-white">Loading admin panel…</div>;
   }
 
+  const canManageRoles = Boolean(overview?.capabilities?.canManageRoles);
+
   return (
-    <main className="min-h-[100dvh] bg-[#121418] text-white px-4 py-6 sm:p-8">
-      <div className="max-w-6xl mx-auto">
-        <header className="flex flex-wrap gap-4 items-center justify-between mb-7">
-          <div><p className="text-[#48cda1] text-sm font-bold tracking-wide">RESTRICTED ACCESS</p><h1 className="text-3xl font-extrabold">Admin panel</h1></div>
-          <div className="flex gap-3"><button onClick={loadOverview} className="border border-[#536070] px-4 py-2 rounded-lg">Refresh</button><Link to="/chats" className="bg-[#48cda1] text-[#111b21] font-bold px-4 py-2 rounded-lg">Open chats</Link></div>
+    <main className="min-h-[100dvh] bg-[#121418] px-4 py-6 text-white sm:p-8">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-7 flex flex-wrap items-center justify-between gap-4">
+          <div><p className="text-sm font-bold tracking-wide text-[#48cda1]">RESTRICTED ACCESS</p><h1 className="text-3xl font-extrabold">Admin panel</h1></div>
+          <div className="flex gap-3"><button onClick={loadOverview} className="rounded-lg border border-[#536070] px-4 py-2">Refresh</button><Link to="/chats" className="rounded-lg bg-[#48cda1] px-4 py-2 font-bold text-[#111b21]">Open chats</Link></div>
         </header>
 
-        <p className="bg-[#242a32] border border-[#3b4653] text-[#d6dce5] rounded-lg p-4 mb-6 text-sm">Passwords are never shown or retrievable. This view is for account and conversation moderation; keep access limited to trusted administrators.</p>
+        <p className="mb-6 rounded-lg border border-[#3b4653] bg-[#242a32] p-4 text-sm text-[#d6dce5]">Passwords are never shown or retrievable. {canManageRoles ? 'As Owner, you can set display titles and choose which accounts are administrators.' : 'This view is for account and conversation moderation; keep access limited to trusted administrators.'}</p>
 
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-7">
-          <div className="bg-[#1d232b] rounded-xl p-5"><p className="text-[#9eabba] text-sm">Users</p><p className="text-3xl font-extrabold mt-1">{overview?.users.length || 0}</p></div>
-          <div className="bg-[#1d232b] rounded-xl p-5"><p className="text-[#9eabba] text-sm">Conversations</p><p className="text-3xl font-extrabold mt-1">{overview?.chats.length || 0}</p></div>
-          <div className="bg-[#1d232b] rounded-xl p-5"><p className="text-[#9eabba] text-sm">Private chats</p><p className="text-3xl font-extrabold mt-1">{overview?.chats.filter((chat) => !chat.isGlobal && !chat.isGroup).length || 0}</p></div>
+        <section className="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Users</p><p className="mt-1 text-3xl font-extrabold">{overview?.users.length || 0}</p></div>
+          <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Conversations</p><p className="mt-1 text-3xl font-extrabold">{overview?.chats.length || 0}</p></div>
+          <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Private chats</p><p className="mt-1 text-3xl font-extrabold">{overview?.chats.filter((chat) => !chat.isGlobal && !chat.isGroup).length || 0}</p></div>
         </section>
 
-        <section className="bg-[#1d232b] rounded-xl overflow-hidden mb-7">
-          <div className="p-5 border-b border-[#323b47] flex flex-wrap justify-between gap-3"><h2 className="font-bold text-xl">Users</h2><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or email" className="bg-[#121418] rounded-lg px-3 py-2 text-sm outline-none w-full sm:w-64" /></div>
-          <div className="overflow-x-auto"><table className="w-full text-left min-w-[580px]"><thead className="text-[#9eabba] text-xs uppercase"><tr><th className="p-4">Name</th><th className="p-4">Email</th><th className="p-4">Bio</th><th className="p-4">Joined</th></tr></thead><tbody>{visibleUsers.map((user) => <tr key={user._id} className="border-t border-[#323b47] text-sm"><td className="p-4 font-semibold">{user.name}</td><td className="p-4 text-[#c5ced9]">{user.email}</td><td className="p-4 text-[#c5ced9]">{user.bio || '—'}</td><td className="p-4 text-[#9eabba]">{formatDate(user.createdAt)}</td></tr>)}</tbody></table></div>
+        <section className="mb-7 overflow-hidden rounded-xl bg-[#1d232b]">
+          <div className="flex flex-wrap justify-between gap-3 border-b border-[#323b47] p-5"><h2 className="text-xl font-bold">Users</h2><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or email" className="w-full rounded-lg bg-[#121418] px-3 py-2 text-sm outline-none sm:w-64" /></div>
+          <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-left"><thead className="text-xs uppercase text-[#9eabba]"><tr><th className="p-4">Name</th><th className="p-4">Email</th><th className="p-4">Title</th><th className="p-4">Access</th><th className="p-4">Joined</th><th className="p-4">Actions</th></tr></thead><tbody>{visibleUsers.map((user) => {
+            const draft = roleDrafts[user._id] || { title: user.title || 'Member', isAdmin: Boolean(user.isAdmin) };
+            return <tr key={user._id} className="border-t border-[#323b47] text-sm"><td className="p-4 font-semibold">{user.name}</td><td className="p-4 text-[#c5ced9]">{user.email}</td><td className="p-4">{canManageRoles && !user.isOwner ? <input value={draft.title} maxLength="32" onChange={(event) => changeRoleDraft(user, { title: event.target.value })} className="w-32 rounded bg-[#121418] px-2 py-1 text-sm outline-none" /> : <span>{user.title}</span>}</td><td className="p-4">{user.isOwner ? <span className="rounded-full bg-[#f4c95d] px-2 py-1 text-xs font-bold text-[#29220d]">Owner</span> : canManageRoles ? <label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={draft.isAdmin} onChange={(event) => changeRoleDraft(user, { isAdmin: event.target.checked })} /> Administrator</label> : user.isAdmin ? <span className="text-[#48cda1]">Administrator</span> : <span className="text-[#9eabba]">Member</span>}</td><td className="p-4 text-[#9eabba]">{formatDate(user.createdAt)}</td><td className="p-4">{canManageRoles && !user.isOwner ? <button onClick={() => saveRole(user)} disabled={savingUserId === user._id} className="rounded bg-[#48cda1] px-3 py-1 text-xs font-bold text-[#111b21] disabled:opacity-50">{savingUserId === user._id ? 'Saving…' : 'Save'}</button> : '—'}</td></tr>;
+          })}</tbody></table></div>
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-7">
-          <div className="bg-[#1d232b] rounded-xl overflow-hidden"><div className="p-5 border-b border-[#323b47]"><h2 className="font-bold text-xl">Conversations</h2><p className="text-sm text-[#9eabba] mt-1">Open a conversation to view its messages.</p></div><div className="max-h-[540px] overflow-y-auto">{overview?.chats.map((chat) => <button key={chat._id} onClick={() => openChat(chat)} className={`w-full text-left p-4 border-b border-[#323b47] hover:bg-[#27313c] ${selectedChat?._id === chat._id ? 'bg-[#27313c]' : ''}`}><p className="font-semibold">{chatName(chat)}</p><p className="text-xs text-[#9eabba] mt-1">{chat.isGlobal ? 'Global' : chat.isGroup ? 'Group' : 'Private'} · {chat.users?.length || 0} members</p></button>)}</div></div>
-          <div className="bg-[#1d232b] rounded-xl overflow-hidden"><div className="p-5 border-b border-[#323b47]"><h2 className="font-bold text-xl">{selectedChat ? chatName(selectedChat) : 'Conversation'}</h2><p className="text-sm text-[#9eabba] mt-1">{selectedChat ? 'Moderation view' : 'Choose a conversation on the left.'}</p></div><div className="p-5 max-h-[540px] overflow-y-auto">{loadingMessages ? <p className="text-[#9eabba]">Loading messages…</p> : selectedChat ? messages.length ? messages.map((message) => <article key={message._id} className="mb-4"><p className="text-xs text-[#48cda1] font-bold">{message.sender?.name || 'Unknown'} <span className="text-[#9eabba] font-normal">· {formatDate(message.createdAt)}</span></p><p className="bg-[#121418] rounded-lg p-3 mt-1 text-sm whitespace-pre-wrap">{message.message}</p></article>) : <p className="text-[#9eabba]">No messages in this conversation.</p> : <p className="text-[#9eabba]">No conversation selected.</p>}</div></div>
+        <section className="grid grid-cols-1 gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="overflow-hidden rounded-xl bg-[#1d232b]"><div className="border-b border-[#323b47] p-5"><h2 className="text-xl font-bold">Conversations</h2><p className="mt-1 text-sm text-[#9eabba]">Open a conversation to view its messages.</p></div><div className="max-h-[540px] overflow-y-auto">{overview?.chats.map((chat) => <button key={chat._id} onClick={() => openChat(chat)} className={`w-full border-b border-[#323b47] p-4 text-left hover:bg-[#27313c] ${selectedChat?._id === chat._id ? 'bg-[#27313c]' : ''}`}><p className="font-semibold">{chatName(chat)}</p><p className="mt-1 text-xs text-[#9eabba]">{chat.isGlobal ? 'Global' : chat.isGroup ? 'Group' : 'Private'} · {chat.users?.length || 0} members</p></button>)}</div></div>
+          <div className="overflow-hidden rounded-xl bg-[#1d232b]"><div className="border-b border-[#323b47] p-5"><h2 className="text-xl font-bold">{selectedChat ? chatName(selectedChat) : 'Conversation'}</h2><p className="mt-1 text-sm text-[#9eabba]">{selectedChat ? 'Moderation view' : 'Choose a conversation on the left.'}</p></div><div className="max-h-[540px] overflow-y-auto p-5">{loadingMessages ? <p className="text-[#9eabba]">Loading messages…</p> : selectedChat ? messages.length ? messages.map((message) => <article key={message._id} className="mb-4"><p className="text-xs font-bold text-[#48cda1]">{message.sender?.name || 'Unknown'} {message.sender?.title && message.sender.title !== 'Member' ? `· ${message.sender.title}` : ''} <span className="font-normal text-[#9eabba]">· {formatDate(message.createdAt)}</span></p><p className="mt-1 whitespace-pre-wrap rounded-lg bg-[#121418] p-3 text-sm">{message.message}</p></article>) : <p className="text-[#9eabba]">No messages in this conversation.</p> : <p className="text-[#9eabba]">No conversation selected.</p>}</div></div>
         </section>
       </div>
     </main>

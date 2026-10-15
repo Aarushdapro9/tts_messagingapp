@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
-import { isAdminEmail } from '../middleware/user.js';
+import { getUserTitle, isAdminUser, isOwnerEmail } from '../middleware/user.js';
 import {
   createId,
   findUser,
@@ -47,6 +47,8 @@ export const register = async (req, res) => {
         bio: 'Available',
         profilePic: defaultProfilePic,
         contacts: [],
+        title: 'Member',
+        isAdmin: false,
         createdAt: now,
         updatedAt: now,
       };
@@ -83,11 +85,29 @@ export const login = async (req, res) => {
   }
 };
 
-export const validUser = async (req, res) =>
-  res.status(200).json({
-    user: { ...withoutPassword(req.rootUser), isAdmin: isAdminEmail(req.rootUser.email) },
+export const validUser = async (req, res) => {
+  const account = await updateDatabase((database) => {
+    const storedAccount = findUser(database, req.rootUserId);
+    if (!storedAccount) return null;
+    if (isOwnerEmail(storedAccount.email)) {
+      storedAccount.title = 'Owner';
+      storedAccount.isAdmin = true;
+    } else if (!storedAccount.title) {
+      storedAccount.title = 'Member';
+    }
+    return storedAccount;
+  });
+  if (!account) return res.status(401).json({ error: 'Invalid token' });
+  return res.status(200).json({
+    user: {
+      ...withoutPassword(account),
+      title: getUserTitle(account),
+      isAdmin: isAdminUser(account),
+      isOwner: isOwnerEmail(account.email),
+    },
     token: req.token,
   });
+};
 
 export const googleAuth = async (req, res) => {
   try {
@@ -118,6 +138,8 @@ export const googleAuth = async (req, res) => {
         bio: 'Available',
         profilePic: picture || defaultProfilePic,
         contacts: [],
+        title: 'Member',
+        isAdmin: false,
         createdAt: now,
         updatedAt: now,
       };

@@ -60,6 +60,8 @@ function Home() {
         bio: data?.user?.bio,
         name: data?.user?.name,
         isAdmin: data?.user?.isAdmin,
+        isOwner: data?.user?.isOwner,
+        title: data?.user?.title,
       }
       dispatch(setActiveUser(user))
     }
@@ -92,7 +94,7 @@ function Home() {
                     </a>
                   </div>
                   <div className='absolute top-4 right-5 flex items-center gap-x-3'>
-                    {activeUser?.isAdmin ? <a href='/admin' className='text-[11px] font-bold text-[#166e48] border border-[#9dd8c0] rounded px-2 py-1'>Admin</a> : null}
+                    {activeUser?.isAdmin ? <a href='/admin' className='text-[11px] font-bold text-[#166e48] border border-[#9dd8c0] rounded px-2 py-1'>{activeUser.isOwner ? 'Owner' : 'Admin'}</a> : null}
                     <button onClick={() => dispatch(setShowNotifications(!showNotifications))}>
                       <NotificationBadge
                         count={notifications.length}

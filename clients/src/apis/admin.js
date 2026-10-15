@@ -13,3 +13,6 @@ export const getAdminOverview = async () => (await adminApi().get('/api/admin'))
 
 export const getAdminChatMessages = async (chatId) =>
   (await adminApi().get(`/api/admin/chats/${chatId}/messages`)).data;
+
+export const updateUserRole = async (userId, role) =>
+  (await adminApi().patch(`/api/admin/users/${userId}/role`, role)).data;
