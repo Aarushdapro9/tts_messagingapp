@@ -45,6 +45,9 @@ export const updateUserRole = async (req, res) => {
   if (!title || title.length > 32) {
     return res.status(400).json({ message: 'A title between 1 and 32 characters is required.' });
   }
+  if (title.toLowerCase() === 'owner') {
+    return res.status(400).json({ message: 'Owner is a reserved title.' });
+  }
 
   const account = await updateDatabase((database) => {
     const storedAccount = findUser(database, req.params.userId);

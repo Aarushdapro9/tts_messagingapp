@@ -10,6 +10,7 @@ import Model from '../components/Model'
 import MessageHistory from '../components/MessageHistory'
 import Loading from '../components/ui/Loading'
 import Typing from '../components/ui/Typing'
+import RankBadge from '../components/RankBadge'
 import { createPoll, deleteMessage, fetchMessages, sendMessage, togglePinnedMessage, voteOnPoll } from '../apis/messages'
 import { fetchChats, setActiveChat, setNotifications } from '../redux/chatsSlice'
 import { getChatName } from '../utils/logics'
@@ -178,7 +179,7 @@ function Chat({ className }) {
   if (loading) return <div className={className}><Loading /></div>
 
   if (!activeChat) {
-    return <div className={`${className} flex items-center justify-center`}><div className='flex flex-col items-center justify-center gap-y-3 px-5 text-center'><img className='w-[50px] h-[50px] rounded-[25px]' alt='User profile' src={activeUser.profilePic} /><h3 className='text-[#111b21] text-[20px] font-medium tracking-wider'>Welcome <span className='text-[#166e48] text-[19px] font-bold'>{activeUser.name}</span></h3>{activeUser.title && <span className='rounded-full bg-[#e8f7ef] px-3 py-1 text-xs font-bold text-[#166e48]'>{activeUser.title}</span>}<p className='max-w-sm text-sm text-[#607166]'>Your chats, folders, pins, and scheduled messages sync with this account on every device.</p></div></div>
+    return <div className={`${className} flex items-center justify-center`}><div className='flex flex-col items-center justify-center gap-y-3 px-5 text-center'><img className='w-[50px] h-[50px] rounded-[25px]' alt='User profile' src={activeUser.profilePic} /><h3 className='text-[#111b21] text-[20px] font-medium tracking-wider'>Welcome <span className='text-[#166e48] text-[19px] font-bold'>{activeUser.name}</span></h3><RankBadge title={activeUser.title} /><p className='max-w-sm text-sm text-[#607166]'>Your chats, folders, pins, and scheduled messages sync with this account on every device.</p></div></div>
   }
 
   return <div className={className}>

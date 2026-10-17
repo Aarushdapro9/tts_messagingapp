@@ -21,6 +21,7 @@ import { Effect } from "react-notification-badge"
 // import NotificationBadge from 'react-notification-badge/lib/components/NotificationBadge';
 import NotificationBadge from 'react-notification-badge';
 import Search from '../components/group/Search'
+import UserProfileDialog from '../components/UserProfileDialog'
 function Home() {
   const dispatch = useDispatch()
   const { showProfile, showNotifications } = useSelector((state) => state.profile)
@@ -184,6 +185,7 @@ function Home() {
 
         </div>
       </div >
+      <UserProfileDialog />
 
     </>
   )

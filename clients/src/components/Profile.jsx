@@ -7,6 +7,7 @@ import InputEdit from './profile/InputEdit'
 import { updateUser } from '../apis/auth'
 import { toast } from 'react-toastify'
 import { setUserNameAndBio } from '../redux/activeUserSlice'
+import RankBadge from './RankBadge'
 function Profile(props) {
   const dispatch = useDispatch()
   const { showProfile } = useSelector((state) => state.profile)
@@ -44,6 +45,7 @@ function Profile(props) {
         <div className=' pt-5'>
           <div className='flex items-center flex-col'>
             <img className='w-[150px] h-[150px] rounded-[100%] -ml-5' src={activeUser?.profilePic} alt="" />
+            <RankBadge title={activeUser?.title} className='mt-3' />
           </div>
           <InputEdit type="name" handleChange={handleChange} input={formData.name} handleSubmit={submit} />
 

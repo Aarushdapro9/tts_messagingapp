@@ -3,7 +3,10 @@ import { useSelector } from 'react-redux'
 import ScrollableFeed from 'react-scrollable-feed'
 import { Tooltip } from '@chakra-ui/tooltip'
 import { Avatar } from '@chakra-ui/avatar'
+import { useDispatch } from 'react-redux'
 import { isSameSender, isSameSenderMargin, isSameUser, isLastMessage } from '../utils/logics'
+import { setSelectedUser } from '../redux/profileSlice'
+import RankBadge from './RankBadge'
 import '../pages/home.css'
 
 function Poll({ message, activeUser, onVote }) {
@@ -18,14 +21,15 @@ function Poll({ message, activeUser, onVote }) {
 
 function MessageHistory({ messages, onVote, onTogglePin, canDelete, onDelete }) {
   const activeUser = useSelector((state) => state.activeUser)
+  const dispatch = useDispatch()
   return <ScrollableFeed className='scrollbar-hide'>
     {messages?.map((message, index) => {
       const mine = message.sender?._id === activeUser.id
       return <div className='flex items-center gap-x-[6px]' key={message._id}>
-        {(isSameSender(messages, message, index, activeUser.id) || isLastMessage(messages, index, activeUser.id)) && <Tooltip label={message.sender?.name} placement='bottom-start' hasArrow><Avatar style={{ width: '32px', height: '32px' }} mt='43px' mr={1} cursor='pointer' name={message.sender?.name} src={message.sender?.profilePic} borderRadius='25px' /></Tooltip>}
+        {(isSameSender(messages, message, index, activeUser.id) || isLastMessage(messages, index, activeUser.id)) && <Tooltip label={`View ${message.sender?.name}'s profile`} placement='bottom-start' hasArrow><button type='button' onClick={() => dispatch(setSelectedUser(message.sender))} className='mt-[43px] mr-1 rounded-full focus:outline-none focus:ring-2 focus:ring-[#319268]' aria-label={`View ${message.sender?.name}'s profile`}><Avatar style={{ width: '32px', height: '32px' }} cursor='pointer' name={message.sender?.name} src={message.sender?.profilePic} borderRadius='25px' /></button></Tooltip>}
         <div className='relative tracking-wider text-[15px] font-medium' style={{ backgroundColor: mine ? '#268d61' : '#f0f0f0', marginLeft: isSameSenderMargin(messages, message, index, activeUser.id), marginTop: isSameUser(messages, message, index) ? 3 : 10, borderRadius: mine ? '10px 10px 0 10px' : '10px 10px 10px 0', padding: '10px 18px', maxWidth: '460px', color: mine ? '#fff' : '#54565a' }}>
           {message.pinned && <span className='mr-1 text-xs'>📌</span>}
-          {message.sender?.title && message.sender.title !== 'Member' && <p className='mb-1 text-[10px] font-bold opacity-80'>{message.sender.title}</p>}
+          <RankBadge title={message.sender?.title} className='mb-1' />
           {message.scheduledFor && !message.deliveredAt ? <p className='mb-1 text-[10px] opacity-75'>Scheduled for {new Date(message.scheduledFor).toLocaleString()}</p> : null}
           {message.type === 'poll' ? <Poll message={message} activeUser={activeUser} onVote={onVote} /> : message.message}
           {message.expiresAt && <p className='mt-1 text-[10px] opacity-70'>Disappears {new Date(message.expiresAt).toLocaleString()}</p>}

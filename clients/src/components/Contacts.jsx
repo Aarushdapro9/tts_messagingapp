@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchChats, setActiveChat } from '../redux/chatsSlice'
 import { getChatName, getChatPhoto, timeSince } from '../utils/logics'
 import { getChatFolders, updateChatFolder } from '../apis/chat'
+import { setSelectedUser } from '../redux/profileSlice'
 import NoContacts from './ui/NoContacts'
 
 const aDay = 24 * 60 * 60 * 1000
@@ -52,10 +53,12 @@ function Contacts() {
         ))}
       </div>
       <div className='flex flex-col -space-y-1 overflow-y-scroll scrollbar-hide h-[calc(100dvh-190px)] md:h-[calc(100dvh-180px)] pb-10'>
-        {visibleChats?.length > 0 ? visibleChats.map((chat) => (
+        {visibleChats?.length > 0 ? visibleChats.map((chat) => {
+          const profileUser = !chat.isGlobal && !chat.isGroup ? chat.users?.find((user) => user._id !== activeUser.id) : null
+          return (
           <div onClick={() => dispatch(setActiveChat(chat))} key={chat._id} className={`flex items-center justify-between gap-x-1 mt-3 ${activeChat?._id === chat._id ? 'bg-[#fafafa]' : 'bg-[#fff]'} cursor-pointer py-3 px-2`}>
             <div className='flex min-w-0 items-center gap-x-3'>
-              <img className='w-11 h-11 rounded-[30px] shadow-lg object-cover' src={getChatPhoto(chat, activeUser)} alt="" />
+              {profileUser ? <button type="button" onClick={(event) => { event.stopPropagation(); dispatch(setSelectedUser(profileUser)) }} className="rounded-full focus:outline-none focus:ring-2 focus:ring-[#319268]" aria-label={`View ${profileUser.name}'s profile`}><img className='w-11 h-11 rounded-[30px] shadow-lg object-cover' src={getChatPhoto(chat, activeUser)} alt="" /></button> : <img className='w-11 h-11 rounded-[30px] shadow-lg object-cover' src={getChatPhoto(chat, activeUser)} alt="" />}
               <div className="min-w-0">
                 <h5 className='truncate text-[14px] sm:text-[16px] text-[#2b2e33] font-bold'>{getChatName(chat, activeUser)}</h5>
                 <p className='truncate text-[12px] sm:text-[13px] font-medium text-[#56585c]'>{chat.latestMessage?.type === 'poll' ? 'Poll' : chat.latestMessage?.message || 'No messages yet'}</p>
@@ -68,7 +71,7 @@ function Contacts() {
               </select>}
             </div>
           </div>
-        )) : <NoContacts />}
+        )}) : <NoContacts />}
       </div>
     </>
   )

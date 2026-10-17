@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   showProfile: false,
   showNotifications: false,
+  selectedUser: null,
 };
 const profileSlice = createSlice({
   name: "profile",
@@ -13,7 +14,10 @@ const profileSlice = createSlice({
     setShowNotifications: (state, { payload }) => {
       state.showNotifications = payload;
     },
+    setSelectedUser: (state, { payload }) => {
+      state.selectedUser = payload;
+    },
   },
 });
-export const { setShowProfile, setShowNotifications } = profileSlice.actions;
+export const { setShowProfile, setShowNotifications, setSelectedUser } = profileSlice.actions;
 export default profileSlice.reducer;
