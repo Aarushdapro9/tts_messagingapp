@@ -9,6 +9,7 @@ import { addToGroup, removeUser, renameGroup } from '../apis/chat';
 import { fetchChats } from '../redux/chatsSlice';
 import Search from './group/Search';
 import { getChatName, getChatPhoto } from '../utils/logics';
+import { setSelectedUser } from '../redux/profileSlice';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -31,6 +32,11 @@ function Model(props) {
   const activeUser = useSelector((state) => state.activeUser)
 
   const handleOpen = () => {
+    if (!activeChat?.isGroup) {
+      const otherUser = activeChat?.users?.find((user) => user._id !== activeUser.id)
+      if (otherUser) dispatch(setSelectedUser(otherUser))
+      return
+    }
     setOpen(true);
     setName(getChatName(activeChat, activeUser))
   };
@@ -116,9 +122,9 @@ function Model(props) {
                   {
                     members.length > 0 && members?.map((e) => {
                       return (
-                        <button button className='flex items-center gap-x-1 bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-green-400 border border-green-400' >
+                        <button key={e._id} type='button' onClick={() => { dispatch(setSelectedUser(e)); handleClose() }} className='flex items-center gap-x-1 bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-green-400 border border-green-400' >
                           <span className='text-[10px]'>{e._id === activeUser.id ? "You" : e.name}</span>
-                          <RxCross2 onClick={() => deleteSelected(e)} />
+                          <RxCross2 onClick={(event) => { event.stopPropagation(); deleteSelected(e) }} />
                         </button>
                       )
                     })

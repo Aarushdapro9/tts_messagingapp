@@ -1,10 +1,11 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import SkeletonLoading from '../ui/SkeletonLoading'
 import { setSelectedUser } from '../../redux/profileSlice'
 import "../../pages/home.css"
 function Search({ type, isLoading, searchResults, handleClick, search, alwaysVisible = false }) {
   const dispatch = useDispatch()
+  const activeUser = useSelector((state) => state.activeUser)
 
   return (
     <div className={`${search || alwaysVisible ? "scrollbar-hide overflow-y-scroll h-[250px] mb-5 bg-[#fff] flex flex-col gap-y-3 pt-3" : "hidden"}`}>
@@ -22,7 +23,7 @@ function Search({ type, isLoading, searchResults, handleClick, search, alwaysVis
                     <h5 className='text-[12px] text-[#68737c] tracking-wide font-normal'>{e.email}</h5>
                   </div>
                 </button>
-                <button onClick={() => handleClick(e)} className='bg-[#0086ea] px-3 py-2 text-[10.6px] tracking-wide text-[#fff]'>Add</button>
+                {activeUser.approved !== false && <button onClick={() => handleClick(e)} className='bg-[#0086ea] px-3 py-2 text-[10.6px] tracking-wide text-[#fff]'>Add</button>}
               </div>
             )
           }) : <span className='text-[13px]'>No results found</span>

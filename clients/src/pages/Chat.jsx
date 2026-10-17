@@ -183,6 +183,7 @@ function Chat({ className }) {
   }
 
   return <div className={className}>
+    {activeUser.approved === false && <div className='bg-[#fff4d6] px-4 py-2 text-center text-xs font-semibold text-[#835500]'>Your account is pending Owner approval. You can only message the Owner until approved.</div>}
     <div className='flex justify-between items-center px-4 md:px-5 h-[61px] bg-[#ffff] w-full'>
       <div className='flex items-center gap-x-[10px]'><button onClick={() => dispatch(setActiveChat(null))} className='md:hidden text-[#319268] p-1 -ml-1' aria-label='Back to chats'><BiArrowBack className='w-6 h-6' /></button><h5 className='text-[17px] text-[#2b2e33] font-bold tracking-wide'>{getChatName(activeChat, activeUser)}</h5></div>
       {!activeChat.isGlobal && <Model />}

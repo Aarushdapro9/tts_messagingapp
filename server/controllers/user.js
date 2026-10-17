@@ -19,6 +19,33 @@ function createToken(account) {
   });
 }
 
+function createOnboardingChat(database, account, now) {
+  if (isOwnerEmail(account.email)) return null;
+  const owner = database.users.find((user) => isOwnerEmail(user.email));
+  if (!owner) return null;
+
+  let chat = database.chats.find(
+    (item) => item.isOnboarding && item.users.includes(owner._id) && item.users.includes(account._id)
+  );
+  if (!chat) {
+    chat = {
+      _id: createId(),
+      chatName: 'Welcome',
+      photo: defaultProfilePic,
+      isGroup: false,
+      isOnboarding: true,
+      users: [owner._id, account._id],
+      latestMessage: null,
+      groupAdmin: owner._id,
+      pinnedMessageIds: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    database.chats.push(chat);
+  }
+  return chat._id;
+}
+
 function sendToken(res, account, status = 200) {
   const token = createToken(account);
   res.cookie('userToken', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
@@ -49,10 +76,12 @@ export const register = async (req, res) => {
         contacts: [],
         title: 'Member',
         isAdmin: false,
+        approved: isOwnerEmail(normalizedEmail),
         createdAt: now,
         updatedAt: now,
       };
       database.users.push(newUser);
+      if (!newUser.approved) createOnboardingChat(database, newUser, now);
       return newUser;
     });
     if (!account) {
@@ -86,7 +115,7 @@ export const login = async (req, res) => {
 };
 
 export const validUser = async (req, res) => {
-  const account = await updateDatabase((database) => {
+  const result = await updateDatabase((database) => {
     const storedAccount = findUser(database, req.rootUserId);
     if (!storedAccount) return null;
     if (isOwnerEmail(storedAccount.email)) {
@@ -95,15 +124,21 @@ export const validUser = async (req, res) => {
     } else if (!storedAccount.title) {
       storedAccount.title = 'Member';
     }
-    return storedAccount;
+    const onboardingChatId = storedAccount.approved === false
+      ? createOnboardingChat(database, storedAccount, new Date().toISOString())
+      : null;
+    return { account: storedAccount, onboardingChatId };
   });
-  if (!account) return res.status(401).json({ error: 'Invalid token' });
+  if (!result) return res.status(401).json({ error: 'Invalid token' });
+  const { account, onboardingChatId } = result;
   return res.status(200).json({
     user: {
       ...withoutPassword(account),
       title: getUserTitle(account),
       isAdmin: isAdminUser(account),
       isOwner: isOwnerEmail(account.email),
+      approved: account.approved !== false,
+      onboardingChatId,
     },
     token: req.token,
   });
@@ -140,10 +175,12 @@ export const googleAuth = async (req, res) => {
         contacts: [],
         title: 'Member',
         isAdmin: false,
+        approved: isOwnerEmail(normalizedEmail),
         createdAt: now,
         updatedAt: now,
       };
       database.users.push(newUser);
+      if (!newUser.approved) createOnboardingChat(database, newUser, now);
       return newUser;
     });
     return sendToken(res, account);

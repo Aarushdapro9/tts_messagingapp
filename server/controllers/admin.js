@@ -14,6 +14,7 @@ function safeAdminUser(user) {
     title: getUserTitle(user),
     isAdmin: isAdminUser(user),
     isOwner: isOwnerEmail(user.email),
+    approved: user.approved !== false,
   };
 }
 
@@ -61,6 +62,18 @@ export const updateUserRole = async (req, res) => {
   if (!account) {
     return res.status(404).json({ message: 'That user cannot be changed.' });
   }
+  return res.status(200).json({ user: account });
+};
+
+export const updateUserApproval = async (req, res) => {
+  const account = await updateDatabase((database) => {
+    const storedAccount = findUser(database, req.params.userId);
+    if (!storedAccount || isOwnerEmail(storedAccount.email)) return null;
+    storedAccount.approved = Boolean(req.body.approved);
+    storedAccount.updatedAt = new Date().toISOString();
+    return safeAdminUser(storedAccount);
+  });
+  if (!account) return res.status(404).json({ message: 'That user cannot be changed.' });
   return res.status(200).json({ user: account });
 };
 

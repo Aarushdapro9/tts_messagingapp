@@ -63,8 +63,15 @@ function Home() {
         isAdmin: data?.user?.isAdmin,
         isOwner: data?.user?.isOwner,
         title: data?.user?.title,
+        approved: data?.user?.approved,
+        onboardingChatId: data?.user?.onboardingChatId,
       }
       dispatch(setActiveUser(user))
+      if (data?.user?.approved === false && data?.user?.onboardingChatId) {
+        const action = await dispatch(fetchChats())
+        const onboardingChat = action.payload?.find((chat) => chat._id === data.user.onboardingChatId)
+        if (onboardingChat) dispatch(setActiveChat(onboardingChat))
+      }
     }
     isValid()
 
@@ -153,10 +160,10 @@ function Home() {
                       <BsSearch style={{ color: "#c4c4c5" }} />
                     </div>
                     <div className='flex items-center justify-between pr-1'>
-                      <Group />
-                      <button onClick={() => setShowUsers(!showUsers)} className='mt-3 text-[11px] font-normal tracking-wide bg-[#f6f6f6] text-[#1f2228] py-1 px-2'>
+                      {activeUser.approved ? <Group /> : <span className='mt-3 text-[11px] font-semibold text-[#a66b00]'>Waiting for Owner approval</span>}
+                      {activeUser.approved && <button onClick={() => setShowUsers(!showUsers)} className='mt-3 text-[11px] font-normal tracking-wide bg-[#f6f6f6] text-[#1f2228] py-1 px-2'>
                         {showUsers ? "Hide users" : "All users"}
-                      </button>
+                      </button>}
                     </div>
 
                     <div style={{ display: search || showUsers ? "" : "none" }} className='h-[calc(100dvh-70px)] absolute z-10 w-[100%] left-[0px] top-[70px] bg-[#fff] flex flex-col gap-y-3 pt-3 px-4'>

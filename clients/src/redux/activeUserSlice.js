@@ -9,6 +9,8 @@ const initialState = {
   isAdmin: false,
   isOwner: false,
   title: 'Member',
+  approved: true,
+  onboardingChatId: null,
 };
 
 const activeUserSlice = createSlice({
@@ -24,6 +26,8 @@ const activeUserSlice = createSlice({
       state.isAdmin = Boolean(payload.isAdmin);
       state.isOwner = Boolean(payload.isOwner);
       state.title = payload.title || (payload.isAdmin ? 'Administrator' : 'Member');
+      state.approved = payload.approved !== false;
+      state.onboardingChatId = payload.onboardingChatId || null;
     },
     setUserNameAndBio: (state, { payload }) => {
       state.name = payload.name;

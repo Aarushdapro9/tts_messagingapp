@@ -12,8 +12,14 @@ function canAccess(chat, userId) {
   return chat && (chat.isGlobal || chat.users.includes(userId));
 }
 
-export const accessGlobalChat = async (_req, res) => {
+function canUseChat(database, chat, userId) {
+  const user = findUser(database, userId);
+  return canAccess(chat, userId) && (user?.approved !== false || chat.isOnboarding === true);
+}
+
+export const accessGlobalChat = async (req, res) => {
   const globalChat = await updateDatabase((database) => {
+    if (findUser(database, req.rootUserId)?.approved === false) return 'pending';
     let chat = database.chats.find((item) => item.isGlobal);
     if (!chat) {
       const now = new Date().toISOString();
@@ -34,6 +40,9 @@ export const accessGlobalChat = async (_req, res) => {
     }
     return expandChat(database, chat);
   });
+  if (globalChat === 'pending') {
+    return res.status(403).json({ message: 'Your account must be approved before joining Global Chat.' });
+  }
   return res.status(200).json(globalChat);
 };
 
@@ -42,6 +51,9 @@ export const accessChats = async (req, res) => {
   if (!userId) return res.status(400).json({ message: "Provide user's ID" });
   if (userId === req.rootUserId) {
     return res.status(400).json({ message: 'You cannot create a chat with yourself' });
+  }
+  if (req.rootUser.approved === false) {
+    return res.status(403).json({ message: 'Your account is waiting for Owner approval.' });
   }
 
   const chat = await updateDatabase((database) => {
@@ -95,8 +107,9 @@ export const fetchAllChats = async (req, res) => {
         updatedAt: now,
       });
     }
+    const pending = findUser(database, req.rootUserId)?.approved === false;
     return database.chats
-      .filter((chat) => chat.isGlobal || chat.users.includes(req.rootUserId))
+      .filter((chat) => pending ? chat.isOnboarding && chat.users.includes(req.rootUserId) : chat.isGlobal || chat.users.includes(req.rootUserId))
       .sort((first, second) => {
         if (first.isGlobal) return -1;
         if (second.isGlobal) return 1;
@@ -111,6 +124,9 @@ export const creatGroup = async (req, res) => {
   const { chatName, users } = req.body;
   if (!chatName?.trim() || !users) {
     return res.status(400).json({ message: 'Please fill the fields' });
+  }
+  if (req.rootUser.approved === false) {
+    return res.status(403).json({ message: 'Your account is waiting for Owner approval.' });
   }
   let selectedUsers;
   try {
@@ -152,7 +168,7 @@ export const renameGroup = async (req, res) => {
   }
   const chat = await updateDatabase((database) => {
     const storedChat = database.chats.find((item) => item._id === chatId);
-    if (!canAccess(storedChat, req.rootUserId) || !storedChat.isGroup || storedChat.isGlobal) return null;
+    if (!canUseChat(database, storedChat, req.rootUserId) || !storedChat.isGroup || storedChat.isGlobal) return null;
     storedChat.chatName = chatName.trim();
     storedChat.updatedAt = new Date().toISOString();
     return expandChat(database, storedChat);
@@ -165,7 +181,7 @@ export const addToGroup = async (req, res) => {
   const { userId, chatId } = req.body;
   const chat = await updateDatabase((database) => {
     const storedChat = database.chats.find((item) => item._id === chatId);
-    if (!canAccess(storedChat, req.rootUserId) || !storedChat.isGroup || storedChat.isGlobal || !findUser(database, userId)) {
+    if (!canUseChat(database, storedChat, req.rootUserId) || !storedChat.isGroup || storedChat.isGlobal || !findUser(database, userId)) {
       return null;
     }
     if (storedChat.users.includes(userId)) return 'exists';
@@ -182,7 +198,7 @@ export const removeFromGroup = async (req, res) => {
   const { userId, chatId } = req.body;
   const chat = await updateDatabase((database) => {
     const storedChat = database.chats.find((item) => item._id === chatId);
-    if (!canAccess(storedChat, req.rootUserId) || !storedChat.isGroup || storedChat.isGlobal) return null;
+    if (!canUseChat(database, storedChat, req.rootUserId) || !storedChat.isGroup || storedChat.isGlobal) return null;
     if (!storedChat.users.includes(userId)) return 'missing';
     if (userId === storedChat.groupAdmin && storedChat.users.length > 1) {
       storedChat.groupAdmin = storedChat.users.find((id) => id !== userId);
@@ -220,7 +236,7 @@ export const setChatFolder = async (req, res) => {
   const folders = await updateDatabase((database) => {
     const user = findUser(database, req.rootUserId);
     const chat = database.chats.find((item) => item._id === chatId);
-    if (!user || !canAccess(chat, req.rootUserId)) return null;
+    if (!user || !canUseChat(database, chat, req.rootUserId)) return null;
     user.chatFolders ||= emptyFolders();
     user.chatFolders.personal ||= [];
     user.chatFolders.work ||= [];

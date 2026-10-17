@@ -16,3 +16,6 @@ export const getAdminChatMessages = async (chatId) =>
 
 export const updateUserRole = async (userId, role) =>
   (await adminApi().patch(`/api/admin/users/${userId}/role`, role)).data;
+
+export const updateUserApproval = async (userId, approved) =>
+  (await adminApi().patch(`/api/admin/users/${userId}/approval`, { approved })).data;

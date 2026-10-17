@@ -1,12 +1,18 @@
 import {
   createId,
   expandMessage,
+  findUser,
   publishAndPruneMessages,
   updateDatabase,
 } from '../storage/store.js';
 
 function canAccess(chat, userId) {
   return chat && (chat.isGlobal || chat.users.includes(userId));
+}
+
+function canUseChat(database, chat, userId) {
+  const user = findUser(database, userId);
+  return canAccess(chat, userId) && (user?.approved !== false || chat.isOnboarding === true);
 }
 
 export const sendMessage = async (req, res) => {
@@ -18,7 +24,7 @@ export const sendMessage = async (req, res) => {
   try {
     const savedMessage = await updateDatabase((database) => {
       const chat = database.chats.find((item) => item._id === chatId);
-      if (!canAccess(chat, req.rootUserId)) return null;
+      if (!canUseChat(database, chat, req.rootUserId)) return null;
       const now = new Date().toISOString();
       const scheduledTime = scheduledFor ? new Date(scheduledFor) : null;
       if (scheduledTime && Number.isNaN(scheduledTime.getTime())) return 'invalidSchedule';
@@ -60,7 +66,7 @@ export const getMessages = async (req, res) => {
   const messages = await updateDatabase((database) => {
     publishAndPruneMessages(database);
     const chat = database.chats.find((item) => item._id === chatId);
-    if (!canAccess(chat, req.rootUserId)) return null;
+    if (!canUseChat(database, chat, req.rootUserId)) return null;
     return database.messages
       .filter((message) => message.chatId === chatId && (message.deliveredAt || message.sender === req.rootUserId))
       .sort((first, second) => new Date(first.createdAt) - new Date(second.createdAt))
@@ -79,7 +85,7 @@ export const createPoll = async (req, res) => {
 
   const savedMessage = await updateDatabase((database) => {
     const chat = database.chats.find((item) => item._id === chatId);
-    if (!canAccess(chat, req.rootUserId) || !chat.isGroup || chat.isGlobal) return null;
+    if (!canUseChat(database, chat, req.rootUserId) || !chat.isGroup || chat.isGlobal) return null;
     const now = new Date().toISOString();
     const newMessage = {
       _id: createId(), sender: req.rootUserId, chatId, message: question.trim(), type: 'poll',
@@ -100,7 +106,7 @@ export const voteOnPoll = async (req, res) => {
   const result = await updateDatabase((database) => {
     const message = database.messages.find((item) => item._id === req.params.messageId);
     const chat = message && database.chats.find((item) => item._id === message.chatId);
-    if (!message || !canAccess(chat, req.rootUserId) || message.type !== 'poll') return null;
+    if (!message || !canUseChat(database, chat, req.rootUserId) || message.type !== 'poll') return null;
     const choice = message.poll?.options.find((option) => option.id === optionId);
     if (!choice) return 'missingOption';
     message.poll.options.forEach((option) => {
@@ -120,7 +126,7 @@ export const togglePin = async (req, res) => {
     publishAndPruneMessages(database);
     const message = database.messages.find((item) => item._id === req.params.messageId);
     const chat = message && database.chats.find((item) => item._id === message.chatId);
-    if (!message || !canAccess(chat, req.rootUserId) || !message.deliveredAt) return null;
+    if (!message || !canUseChat(database, chat, req.rootUserId) || !message.deliveredAt) return null;
     chat.pinnedMessageIds ||= [];
     const isPinned = chat.pinnedMessageIds.includes(message._id);
     chat.pinnedMessageIds = isPinned
