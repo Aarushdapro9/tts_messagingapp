@@ -68,14 +68,15 @@ function Profile(props) {
 
   return (
 
-    <div style={{ transition: showProfile ? "0.3s ease-in-out" : "" }} className={`${props.className} overflow-y-auto scrollbar-hide`}>
-      <div className='min-h-full w-[100%]'>
-        <div className='profile-header sticky top-0 z-20 bg-[#166e48] pt-12 pb-3'>
+    <div style={{ transition: showProfile ? "0.3s ease-in-out" : "" }} className={`${props.className} flex flex-col overflow-hidden`}>
+      <div className='profile-header z-20 shrink-0 bg-[#166e48] pt-12 pb-3'>
           <button onClick={() => dispatch(setShowProfile(false))} className='flex items-center'>
             <IoArrowBack style={{ color: "#fff", width: "30px", height: "20px" }} />
             <h6 className='text-[16px] text-[#fff] font-semibold'>Profile</h6>
           </button>
-        </div>
+      </div>
+      <div className='min-h-0 flex-1 overflow-y-auto scrollbar-hide'>
+        <div className='min-h-full w-[100%]'>
         <div className=' pt-5'>
           <div className='flex items-center flex-col'>
             <img className='w-[150px] h-[150px] rounded-[100%] -ml-5' src={activeUser?.profilePic} alt="" />
@@ -100,6 +101,7 @@ function Profile(props) {
           <IoMdLogOut className='text-[#e44d4d] w-[27px] h-[23px]' />
           <h6 className='text-[17px] text-[#e44d4d] font-semibold'>Logout</h6>
         </div>
+      </div>
       </div>
     </div>
   )
