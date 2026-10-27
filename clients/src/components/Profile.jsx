@@ -68,8 +68,8 @@ function Profile(props) {
 
   return (
 
-    <div style={{ transition: showProfile ? "0.3s ease-in-out" : "" }} className={props.className}>
-      <div className='absolute  w-[100%]'>
+    <div style={{ transition: showProfile ? "0.3s ease-in-out" : "" }} className={`${props.className} overflow-y-auto scrollbar-hide`}>
+      <div className='min-h-full w-[100%]'>
         <div className='profile-header bg-[#166e48] pt-12 pb-3'>
           <button onClick={() => dispatch(setShowProfile(false))} className='flex items-center'>
             <IoArrowBack style={{ color: "#fff", width: "30px", height: "20px" }} />
