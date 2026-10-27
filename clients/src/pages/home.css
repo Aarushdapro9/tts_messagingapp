@@ -18,6 +18,69 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+.chat-shell {
+  width: 100%;
+  max-width: 1440px;
+}
+
+.chat-composer {
+  width: min(440px, calc(100% - 1.5rem));
+  z-index: 5;
+}
+
+.chat-composer > form,
+.chat-composer > div {
+  width: 100%;
+}
+
+.chat-composer em-emoji-picker {
+  max-width: 100%;
+}
+
+.chat-shell[data-device='tablet'] {
+  width: 100%;
+  max-width: none;
+}
+
+.chat-shell[data-device='tablet'] .chat-sidebar {
+  min-width: 320px;
+  max-width: 380px;
+}
+
+.chat-shell[data-device='tablet'] .chat-page {
+  min-width: 0;
+}
+
+.chat-shell[data-device='tablet'] .chat-composer {
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: 1.25rem;
+  width: min(520px, calc(100% - 2.5rem));
+}
+
+.chat-shell[data-device='phone'] .chat-sidebar,
+.chat-shell[data-device='phone'] .chat-page {
+  height: 100dvh;
+}
+
+.chat-shell[data-device='phone'] .chat-composer {
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  left: 0.75rem;
+  right: 0.75rem;
+  width: auto;
+}
+
+.chat-shell[data-device='phone'] .chat-composer > div {
+  min-height: 52px;
+}
+
+@media screen and (min-width: 768px) {
+  .chat-shell[data-device='desktop'] .chat-composer {
+    bottom: 1.25rem;
+    left: 1.5rem;
+  }
+}
+
 @media screen and (max-width: 767px) {
   .chat-page {
     min-width: 0;

@@ -25,6 +25,15 @@ import UserProfileDialog from '../components/UserProfileDialog'
 import AppAlertDialog from '../components/AppAlertDialog'
 import { dismissAppAlert, getPendingAlerts } from '../apis/admin'
 import { toast } from 'react-toastify'
+
+function getDeviceType() {
+  const hasTouchInput = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0
+  if (!hasTouchInput) return 'desktop'
+  if (window.innerWidth < 768) return 'phone'
+  if (window.innerWidth <= 1366) return 'tablet'
+  return 'desktop'
+}
+
 function Home() {
   const dispatch = useDispatch()
   const { showProfile, showNotifications } = useSelector((state) => state.profile)
@@ -36,6 +45,7 @@ function Home() {
   const [showUsers, setShowUsers] = useState(false)
   const [appAlerts, setAppAlerts] = useState([])
   const [dismissingAlert, setDismissingAlert] = useState(false)
+  const [deviceType, setDeviceType] = useState(getDeviceType)
 
   const handleSearch = async (e) => {
     setSearch(e.target.value)
@@ -83,6 +93,12 @@ function Home() {
   }, [dispatch])
 
   useEffect(() => {
+    const updateDeviceType = () => setDeviceType(getDeviceType())
+    window.addEventListener('resize', updateDeviceType, { passive: true })
+    return () => window.removeEventListener('resize', updateDeviceType)
+  }, [])
+
+  useEffect(() => {
     if (!activeUser.id) return undefined
     let cancelled = false
     getPendingAlerts()
@@ -119,7 +135,7 @@ function Home() {
   return (
     <>
 
-      <div className="bg-[#282C35!] scrollbar-hide z-10 h-[100dvh] lg:w-[90%] lg:mx-auto overflow-hidden shadow-2xl">
+      <div data-device={deviceType} className="chat-shell bg-[#282C35!] scrollbar-hide z-10 h-[100dvh] lg:w-[90%] lg:mx-auto overflow-hidden shadow-2xl">
 
         <div className='flex h-full'>
           {
