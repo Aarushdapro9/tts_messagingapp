@@ -1,4 +1,5 @@
 import {
+  createId,
   expandChat,
   expandMessage,
   findUser,
@@ -15,6 +16,16 @@ function safeAdminUser(user) {
     isAdmin: isAdminUser(user),
     isOwner: isOwnerEmail(user.email),
     approved: user.approved !== false,
+  };
+}
+
+function safeAlert(alert) {
+  return {
+    _id: alert._id,
+    title: alert.title,
+    message: alert.message,
+    type: alert.type === 'alert' ? 'alert' : 'notification',
+    createdAt: alert.createdAt,
   };
 }
 
@@ -93,4 +104,60 @@ export const getAdminChatMessages = async (req, res) => {
     console.error('Admin messages failed:', error);
     return res.status(500).json({ message: 'Unable to load this conversation.' });
   }
+};
+
+export const createAppAlert = async (req, res) => {
+  const title = typeof req.body.title === 'string' ? req.body.title.trim() : '';
+  const message = typeof req.body.message === 'string' ? req.body.message.trim() : '';
+  const type = req.body.type === 'alert' ? 'alert' : 'notification';
+
+  if (!title || title.length > 80 || !message || message.length > 500) {
+    return res.status(400).json({ message: 'Use a title up to 80 characters and a message up to 500 characters.' });
+  }
+
+  const alert = await updateDatabase((database) => {
+    const nextAlert = {
+      _id: createId(),
+      title,
+      message,
+      type,
+      recipientIds: database.users.map((user) => user._id),
+      dismissedBy: [],
+      createdAt: new Date().toISOString(),
+    };
+    database.alerts = Array.isArray(database.alerts) ? database.alerts : [];
+    database.alerts.push(nextAlert);
+    return safeAlert(nextAlert);
+  });
+
+  return res.status(201).json({ alert });
+};
+
+export const getPendingAlerts = async (req, res) => {
+  try {
+    const database = await getDatabase();
+    const alerts = (database.alerts || [])
+      .filter((alert) =>
+        (!Array.isArray(alert.recipientIds) || alert.recipientIds.includes(req.rootUserId)) &&
+        !alert.dismissedBy?.includes(req.rootUserId)
+      )
+      .sort((first, second) => new Date(first.createdAt) - new Date(second.createdAt))
+      .map(safeAlert);
+    return res.status(200).json({ alerts });
+  } catch (error) {
+    console.error('Loading app alerts failed:', error);
+    return res.status(500).json({ message: 'Unable to load app alerts.' });
+  }
+};
+
+export const dismissAppAlert = async (req, res) => {
+  const dismissed = await updateDatabase((database) => {
+    const alert = (database.alerts || []).find((item) => item._id === req.params.alertId);
+    if (!alert || (Array.isArray(alert.recipientIds) && !alert.recipientIds.includes(req.rootUserId))) return null;
+    alert.dismissedBy = Array.isArray(alert.dismissedBy) ? alert.dismissedBy : [];
+    if (!alert.dismissedBy.includes(req.rootUserId)) alert.dismissedBy.push(req.rootUserId);
+    return true;
+  });
+  if (!dismissed) return res.status(404).json({ message: 'Alert not found.' });
+  return res.status(204).end();
 };

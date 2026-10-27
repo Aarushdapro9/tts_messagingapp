@@ -22,6 +22,9 @@ import { Effect } from "react-notification-badge"
 import NotificationBadge from 'react-notification-badge';
 import Search from '../components/group/Search'
 import UserProfileDialog from '../components/UserProfileDialog'
+import AppAlertDialog from '../components/AppAlertDialog'
+import { dismissAppAlert, getPendingAlerts } from '../apis/admin'
+import { toast } from 'react-toastify'
 function Home() {
   const dispatch = useDispatch()
   const { showProfile, showNotifications } = useSelector((state) => state.profile)
@@ -31,6 +34,8 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = useState("")
   const [showUsers, setShowUsers] = useState(false)
+  const [appAlerts, setAppAlerts] = useState([])
+  const [dismissingAlert, setDismissingAlert] = useState(false)
 
   const handleSearch = async (e) => {
     setSearch(e.target.value)
@@ -78,10 +83,37 @@ function Home() {
   }, [dispatch])
 
   useEffect(() => {
+    if (!activeUser.id) return undefined
+    let cancelled = false
+    getPendingAlerts()
+      .then(({ alerts }) => {
+        if (!cancelled) setAppAlerts(alerts || [])
+      })
+      .catch(() => {
+        if (!cancelled) setAppAlerts([])
+      })
+    return () => { cancelled = true }
+  }, [activeUser.id])
+
+  useEffect(() => {
     const syncChats = () => dispatch(fetchChats())
     const interval = window.setInterval(syncChats, 20_000)
     return () => window.clearInterval(interval)
   }, [dispatch])
+
+  const dismissCurrentAlert = async () => {
+    const currentAlert = appAlerts[0]
+    if (!currentAlert) return
+    setDismissingAlert(true)
+    try {
+      await dismissAppAlert(currentAlert._id)
+      setAppAlerts((current) => current.slice(1))
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to dismiss this notification.')
+    } finally {
+      setDismissingAlert(false)
+    }
+  }
 
 
   return (
@@ -193,6 +225,7 @@ function Home() {
         </div>
       </div >
       <UserProfileDialog />
+      <AppAlertDialog alert={appAlerts[0]} dismissing={dismissingAlert} onDismiss={dismissCurrentAlert} />
 
     </>
   )

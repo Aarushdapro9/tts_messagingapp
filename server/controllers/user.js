@@ -202,7 +202,10 @@ export const searchUsers = async (req, res) => {
         account.name.toLowerCase().includes(query) ||
         account.email.toLowerCase().includes(query))
   );
-  return res.status(200).json(matches.map(withoutPassword));
+  return res.status(200).json(matches.map((account) => {
+    const { email, ...publicAccount } = withoutPassword(account);
+    return publicAccount;
+  }));
 };
 
 export const getUserById = async (req, res) => {

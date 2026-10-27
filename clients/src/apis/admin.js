@@ -19,3 +19,12 @@ export const updateUserRole = async (userId, role) =>
 
 export const updateUserApproval = async (userId, approved) =>
   (await adminApi().patch(`/api/admin/users/${userId}/approval`, { approved })).data;
+
+export const createAppAlert = async (alert) =>
+  (await adminApi().post('/api/admin/alerts', alert)).data;
+
+export const getPendingAlerts = async () =>
+  (await adminApi().get('/api/admin/alerts/pending')).data;
+
+export const dismissAppAlert = async (alertId) =>
+  adminApi().post(`/api/admin/alerts/${alertId}/dismiss`);

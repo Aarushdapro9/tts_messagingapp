@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { getAdminChatMessages, getAdminOverview, updateUserRole } from '../apis/admin';
+import { createAppAlert, getAdminChatMessages, getAdminOverview, updateUserRole } from '../apis/admin';
 
 function chatName(chat) {
   if (chat.isGlobal) return 'Global Chat';
@@ -23,6 +23,8 @@ function Admin() {
   const [query, setQuery] = useState('');
   const [roleDrafts, setRoleDrafts] = useState({});
   const [savingUserId, setSavingUserId] = useState('');
+  const [alertDraft, setAlertDraft] = useState({ type: 'notification', title: '', message: '' });
+  const [sendingAlert, setSendingAlert] = useState(false);
 
   const loadOverview = useCallback(async () => {
     setLoading(true);
@@ -101,6 +103,20 @@ function Admin() {
     }
   };
 
+  const sendAlert = async (event) => {
+    event.preventDefault();
+    setSendingAlert(true);
+    try {
+      await createAppAlert(alertDraft);
+      setAlertDraft({ type: 'notification', title: '', message: '' });
+      toast.success('Notification will appear when users next open the app.');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to send this notification.');
+    } finally {
+      setSendingAlert(false);
+    }
+  };
+
   if (loading) {
     return <div className="flex min-h-[100dvh] items-center justify-center bg-[#121418] text-white">Loading admin panel…</div>;
   }
@@ -121,6 +137,16 @@ function Admin() {
           <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Users</p><p className="mt-1 text-3xl font-extrabold">{overview?.users.length || 0}</p></div>
           <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Conversations</p><p className="mt-1 text-3xl font-extrabold">{overview?.chats.length || 0}</p></div>
           <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Private chats</p><p className="mt-1 text-3xl font-extrabold">{overview?.chats.filter((chat) => !chat.isGlobal && !chat.isGroup).length || 0}</p></div>
+        </section>
+
+        <section className="mb-7 rounded-xl bg-[#1d232b] p-5">
+          <div className="mb-4"><h2 className="text-xl font-bold">Send app notification</h2><p className="mt-1 text-sm text-[#9eabba]">This is shown as a popup to every current account the next time they open the app.</p></div>
+          <form onSubmit={sendAlert} className="grid grid-cols-1 gap-3 md:grid-cols-[150px_minmax(0,1fr)]">
+            <label className="text-sm font-semibold">Type<select value={alertDraft.type} onChange={(event) => setAlertDraft((current) => ({ ...current, type: event.target.value }))} className="mt-1 w-full rounded-lg bg-[#121418] px-3 py-2 font-normal outline-none"><option value="notification">Notification</option><option value="alert">Important alert</option></select></label>
+            <label className="text-sm font-semibold">Title<input required maxLength="80" value={alertDraft.title} onChange={(event) => setAlertDraft((current) => ({ ...current, title: event.target.value }))} placeholder="For example: Scheduled maintenance" className="mt-1 w-full rounded-lg bg-[#121418] px-3 py-2 font-normal outline-none" /></label>
+            <label className="text-sm font-semibold md:col-span-2">Message<textarea required maxLength="500" value={alertDraft.message} onChange={(event) => setAlertDraft((current) => ({ ...current, message: event.target.value }))} placeholder="Write the message users will see." rows="3" className="mt-1 w-full resize-y rounded-lg bg-[#121418] px-3 py-2 font-normal outline-none" /></label>
+            <div className="md:col-span-2"><button type="submit" disabled={sendingAlert} className="rounded-lg bg-[#48cda1] px-4 py-2 font-bold text-[#111b21] disabled:opacity-50">{sendingAlert ? 'Sending…' : 'Send notification'}</button></div>
+          </form>
         </section>
 
         <section className="mb-7 overflow-hidden rounded-xl bg-[#1d232b]">

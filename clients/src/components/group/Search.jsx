@@ -20,7 +20,7 @@ function Search({ type, isLoading, searchResults, handleClick, search, alwaysVis
                   <img className='w-[42px] h-[42px] rounded-[25px]' src={!e.profilePic ? "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg" : e.profilePic} alt="" />
                   <div className='flex flex-col gap-y-[1px]'>
                     <h5 className='text-[15px] text-[#111b21] tracking-wide font-medium'>{e.name}</h5>
-                    <h5 className='text-[12px] text-[#68737c] tracking-wide font-normal'>{e.email}</h5>
+                    {e.title && e.title !== 'Member' ? <h5 className='text-[12px] text-[#68737c] tracking-wide font-normal'>{e.title}</h5> : null}
                   </div>
                 </button>
                 {activeUser.approved !== false && <button onClick={() => handleClick(e)} className='bg-[#0086ea] px-3 py-2 text-[10.6px] tracking-wide text-[#fff]'>Add</button>}

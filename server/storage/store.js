@@ -12,7 +12,7 @@ const usesBlobStore = Boolean(
   process.env.BLOB_READ_WRITE_TOKEN ||
     (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN)
 );
-const emptyDatabase = () => ({ users: [], chats: [], messages: [] });
+const emptyDatabase = () => ({ users: [], chats: [], messages: [], alerts: [] });
 
 let writeQueue = Promise.resolve();
 
@@ -25,6 +25,7 @@ async function readDatabase() {
       users: Array.isArray(parsed.users) ? parsed.users : [],
       chats: Array.isArray(parsed.chats) ? parsed.chats : [],
       messages: Array.isArray(parsed.messages) ? parsed.messages : [],
+      alerts: Array.isArray(parsed.alerts) ? parsed.alerts : [],
     };
   }
 
@@ -35,6 +36,7 @@ async function readDatabase() {
       users: Array.isArray(parsed.users) ? parsed.users : [],
       chats: Array.isArray(parsed.chats) ? parsed.chats : [],
       messages: Array.isArray(parsed.messages) ? parsed.messages : [],
+      alerts: Array.isArray(parsed.alerts) ? parsed.alerts : [],
     };
   } catch (error) {
     if (error.code === 'ENOENT') return emptyDatabase();
