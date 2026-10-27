@@ -11,6 +11,7 @@ const initialState = {
   title: 'Member',
   approved: true,
   onboardingChatId: null,
+  theme: null,
 };
 
 const activeUserSlice = createSlice({
@@ -28,10 +29,12 @@ const activeUserSlice = createSlice({
       state.title = payload.title || (payload.isAdmin ? 'Administrator' : 'Member');
       state.approved = payload.approved !== false;
       state.onboardingChatId = payload.onboardingChatId || null;
+      state.theme = payload.theme || null;
     },
     setUserNameAndBio: (state, { payload }) => {
       state.name = payload.name;
       state.bio = payload.bio;
+      state.theme = payload.theme || null;
     },
   },
 });

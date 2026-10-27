@@ -12,6 +12,14 @@ import {
 
 const defaultProfilePic =
   'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg';
+const themeKeys = ['app', 'surface', 'sidebar', 'accent', 'outgoing', 'incoming'];
+const hexColor = /^#[0-9a-f]{6}$/i;
+
+function validTheme(theme) {
+  return theme && typeof theme === 'object' && themeKeys.every(
+    (key) => typeof theme[key] === 'string' && hexColor.test(theme[key])
+  );
+}
 
 function createToken(account) {
   return jwt.sign({ id: account._id, email: account.email }, process.env.SECRET, {
@@ -219,12 +227,18 @@ export const updateInfo = async (req, res) => {
   if (req.params.id !== req.rootUserId) {
     return res.status(403).json({ message: 'You can only update your own profile' });
   }
-  const { bio, name } = req.body;
+  const { bio, name, theme } = req.body;
+  if (theme !== undefined && !validTheme(theme)) {
+    return res.status(400).json({ message: 'Choose valid six-digit hex colors for every theme color.' });
+  }
   const account = await updateDatabase((database) => {
     const storedAccount = findUser(database, req.params.id);
     if (!storedAccount) return null;
     if (typeof name === 'string' && name.trim()) storedAccount.name = name.trim();
     if (typeof bio === 'string') storedAccount.bio = bio.trim();
+    if (theme !== undefined) {
+      storedAccount.theme = Object.fromEntries(themeKeys.map((key) => [key, theme[key]]));
+    }
     storedAccount.updatedAt = new Date().toISOString();
     return storedAccount;
   });

@@ -24,6 +24,35 @@
   max-width: 1440px;
 }
 
+.themed-app {
+  --theme-app: #282c35;
+  --theme-surface: #fafafa;
+  --theme-sidebar: #ffffff;
+  --theme-accent: #319268;
+  --theme-outgoing: #268d61;
+  --theme-incoming: #f0f0f0;
+  background-color: var(--theme-app) !important;
+}
+
+.themed-app .chat-sidebar,
+.themed-app .chat-header,
+.themed-app .chat-input {
+  background-color: var(--theme-sidebar) !important;
+}
+
+.themed-app .chat-page,
+.themed-app .profile-panel {
+  background-color: var(--theme-surface) !important;
+}
+
+.themed-app .chat-tools {
+  background-color: color-mix(in srgb, var(--theme-sidebar) 85%, var(--theme-surface)) !important;
+}
+
+.themed-app .profile-header {
+  background-color: var(--theme-accent) !important;
+}
+
 .chat-composer {
   width: min(440px, calc(100% - 1.5rem));
   z-index: 5;

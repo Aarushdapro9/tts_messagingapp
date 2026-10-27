@@ -184,7 +184,7 @@ function Chat({ className }) {
 
   return <div className={className}>
     {activeUser.approved === false && <div className='bg-[#fff4d6] px-4 py-2 text-center text-xs font-semibold text-[#835500]'>Your account is pending Owner approval. You can only message the Owner until approved.</div>}
-    <div className='flex justify-between items-center px-4 md:px-5 h-[61px] bg-[#ffff] w-full'>
+    <div className='chat-header flex justify-between items-center px-4 md:px-5 h-[61px] bg-[#ffff] w-full'>
       <div className='flex items-center gap-x-[10px]'><button onClick={() => dispatch(setActiveChat(null))} className='md:hidden text-[#319268] p-1 -ml-1' aria-label='Back to chats'><BiArrowBack className='w-6 h-6' /></button><h5 className='text-[17px] text-[#2b2e33] font-bold tracking-wide'>{getChatName(activeChat, activeUser)}</h5></div>
       {!activeChat.isGlobal && <Model />}
     </div>
@@ -197,10 +197,10 @@ function Chat({ className }) {
       {showPoll && activeChat.isGroup && <form onSubmit={submitPoll} className='mb-2 rounded-lg border border-[#aabac8] bg-white p-3 shadow-lg'><div className='mb-2 flex justify-between'><b className='text-sm'>New poll</b><button type='button' onClick={() => setShowPoll(false)} className='text-xs text-[#687a70]'>Close</button></div><input value={pollQuestion} onChange={(event) => setPollQuestion(event.target.value)} placeholder='Question' className='mb-2 w-full rounded border p-2 text-sm' required />{pollOptions.map((option, index) => <input key={index} value={option} onChange={(event) => setPollOptions((current) => current.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} placeholder={`Option ${index + 1}`} className='mb-2 w-full rounded border p-2 text-sm' required />)}<div className='flex gap-2'><button type='button' onClick={() => setPollOptions((current) => current.length < 6 ? [...current, ''] : current)} className='text-xs text-[#319268]'>+ Option</button><button className='ml-auto rounded bg-[#319268] px-3 py-1 text-xs font-bold text-white'>Create poll</button></div></form>}
       {showPicker && <Picker data={data} onEmojiSelect={(emoji) => setMessage((current) => current + emoji.native)} />}
       {showSchedule && <div className='mb-2 flex items-center gap-2 rounded-lg border bg-white p-2 text-xs'><label htmlFor='scheduled-for'>Send at</label><input id='scheduled-for' type='datetime-local' min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)} value={scheduledFor} onChange={(event) => setScheduledFor(event.target.value)} className='min-w-0 flex-1' /><button type='button' onClick={() => setShowSchedule(false)} className='text-[#687a70]'>Cancel</button></div>}
-      <form onSubmit={sendCurrentMessage} className='border border-[#aabac8] rounded-t-[10px] bg-white px-4 py-2 w-full md:w-[400px]'>
+      <form onSubmit={sendCurrentMessage} className='chat-input border border-[#aabac8] rounded-t-[10px] bg-white px-4 py-2 w-full md:w-[400px]'>
         <input onChange={onType} className='focus:outline-0 w-full bg-white text-sm' type='text' placeholder='Enter message' value={message} />
       </form>
-      <div className='flex items-center gap-2 border-x border-b bg-[#f8f9fa] border-[#aabac8] px-3 py-2 w-full md:w-[400px] rounded-b-[10px] min-h-[48px]'>
+      <div className='chat-tools flex items-center gap-2 border-x border-b bg-[#f8f9fa] border-[#aabac8] px-3 py-2 w-full md:w-[400px] rounded-b-[10px] min-h-[48px]'>
         <button onClick={() => setShowPicker((current) => !current)} aria-label='Add emoji'>{showPicker ? <BsFillEmojiSmileFill className='w-5 h-5 text-[#ffb02e]' /> : <BsEmojiSmile className='w-5 h-5' />}</button>
         <select aria-label='Message expiry' value={expiresInMinutes} onChange={(event) => setExpiresInMinutes(event.target.value)} className='min-w-0 flex-1 bg-transparent text-[11px] outline-none'>{expiryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
         <button onClick={() => setShowSchedule((current) => !current)} className='text-[11px] text-[#319268]'>Later</button>

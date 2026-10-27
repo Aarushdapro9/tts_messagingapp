@@ -25,6 +25,7 @@ import UserProfileDialog from '../components/UserProfileDialog'
 import AppAlertDialog from '../components/AppAlertDialog'
 import { dismissAppAlert, getPendingAlerts } from '../apis/admin'
 import { toast } from 'react-toastify'
+import { themeCssVars } from '../utils/theme'
 
 function getDeviceType() {
   const hasTouchInput = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0
@@ -78,6 +79,7 @@ function Home() {
         isAdmin: data?.user?.isAdmin,
         isOwner: data?.user?.isOwner,
         title: data?.user?.title,
+        theme: data?.user?.theme,
         approved: data?.user?.approved,
         onboardingChatId: data?.user?.onboardingChatId,
       }
@@ -135,7 +137,7 @@ function Home() {
   return (
     <>
 
-      <div data-device={deviceType} className="chat-shell bg-[#282C35!] scrollbar-hide z-10 h-[100dvh] lg:w-[90%] lg:mx-auto overflow-hidden shadow-2xl">
+      <div data-device={deviceType} style={themeCssVars(activeUser.theme)} className="themed-app chat-shell bg-[#282C35!] scrollbar-hide z-10 h-[100dvh] lg:w-[90%] lg:mx-auto overflow-hidden shadow-2xl">
 
         <div className='flex h-full'>
           {
@@ -231,7 +233,7 @@ function Home() {
                 </div>
 
 
-              </div> : <Profile className="min-w-[100%] sm:min-w-[360px] h-[100vh] bg-[#fafafa] shodow-xl relative" />
+              </div> : <Profile className="profile-panel min-w-[100%] sm:min-w-[360px] h-[100vh] bg-[#fafafa] shodow-xl relative" />
           }
           <Chat className={`${activeChat ? 'block' : 'hidden md:block'} chat-page relative w-full min-w-0 h-[100dvh] bg-[#fafafa]`} />
 
