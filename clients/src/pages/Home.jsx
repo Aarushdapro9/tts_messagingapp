@@ -80,6 +80,7 @@ function Home() {
         isOwner: data?.user?.isOwner,
         title: data?.user?.title,
         theme: data?.user?.theme,
+        themeSettings: data?.user?.themeSettings,
         approved: data?.user?.approved,
         onboardingChatId: data?.user?.onboardingChatId,
       }
@@ -137,7 +138,7 @@ function Home() {
   return (
     <>
 
-      <div data-device={deviceType} style={themeCssVars(activeUser.theme)} className="themed-app chat-shell bg-[#282C35!] scrollbar-hide z-10 h-[100dvh] lg:w-[90%] lg:mx-auto overflow-hidden shadow-2xl">
+      <div data-device={deviceType} style={themeCssVars(activeUser.themeSettings, activeUser.theme)} className="themed-app chat-shell bg-[#282C35!] scrollbar-hide z-10 h-[100dvh] lg:w-[90%] lg:mx-auto overflow-hidden shadow-2xl">
 
         <div className='flex h-full'>
           {

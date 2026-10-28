@@ -13,12 +13,45 @@ import {
 const defaultProfilePic =
   'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg';
 const themeKeys = ['app', 'surface', 'sidebar', 'accent', 'outgoing', 'incoming'];
+const themeSettingColorKeys = [...themeKeys, 'text', 'muted', 'outgoingText', 'incomingText', 'header', 'input', 'send', 'timestamp'];
 const hexColor = /^#[0-9a-f]{6}$/i;
+const themePatterns = new Set(['none', 'doodle', 'dots', 'leaves', 'waves', 'clouds', 'grid', 'stars', 'hearts', 'sun', 'snow', 'confetti']);
+const themeGradients = new Set(['none', 'instagram', 'violet-pink', 'sunset', 'midnight', 'galaxy', 'aurora', 'cyber']);
+const themeFonts = new Set(['system', 'serif', 'rounded', 'mono']);
 
 function validTheme(theme) {
   return theme && typeof theme === 'object' && themeKeys.every(
     (key) => typeof theme[key] === 'string' && hexColor.test(theme[key])
   );
+}
+
+function validThemeConfig(config) {
+  if (!config || typeof config !== 'object' || Array.isArray(config)) return false;
+  if (Object.keys(config).some((key) => ![...themeSettingColorKeys, 'pattern', 'gradient', 'font', 'radius', 'brightness', 'transparency'].includes(key))) return false;
+  if (themeSettingColorKeys.some((key) => config[key] !== undefined && (typeof config[key] !== 'string' || !hexColor.test(config[key])))) return false;
+  if (config.pattern !== undefined && !themePatterns.has(config.pattern)) return false;
+  if (config.gradient !== undefined && !themeGradients.has(config.gradient)) return false;
+  if (config.font !== undefined && !themeFonts.has(config.font)) return false;
+  return ![
+    ['radius', 0, 32], ['brightness', 55, 130], ['transparency', 45, 100],
+  ].some(([key, min, max]) => config[key] !== undefined && (!Number.isFinite(config[key]) || config[key] < min || config[key] > max));
+}
+
+function validThemeSettings(settings) {
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return false;
+  if (settings.version !== 2 || typeof settings.selectedThemeId !== 'string' || settings.selectedThemeId.length > 100) return false;
+  if (!Array.isArray(settings.favorites) || settings.favorites.length > 50 || settings.favorites.some((id) => typeof id !== 'string' || id.length > 100)) return false;
+  if (!Array.isArray(settings.customThemes) || settings.customThemes.length > 20) return false;
+  return settings.customThemes.every((theme) => theme && typeof theme === 'object' && typeof theme.id === 'string' && theme.id.length <= 100 && typeof theme.name === 'string' && theme.name.trim().length > 0 && theme.name.length <= 40 && validThemeConfig(theme.config));
+}
+
+function sanitizeThemeSettings(settings) {
+  return {
+    version: 2,
+    selectedThemeId: settings.selectedThemeId,
+    favorites: [...settings.favorites],
+    customThemes: settings.customThemes.map((theme) => ({ id: theme.id, name: theme.name.trim(), config: { ...theme.config } })),
+  };
 }
 
 function createToken(account) {
@@ -227,9 +260,12 @@ export const updateInfo = async (req, res) => {
   if (req.params.id !== req.rootUserId) {
     return res.status(403).json({ message: 'You can only update your own profile' });
   }
-  const { bio, name, theme } = req.body;
+  const { bio, name, theme, themeSettings } = req.body;
   if (theme !== undefined && !validTheme(theme)) {
     return res.status(400).json({ message: 'Choose valid six-digit hex colors for every theme color.' });
+  }
+  if (themeSettings !== undefined && !validThemeSettings(themeSettings)) {
+    return res.status(400).json({ message: 'Choose valid saved theme settings.' });
   }
   const account = await updateDatabase((database) => {
     const storedAccount = findUser(database, req.params.id);
@@ -238,6 +274,9 @@ export const updateInfo = async (req, res) => {
     if (typeof bio === 'string') storedAccount.bio = bio.trim();
     if (theme !== undefined) {
       storedAccount.theme = Object.fromEntries(themeKeys.map((key) => [key, theme[key]]));
+    }
+    if (themeSettings !== undefined) {
+      storedAccount.themeSettings = sanitizeThemeSettings(themeSettings);
     }
     storedAccount.updatedAt = new Date().toISOString();
     return storedAccount;

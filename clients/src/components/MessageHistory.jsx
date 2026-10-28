@@ -6,7 +6,7 @@ import { Avatar } from '@chakra-ui/avatar'
 import { isSameSender, isSameSenderMargin, isSameUser, isLastMessage } from '../utils/logics'
 import { setSelectedUser } from '../redux/profileSlice'
 import RankBadge from './RankBadge'
-import { normalizeTheme } from '../utils/theme'
+import { resolveTheme } from '../utils/theme'
 import '../pages/home.css'
 
 function Poll({ message, activeUser, onVote }) {
@@ -21,7 +21,7 @@ function Poll({ message, activeUser, onVote }) {
 
 function MessageHistory({ messages, onVote, onTogglePin, canDelete, onDelete }) {
   const activeUser = useSelector((state) => state.activeUser)
-  const theme = normalizeTheme(activeUser.theme)
+  const theme = resolveTheme(activeUser.themeSettings, activeUser.theme).config
   const dispatch = useDispatch()
   return <ScrollableFeed className='scrollbar-hide'>
     {messages?.map((message, index) => {
@@ -29,7 +29,7 @@ function MessageHistory({ messages, onVote, onTogglePin, canDelete, onDelete }) 
       const ownerMessage = mine && activeUser.isOwner
       return <div className='flex items-center gap-x-[6px]' key={message._id}>
         {(isSameSender(messages, message, index, activeUser.id) || isLastMessage(messages, index, activeUser.id)) && <Tooltip label={`View ${message.sender?.name}'s profile`} placement='bottom-start' hasArrow><button type='button' onClick={() => dispatch(setSelectedUser(message.sender))} className='mt-[43px] mr-1 rounded-full focus:outline-none focus:ring-2 focus:ring-[#319268]' aria-label={`View ${message.sender?.name}'s profile`}><Avatar style={{ width: '32px', height: '32px' }} cursor='pointer' name={message.sender?.name} src={message.sender?.profilePic} borderRadius='25px' /></button></Tooltip>}
-        <div className='relative tracking-wider text-[15px] font-medium' style={{ background: ownerMessage ? 'linear-gradient(135deg, #050505 0%, #16051f 58%, #2e0b42 100%)' : mine ? theme.outgoing : theme.incoming, border: ownerMessage ? '1px solid rgba(214, 129, 255, 0.7)' : 'none', boxShadow: ownerMessage ? '0 0 10px rgba(190, 95, 255, 0.38)' : 'none', marginLeft: isSameSenderMargin(messages, message, index, activeUser.id), marginTop: isSameUser(messages, message, index) ? 3 : 10, borderRadius: mine ? '10px 10px 0 10px' : '10px 10px 10px 0', padding: '10px 18px', maxWidth: '460px', color: mine ? '#fff' : '#54565a' }}>
+        <div className='relative tracking-wider text-[15px] font-medium' style={{ background: ownerMessage ? 'linear-gradient(135deg, #050505 0%, #16051f 58%, #2e0b42 100%)' : mine ? theme.outgoing : theme.incoming, border: ownerMessage ? '1px solid rgba(214, 129, 255, 0.7)' : 'none', boxShadow: ownerMessage ? '0 0 10px rgba(190, 95, 255, 0.38)' : 'none', marginLeft: isSameSenderMargin(messages, message, index, activeUser.id), marginTop: isSameUser(messages, message, index) ? 3 : 10, borderRadius: mine ? `${theme.radius}px ${theme.radius}px 0 ${theme.radius}px` : `${theme.radius}px ${theme.radius}px ${theme.radius}px 0`, padding: '10px 18px', maxWidth: '460px', color: ownerMessage ? '#fff' : mine ? theme.outgoingText : theme.incomingText }}>
           {message.pinned && <span className='mr-1 text-xs'>📌</span>}
           {message.sender?.title && message.sender.title !== 'Member' ? <div className='mb-1'><RankBadge title={message.sender.title} /></div> : null}
           <button type='button' onClick={() => dispatch(setSelectedUser(message.sender))} className='mb-1 block text-left text-[10px] font-bold underline decoration-transparent hover:decoration-current'>{message.sender?.name}</button>

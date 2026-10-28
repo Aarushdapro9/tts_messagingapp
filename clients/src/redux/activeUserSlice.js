@@ -12,6 +12,7 @@ const initialState = {
   approved: true,
   onboardingChatId: null,
   theme: null,
+  themeSettings: null,
 };
 
 const activeUserSlice = createSlice({
@@ -30,13 +31,18 @@ const activeUserSlice = createSlice({
       state.approved = payload.approved !== false;
       state.onboardingChatId = payload.onboardingChatId || null;
       state.theme = payload.theme || null;
+      state.themeSettings = payload.themeSettings || null;
     },
     setUserNameAndBio: (state, { payload }) => {
       state.name = payload.name;
       state.bio = payload.bio;
-      state.theme = payload.theme || null;
+      if (payload.theme) state.theme = payload.theme;
+      if (payload.themeSettings) state.themeSettings = payload.themeSettings;
+    },
+    setUserThemeSettings: (state, { payload }) => {
+      state.themeSettings = payload;
     },
   },
 });
-export const { setActiveUser, setUserNameAndBio } = activeUserSlice.actions;
+export const { setActiveUser, setUserNameAndBio, setUserThemeSettings } = activeUserSlice.actions;
 export default activeUserSlice.reducer;
