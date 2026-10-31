@@ -6,6 +6,7 @@ import { Avatar } from '@chakra-ui/avatar'
 import { isSameSender, isSameSenderMargin, isSameUser, isLastMessage } from '../utils/logics'
 import { setSelectedUser } from '../redux/profileSlice'
 import RankBadge from './RankBadge'
+import GameInviteMessage from './games/GameInviteMessage'
 import { resolveTheme } from '../utils/theme'
 import '../pages/home.css'
 
@@ -19,7 +20,7 @@ function Poll({ message, activeUser, onVote }) {
   })}</div><p className='mt-2 text-[10px] opacity-80'>{votes} vote{votes === 1 ? '' : 's'} · tap to change vote</p></div>
 }
 
-function MessageHistory({ messages, onVote, onTogglePin, canDelete, onDelete }) {
+function MessageHistory({ messages, onVote, onTogglePin, canDelete, onDelete, onOpenGame }) {
   const activeUser = useSelector((state) => state.activeUser)
   const theme = resolveTheme(activeUser.themeSettings, activeUser.theme).config
   const dispatch = useDispatch()
@@ -34,7 +35,11 @@ function MessageHistory({ messages, onVote, onTogglePin, canDelete, onDelete }) 
           {message.sender?.title && message.sender.title !== 'Member' ? <div className='mb-1'><RankBadge title={message.sender.title} /></div> : null}
           <button type='button' onClick={() => dispatch(setSelectedUser(message.sender))} className='mb-1 block text-left text-[10px] font-bold underline decoration-transparent hover:decoration-current'>{message.sender?.name}</button>
           {message.scheduledFor && !message.deliveredAt ? <p className='mb-1 text-[10px] opacity-75'>Scheduled for {new Date(message.scheduledFor).toLocaleString()}</p> : null}
-          {message.type === 'poll' ? <Poll message={message} activeUser={activeUser} onVote={onVote} /> : message.message}
+          {message.type === 'poll'
+            ? <Poll message={message} activeUser={activeUser} onVote={onVote} />
+            : message.type === 'game_invite'
+              ? <GameInviteMessage message={message} onOpen={onOpenGame} />
+              : message.message}
           {message.expiresAt && <p className='mt-1 text-[10px] opacity-70'>Disappears {new Date(message.expiresAt).toLocaleString()}</p>}
           {message.deliveredAt && <button onClick={() => onTogglePin(message._id)} className='ml-2 text-[10px] opacity-75 hover:opacity-100'>{message.pinned ? 'Unpin' : 'Pin'}</button>}
           {canDelete && <button onClick={() => onDelete(message._id)} className='ml-2 text-[10px] font-bold opacity-75 hover:opacity-100'>Delete</button>}

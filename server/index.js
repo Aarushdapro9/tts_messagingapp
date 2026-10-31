@@ -6,6 +6,7 @@ import userRoutes from './routes/user.js';
 import chatRoutes from './routes/chat.js';
 import messageRoutes from './routes/message.js';
 import adminRoutes from './routes/admin.js';
+import gameRoutes from './routes/game.js';
 import * as Server from 'socket.io';
 import { initializeStore } from './storage/store.js';
 
@@ -28,6 +29,7 @@ app.use('/', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/message', messageRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/games', gameRoutes);
 await initializeStore();
 const server = app.listen(PORT, () => {
   console.log(`Server Listening at PORT - ${PORT}`);

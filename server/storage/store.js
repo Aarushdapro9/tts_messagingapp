@@ -16,8 +16,9 @@ const usesBlobStore = Boolean(
     (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN)
   )
 );
-const emptyDatabase = () => ({ users: [], chats: [], messages: [], alerts: [] });
+const emptyDatabase = () => ({ users: [], chats: [], messages: [], alerts: [], games: [], gameActions: [] });
 const maxStoreWriteAttempts = 3;
+const noWriteResult = Symbol('noWriteResult');
 
 let writeQueue = Promise.resolve();
 
@@ -27,6 +28,8 @@ function normalizeDatabase(parsed) {
     chats: Array.isArray(parsed?.chats) ? parsed.chats : [],
     messages: Array.isArray(parsed?.messages) ? parsed.messages : [],
     alerts: Array.isArray(parsed?.alerts) ? parsed.alerts : [],
+    games: Array.isArray(parsed?.games) ? parsed.games : [],
+    gameActions: Array.isArray(parsed?.gameActions) ? parsed.gameActions : [],
   };
 }
 
@@ -144,6 +147,7 @@ export async function updateDatabase(mutator) {
       const state = await readSupabaseState();
       const database = state?.database || emptyDatabase();
       const result = await mutator(database);
+      if (result?.[noWriteResult]) return result.value;
       if (await updateSupabaseDatabase(database, state?.updatedAt)) return result;
     }
     throw new Error('Supabase database changed during this update. Please retry the request.');
@@ -152,12 +156,19 @@ export async function updateDatabase(mutator) {
   const task = writeQueue.then(async () => {
     const database = await readDatabase();
     const result = await mutator(database);
+    if (result?.[noWriteResult]) return result.value;
     await writeDatabase(database);
     return result;
   });
 
   writeQueue = task.catch(() => undefined);
   return task;
+}
+
+// Lets read-like validation and idempotent retries avoid an unnecessary full
+// state write while keeping the existing storage API backward compatible.
+export function noDatabaseWrite(value) {
+  return { [noWriteResult]: true, value };
 }
 
 export function createId() {
