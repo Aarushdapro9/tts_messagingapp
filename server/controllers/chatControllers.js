@@ -2,6 +2,7 @@ import {
   createId,
   expandChat,
   findUser,
+  getDatabase,
   publishAndPruneMessages,
   updateDatabase,
 } from '../storage/store.js';
@@ -89,34 +90,39 @@ export const accessChats = async (req, res) => {
 };
 
 export const fetchAllChats = async (req, res) => {
-  const chats = await updateDatabase((database) => {
-    publishAndPruneMessages(database);
-    if (!database.chats.some((chat) => chat.isGlobal)) {
-      const now = new Date().toISOString();
-      database.chats.push({
-        _id: createId(),
-        chatName: 'Global Chat',
-        photo: defaultGroupPhoto,
-        isGroup: false,
-        isGlobal: true,
-        users: [],
-        latestMessage: null,
-        groupAdmin: null,
-        pinnedMessageIds: [],
-        createdAt: now,
-        updatedAt: now,
-      });
-    }
-    const pending = findUser(database, req.rootUserId)?.approved === false;
-    return database.chats
-      .filter((chat) => pending ? chat.isOnboarding && chat.users.includes(req.rootUserId) : chat.isGlobal || chat.users.includes(req.rootUserId))
-      .sort((first, second) => {
-        if (first.isGlobal) return -1;
-        if (second.isGlobal) return 1;
-        return new Date(second.updatedAt) - new Date(first.updatedAt);
-      })
-      .map((chat) => expandChat(database, chat));
-  });
+  let database = await getDatabase();
+  if (!database.chats.some((chat) => chat.isGlobal)) {
+    database = await updateDatabase((data) => {
+      publishAndPruneMessages(data);
+      if (!data.chats.some((chat) => chat.isGlobal)) {
+        const now = new Date().toISOString();
+        data.chats.push({
+          _id: createId(),
+          chatName: 'Global Chat',
+          photo: defaultGroupPhoto,
+          isGroup: false,
+          isGlobal: true,
+          users: [],
+          latestMessage: null,
+          groupAdmin: null,
+          pinnedMessageIds: [],
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+      return data;
+    });
+  }
+
+  const pending = findUser(database, req.rootUserId)?.approved === false;
+  const chats = database.chats
+    .filter((chat) => pending ? chat.isOnboarding && chat.users.includes(req.rootUserId) : chat.isGlobal || chat.users.includes(req.rootUserId))
+    .sort((first, second) => {
+      if (first.isGlobal) return -1;
+      if (second.isGlobal) return 1;
+      return new Date(second.updatedAt) - new Date(first.updatedAt);
+    })
+    .map((chat) => expandChat(database, chat));
   return res.status(200).json(chats);
 };
 
@@ -218,14 +224,10 @@ export const removeContact = async (_req, res) =>
 const emptyFolders = () => ({ personal: [], work: [] });
 
 export const getChatFolders = async (req, res) => {
-  const database = await updateDatabase((data) => {
-    const user = findUser(data, req.rootUserId);
-    if (!user) return null;
-    user.chatFolders ||= emptyFolders();
-    return user.chatFolders;
-  });
-  if (!database) return res.status(404).json({ message: 'User not found' });
-  return res.status(200).json({ folders: database });
+  const database = await getDatabase();
+  const user = findUser(database, req.rootUserId);
+  if (!user) return res.status(404).json({ message: 'User not found' });
+  return res.status(200).json({ folders: user.chatFolders || emptyFolders() });
 };
 
 export const setChatFolder = async (req, res) => {
