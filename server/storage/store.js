@@ -41,7 +41,8 @@ async function readSupabaseDatabase() {
     headers: supabaseHeaders(),
   });
   if (!response.ok) {
-    throw new Error(`Supabase database read failed (${response.status}). Ensure the app_state table exists and the service-role key is valid.`);
+    const details = (await response.text()).slice(0, 300);
+    throw new Error(`Supabase database read failed (${response.status}): ${details || 'No error details returned.'}`);
   }
   const rows = await response.json();
   return rows[0]?.data ? normalizeDatabase(rows[0].data) : null;
