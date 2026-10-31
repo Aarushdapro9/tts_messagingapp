@@ -16,11 +16,31 @@ const usesBlobStore = Boolean(
     (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN)
   )
 );
-const emptyDatabase = () => ({ users: [], chats: [], messages: [], alerts: [], games: [], gameActions: [] });
+const defaultSettings = () => ({
+  registrationMode: 'open', maintenanceMode: false, globalChatLocked: false,
+  globalChatSlowModeSeconds: 0, featureFlags: { games: true, polls: true },
+});
+const emptyDatabase = () => ({
+  users: [], chats: [], messages: [], alerts: [], games: [], gameActions: [],
+  reports: [], moderationActions: [], auditLogs: [], sessions: [], loginAttempts: [], settings: defaultSettings(),
+});
 const maxStoreWriteAttempts = 3;
 const noWriteResult = Symbol('noWriteResult');
 
 let writeQueue = Promise.resolve();
+let readCache = null;
+let readCacheExpiresAt = 0;
+let readCachePromise = null;
+const readCacheTtlMs = 750;
+
+function cloneDatabase(database) {
+  return structuredClone(database);
+}
+
+function refreshReadCache(database) {
+  readCache = cloneDatabase(normalizeDatabase(database));
+  readCacheExpiresAt = Date.now() + readCacheTtlMs;
+}
 
 function normalizeDatabase(parsed) {
   return {
@@ -30,6 +50,12 @@ function normalizeDatabase(parsed) {
     alerts: Array.isArray(parsed?.alerts) ? parsed.alerts : [],
     games: Array.isArray(parsed?.games) ? parsed.games : [],
     gameActions: Array.isArray(parsed?.gameActions) ? parsed.gameActions : [],
+    reports: Array.isArray(parsed?.reports) ? parsed.reports : [],
+    moderationActions: Array.isArray(parsed?.moderationActions) ? parsed.moderationActions : [],
+    auditLogs: Array.isArray(parsed?.auditLogs) ? parsed.auditLogs : [],
+    sessions: Array.isArray(parsed?.sessions) ? parsed.sessions : [],
+    loginAttempts: Array.isArray(parsed?.loginAttempts) ? parsed.loginAttempts : [],
+    settings: { ...defaultSettings(), ...(parsed?.settings || {}), featureFlags: { ...defaultSettings().featureFlags, ...(parsed?.settings?.featureFlags || {}) } },
   };
 }
 
@@ -131,6 +157,8 @@ export async function initializeStore() {
     const database = await readDatabase();
     if (!usesBlobStore) await writeDatabase(database);
   }
+  readCache = null;
+  readCacheExpiresAt = 0;
   console.log(
     usesSupabaseStore ? 'Supabase database ready' : usesBlobStore ? 'Vercel Blob database ready' : `File database ready at ${dataFile}`
   );
@@ -138,7 +166,16 @@ export async function initializeStore() {
 
 export async function getDatabase() {
   await writeQueue;
-  return readDatabase();
+  if (readCache && readCacheExpiresAt > Date.now()) return cloneDatabase(readCache);
+  if (!readCachePromise) {
+    readCachePromise = readDatabase()
+      .then((database) => {
+        refreshReadCache(database);
+        return readCache;
+      })
+      .finally(() => { readCachePromise = null; });
+  }
+  return cloneDatabase(await readCachePromise);
 }
 
 export async function updateDatabase(mutator) {
@@ -148,7 +185,10 @@ export async function updateDatabase(mutator) {
       const database = state?.database || emptyDatabase();
       const result = await mutator(database);
       if (result?.[noWriteResult]) return result.value;
-      if (await updateSupabaseDatabase(database, state?.updatedAt)) return result;
+      if (await updateSupabaseDatabase(database, state?.updatedAt)) {
+        refreshReadCache(database);
+        return result;
+      }
     }
     throw new Error('Supabase database changed during this update. Please retry the request.');
   }
@@ -158,6 +198,7 @@ export async function updateDatabase(mutator) {
     const result = await mutator(database);
     if (result?.[noWriteResult]) return result.value;
     await writeDatabase(database);
+    refreshReadCache(database);
     return result;
   });
 
@@ -177,7 +218,7 @@ export function createId() {
 
 export function withoutPassword(user) {
   if (!user) return null;
-  const { password, ...safeUser } = user;
+  const { password, mfaSecretEncrypted, recoveryCodes, ...safeUser } = user;
   return safeUser;
 }
 

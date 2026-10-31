@@ -13,6 +13,7 @@ const initialState = {
   onboardingChatId: null,
   theme: null,
   themeSettings: null,
+  blockedUserIds: [],
 };
 
 const activeUserSlice = createSlice({
@@ -32,6 +33,7 @@ const activeUserSlice = createSlice({
       state.onboardingChatId = payload.onboardingChatId || null;
       state.theme = payload.theme || null;
       state.themeSettings = payload.themeSettings || null;
+      state.blockedUserIds = payload.blockedUserIds || [];
     },
     setUserNameAndBio: (state, { payload }) => {
       state.name = payload.name;

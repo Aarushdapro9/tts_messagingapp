@@ -8,6 +8,7 @@ import {
   searchUsers,
   updateInfo,
   getUserById,
+  toggleUserBlock,
 } from '../controllers/user.js';
 import { Auth } from '../middleware/user.js';
 const router = express.Router();
@@ -18,5 +19,6 @@ router.get('/auth/logout', Auth, logout);
 router.post('/api/google', googleAuth);
 router.get('/api/user?', Auth, searchUsers);
 router.get('/api/users/:id', Auth, getUserById);
+router.post('/api/users/:id/block', Auth, toggleUserBlock);
 router.patch('/api/users/update/:id', Auth, updateInfo);
 export default router;

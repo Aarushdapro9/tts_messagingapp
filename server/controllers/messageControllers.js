@@ -6,6 +6,7 @@ import {
   publishAndPruneMessages,
   updateDatabase,
 } from '../storage/store.js';
+import { accountStatus, appendAudit, hasActiveRestriction } from '../services/moderation.js';
 
 function canAccess(chat, userId) {
   return chat && (chat.isGlobal || chat.users.includes(userId));
@@ -13,7 +14,28 @@ function canAccess(chat, userId) {
 
 function canUseChat(database, chat, userId) {
   const user = findUser(database, userId);
-  return canAccess(chat, userId) && (user?.approved !== false || chat.isOnboarding === true);
+  if (!canAccess(chat, userId) || !user) return false;
+  if (!chat.isGlobal && chat.users.some((memberId) => {
+    if (memberId === userId) return false;
+    const member = findUser(database, memberId);
+    return user.blockedUserIds?.includes(memberId) || member?.blockedUserIds?.includes(userId);
+  })) return false;
+  if (accountStatus(user) === 'Banned' || accountStatus(user) === 'Suspended') return false;
+  if (user.approved === false && chat.isOnboarding !== true) return false;
+  if (hasActiveRestriction(user, 'chatMutedUntil')) return false;
+  if (chat.isGlobal && (hasActiveRestriction(user, 'globalChatBannedUntil') || database.settings?.globalChatLocked)) return false;
+  return true;
+}
+
+function violatesFloodProtection(database, chat, userId, text, now) {
+  const recent = database.messages
+    .filter((item) => item.sender === userId && item.chatId === chat._id && item.deliveredAt)
+    .sort((first, second) => new Date(second.createdAt) - new Date(first.createdAt));
+  const tenSecondsAgo = now - 10_000;
+  if (recent.filter((item) => new Date(item.createdAt).getTime() >= tenSecondsAgo).length >= 5) return true;
+  if (recent.slice(0, 3).length === 3 && recent.slice(0, 3).every((item) => item.message === text)) return true;
+  const slowSeconds = chat.isGlobal ? Number(database.settings?.globalChatSlowModeSeconds || 0) : 0;
+  return slowSeconds > 0 && recent[0] && now - new Date(recent[0].createdAt).getTime() < slowSeconds * 1000;
 }
 
 export const sendMessage = async (req, res) => {
@@ -27,6 +49,7 @@ export const sendMessage = async (req, res) => {
       const chat = database.chats.find((item) => item._id === chatId);
       if (!canUseChat(database, chat, req.rootUserId)) return null;
       const now = new Date().toISOString();
+      if (violatesFloodProtection(database, chat, req.rootUserId, message.trim(), Date.now())) return 'rateLimited';
       const scheduledTime = scheduledFor ? new Date(scheduledFor) : null;
       if (scheduledTime && Number.isNaN(scheduledTime.getTime())) return 'invalidSchedule';
       if (scheduledTime && scheduledTime.getTime() <= Date.now() + 60_000) return 'invalidSchedule';
@@ -54,6 +77,7 @@ export const sendMessage = async (req, res) => {
     if (savedMessage === 'invalidSchedule') {
       return res.status(400).json({ message: 'Choose a future time at least one minute from now.' });
     }
+    if (savedMessage === 'rateLimited') return res.status(429).json({ message: 'Please slow down before sending another message.' });
     if (!savedMessage) return res.status(404).json({ message: 'Chat not found' });
     return res.status(201).json(savedMessage);
   } catch (error) {
@@ -85,6 +109,7 @@ export const createPoll = async (req, res) => {
 
   const savedMessage = await updateDatabase((database) => {
     const chat = database.chats.find((item) => item._id === chatId);
+    if (database.settings?.featureFlags?.polls === false) return 'pollsDisabled';
     if (!canUseChat(database, chat, req.rootUserId) || !chat.isGroup || chat.isGlobal) return null;
     const now = new Date().toISOString();
     const newMessage = {
@@ -97,6 +122,7 @@ export const createPoll = async (req, res) => {
     chat.updatedAt = now;
     return expandMessage(database, newMessage);
   });
+  if (savedMessage === 'pollsDisabled') return res.status(503).json({ message: 'Polls are temporarily unavailable.' });
   if (!savedMessage) return res.status(400).json({ message: 'Polls can only be created in a group you belong to.' });
   return res.status(201).json(savedMessage);
 };
@@ -145,6 +171,7 @@ export const deleteMessage = async (req, res) => {
     const [message] = database.messages.splice(messageIndex, 1);
     const chat = database.chats.find((item) => item._id === message.chatId);
     if (chat) chat.updatedAt = new Date().toISOString();
+    appendAudit(database, req.rootUserId, 'message.deleted', 'message', message._id, { chatId: message.chatId });
     publishAndPruneMessages(database);
     return { _id: message._id, chatId: message.chatId };
   });

@@ -6,6 +6,7 @@ import {
   createId,
   findUser,
   getDatabase,
+  noDatabaseWrite,
   updateDatabase,
   withoutPassword,
 } from '../storage/store.js';
@@ -105,6 +106,9 @@ export const register = async (req, res) => {
 
   try {
     const account = await updateDatabase(async (database) => {
+      if (database.settings?.registrationMode === 'invite_only' && !isOwnerEmail(normalizedEmail)) {
+        return noDatabaseWrite('registrationClosed');
+      }
       if (database.users.some((user) => user.email === normalizedEmail)) return null;
       const now = new Date().toISOString();
       const newUser = {
@@ -125,6 +129,7 @@ export const register = async (req, res) => {
       if (!newUser.approved) createOnboardingChat(database, newUser, now);
       return newUser;
     });
+    if (account === 'registrationClosed') return res.status(403).json({ message: 'Registration is currently invite only.' });
     if (!account) {
       return res.status(409).json({ message: 'An account already exists for this email' });
     }
@@ -143,12 +148,28 @@ export const login = async (req, res) => {
   }
 
   try {
-    const database = await getDatabase();
-    const account = database.users.find((user) => user.email === normalizedEmail);
-    if (!account || !(await bcrypt.compare(password, account.password))) {
+    const login = await updateDatabase(async (database) => {
+      const now = Date.now();
+      const key = `${normalizedEmail}:${req.ip || 'unknown'}`;
+      database.loginAttempts = (database.loginAttempts || []).filter((attempt) => now - new Date(attempt.createdAt).getTime() < 15 * 60_000);
+      const failures = database.loginAttempts.filter((attempt) => attempt.key === key && attempt.success === false);
+      if (failures.length >= 5) return noDatabaseWrite({ throttled: true });
+      const account = database.users.find((user) => user.email === normalizedEmail);
+      if (!account || !(await bcrypt.compare(password, account.password))) {
+        database.loginAttempts.push({ key, success: false, createdAt: new Date(now).toISOString() });
+        return { invalid: true };
+      }
+      if (account.restrictions?.bannedAt) return noDatabaseWrite({ banned: true });
+      account.lastActiveAt = new Date(now).toISOString();
+      database.loginAttempts = database.loginAttempts.filter((attempt) => attempt.key !== key);
+      return { account };
+    });
+    if (login.throttled) return res.status(429).json({ message: 'Too many sign-in attempts. Please try again in 15 minutes.' });
+    if (login.banned) return res.status(403).json({ message: 'This account is unavailable.' });
+    if (login.invalid) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
-    return sendToken(res, account);
+    return sendToken(res, login.account);
   } catch (error) {
     console.error('Login failed:', error);
     return res.status(500).json({ message: 'Unable to log in. Please try again.' });
@@ -165,6 +186,7 @@ export const validUser = async (req, res) => {
     } else if (!storedAccount.title) {
       storedAccount.title = 'Member';
     }
+    storedAccount.lastActiveAt = new Date().toISOString();
     const onboardingChatId = storedAccount.approved === false
       ? createOnboardingChat(database, storedAccount, new Date().toISOString())
       : null;
@@ -205,6 +227,9 @@ export const googleAuth = async (req, res) => {
     const account = await updateDatabase(async (database) => {
       const existing = database.users.find((user) => user.email === normalizedEmail);
       if (existing) return existing;
+      if (database.settings?.registrationMode === 'invite_only' && !isOwnerEmail(normalizedEmail)) {
+        return noDatabaseWrite('registrationClosed');
+      }
       const now = new Date().toISOString();
       const newUser = {
         _id: createId(),
@@ -224,6 +249,7 @@ export const googleAuth = async (req, res) => {
       if (!newUser.approved) createOnboardingChat(database, newUser, now);
       return newUser;
     });
+    if (account === 'registrationClosed') return res.status(403).json({ message: 'Registration is currently invite only.' });
     return sendToken(res, account);
   } catch (error) {
     console.error('Google sign-in failed:', error.message);
@@ -254,6 +280,22 @@ export const getUserById = async (req, res) => {
   const account = findUser(database, req.params.id);
   if (!account) return res.status(404).json({ message: 'User not found' });
   return res.status(200).json(withoutPassword(account));
+};
+
+export const toggleUserBlock = async (req, res) => {
+  if (req.params.id === req.rootUserId) return res.status(400).json({ message: 'You cannot block yourself.' });
+  const result = await updateDatabase((database) => {
+    const target = findUser(database, req.params.id);
+    const account = findUser(database, req.rootUserId);
+    if (!target || !account) return null;
+    account.blockedUserIds ||= [];
+    const blocked = account.blockedUserIds.includes(target._id);
+    account.blockedUserIds = blocked ? account.blockedUserIds.filter((id) => id !== target._id) : [...account.blockedUserIds, target._id];
+    account.updatedAt = new Date().toISOString();
+    return { blocked: !blocked, user: withoutPassword(account) };
+  });
+  if (!result) return res.status(404).json({ message: 'User not found.' });
+  return res.status(200).json(result);
 };
 
 export const updateInfo = async (req, res) => {

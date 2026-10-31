@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { createAppAlert, deleteUserAccount, getAdminChatMessages, getAdminOverview, updateUserRole } from '../apis/admin';
+import { createAppAlert, deleteUserAccount, downloadOwnerExport, getAdminChatMessages, getAdminOverview, getAuditLogs, getReports, getSystemSettings, updateReport, updateSystemSettings, updateUserModeration, updateUserRole } from '../apis/admin';
 
 function chatName(chat) {
   if (chat.isGlobal) return 'Global Chat';
@@ -26,11 +26,20 @@ function Admin() {
   const [alertDraft, setAlertDraft] = useState({ type: 'notification', title: '', message: '' });
   const [sendingAlert, setSendingAlert] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState('');
+  const [reports, setReports] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [moderatingUserId, setModeratingUserId] = useState('');
+  const [systemSettings, setSystemSettings] = useState(null);
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const loadOverview = useCallback(async () => {
     setLoading(true);
     try {
-      setOverview(await getAdminOverview());
+      const [nextOverview, nextReports, nextAuditLogs, nextSettings] = await Promise.all([getAdminOverview(), getReports(), getAuditLogs(), getSystemSettings()]);
+      setOverview(nextOverview);
+      setReports(nextReports.reports || []);
+      setAuditLogs(nextAuditLogs.logs || []);
+      setSystemSettings(nextSettings.settings || null);
     } catch (error) {
       const status = error.response?.status;
       toast.error(status === 403 ? 'Your account is not an administrator.' : 'Unable to load the admin panel.');
@@ -137,6 +146,48 @@ function Admin() {
     }
   };
 
+  const moderateUser = async (user, kind, hours = 0) => {
+    if (!window.confirm(`Confirm ${kind.replace('_', ' ')} for ${user.name}?`)) return;
+    setModeratingUserId(user._id);
+    try {
+      const until = hours ? new Date(Date.now() + hours * 60 * 60 * 1000).toISOString() : undefined;
+      const data = await updateUserModeration(user._id, { kind, until });
+      setOverview((current) => ({ ...current, users: current.users.map((item) => item._id === user._id ? data.user : item) }));
+      toast.success('Moderation action saved.');
+    } catch (error) { toast.error(error.response?.data?.message || 'Unable to save moderation action.'); }
+    finally { setModeratingUserId(''); }
+  };
+
+  const resolveReport = async (report, status) => {
+    try {
+      const data = await updateReport(report.id, { status });
+      setReports((current) => current.map((item) => item.id === report.id ? data.report : item));
+      toast.success('Report updated.');
+    } catch (error) { toast.error(error.response?.data?.message || 'Unable to update report.'); }
+  };
+
+  const saveSettings = async (event) => {
+    event.preventDefault();
+    setSavingSettings(true);
+    try {
+      const data = await updateSystemSettings(systemSettings);
+      setSystemSettings(data.settings);
+      toast.success('Owner settings updated.');
+    } catch (error) { toast.error(error.response?.data?.message || 'Unable to update owner settings.'); }
+    finally { setSavingSettings(false); }
+  };
+
+  const exportData = async () => {
+    try {
+      const response = await downloadOwnerExport();
+      const url = URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url; link.download = 'messaging-app-owner-export.json'; link.click();
+      URL.revokeObjectURL(url);
+      toast.success('Owner export downloaded.');
+    } catch (error) { toast.error(error.response?.data?.message || 'Unable to create the export.'); }
+  };
+
   if (loading) {
     return <div className="flex min-h-[100dvh] items-center justify-center bg-[#121418] text-white">Loading admin panel…</div>;
   }
@@ -157,6 +208,13 @@ function Admin() {
           <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Users</p><p className="mt-1 text-3xl font-extrabold">{overview?.users.length || 0}</p></div>
           <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Conversations</p><p className="mt-1 text-3xl font-extrabold">{overview?.chats.length || 0}</p></div>
           <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Private chats</p><p className="mt-1 text-3xl font-extrabold">{overview?.chats.filter((chat) => !chat.isGlobal && !chat.isGroup).length || 0}</p></div>
+          <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Pending reports</p><p className="mt-1 text-3xl font-extrabold">{overview?.stats?.reportsPending || 0}</p></div>
+          <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Suspended / banned</p><p className="mt-1 text-3xl font-extrabold">{(overview?.stats?.suspended || 0) + (overview?.stats?.banned || 0)}</p></div>
+        </section>
+
+        <section className="mb-7 grid grid-cols-1 gap-7 lg:grid-cols-2">
+          <div className="rounded-xl bg-[#1d232b] p-5"><h2 className="text-xl font-bold">Report queue</h2><div className="mt-3 max-h-56 space-y-2 overflow-y-auto">{reports.length ? reports.map((report) => <div key={report.id} className="rounded bg-[#121418] p-3 text-sm"><b>{report.priority} · {report.targetType}</b><p className="mt-1 text-[#c5ced9]">{report.reason}</p><div className="mt-2 flex gap-2"><button onClick={() => resolveReport(report, 'reviewing')} className="text-xs text-[#48cda1]">Review</button><button onClick={() => resolveReport(report, 'resolved')} className="text-xs text-[#48cda1]">Resolve</button><span className="ml-auto text-xs text-[#9eabba]">{report.status}</span></div></div>) : <p className="text-sm text-[#9eabba]">No reports.</p>}</div></div>
+          <div className="rounded-xl bg-[#1d232b] p-5"><h2 className="text-xl font-bold">Security audit</h2><div className="mt-3 max-h-56 space-y-2 overflow-y-auto">{auditLogs.length ? auditLogs.map((log) => <div key={log.id} className="rounded bg-[#121418] p-3 text-xs"><b>{log.action}</b><span className="ml-2 text-[#9eabba]">{formatDate(log.createdAt)}</span></div>) : <p className="text-sm text-[#9eabba]">No sensitive actions recorded yet.</p>}</div></div>
         </section>
 
         <section className="mb-7 rounded-xl bg-[#1d232b] p-5">
@@ -168,6 +226,10 @@ function Admin() {
             <div className="md:col-span-2"><button type="submit" disabled={sendingAlert} className="rounded-lg bg-[#48cda1] px-4 py-2 font-bold text-[#111b21] disabled:opacity-50">{sendingAlert ? 'Sending…' : 'Send notification'}</button></div>
           </form>
         </section>
+
+        {canManageRoles && systemSettings && <section className="mb-7 rounded-xl bg-[#1d232b] p-5"><h2 className="text-xl font-bold">Owner controls</h2><p className="mt-1 text-sm text-[#9eabba]">Changes apply server-side. Maintenance mode lets only the Owner use the app.</p><form onSubmit={saveSettings} className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2"><label className="text-sm font-semibold">Registration<select value={systemSettings.registrationMode} onChange={(event) => setSystemSettings((current) => ({ ...current, registrationMode: event.target.value }))} className="mt-1 block w-full rounded bg-[#121418] p-2"><option value="open">Open registration</option><option value="invite_only">Invite only</option></select></label><label className="text-sm font-semibold">Global Chat slow mode (seconds)<input type="number" min="0" max="300" value={systemSettings.globalChatSlowModeSeconds} onChange={(event) => setSystemSettings((current) => ({ ...current, globalChatSlowModeSeconds: Number(event.target.value) }))} className="mt-1 block w-full rounded bg-[#121418] p-2" /></label>{[['maintenanceMode', 'Maintenance mode'], ['globalChatLocked', 'Lock Global Chat'], ['games', 'Games enabled'], ['polls', 'Polls enabled']].map(([key, label]) => <label key={key} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={key === 'games' || key === 'polls' ? Boolean(systemSettings.featureFlags?.[key]) : Boolean(systemSettings[key])} onChange={(event) => setSystemSettings((current) => key === 'games' || key === 'polls' ? ({ ...current, featureFlags: { ...current.featureFlags, [key]: event.target.checked } }) : ({ ...current, [key]: event.target.checked }))} />{label}</label>)}<div className="flex flex-wrap gap-3 sm:col-span-2"><button type="submit" disabled={savingSettings} className="rounded bg-[#48cda1] px-4 py-2 font-bold text-[#111b21] disabled:opacity-50">{savingSettings ? 'Saving…' : 'Save system settings'}</button><button type="button" onClick={exportData} className="rounded border border-[#718096] px-4 py-2 font-bold">Download data export</button></div></form></section>}
+
+        <section className="mb-7 rounded-xl bg-[#1d232b] p-5"><h2 className="text-xl font-bold">Account safety controls</h2><p className="mt-1 text-sm text-[#9eabba]">Every action is recorded. The Owner and your own account cannot be changed here.</p><div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">{visibleUsers.filter((user) => !user.isOwner && user._id !== overview?.capabilities?.currentUserId).map((user) => <article key={user._id} className="rounded-lg bg-[#121418] p-3"><p className="font-bold">{user.name} <span className="text-xs font-normal text-[#9eabba]">· {user.status}</span></p><p className="mt-1 text-xs text-[#9eabba]">Last active: {formatDate(user.lastActiveAt)}</p><div className="mt-3 flex flex-wrap gap-2"><button disabled={moderatingUserId === user._id} onClick={() => moderateUser(user, 'mute_chat', 24)} className="rounded border border-[#e6b85c] px-2 py-1 text-xs">Mute 24h</button><button disabled={moderatingUserId === user._id} onClick={() => moderateUser(user, 'suspend', 24)} className="rounded border border-[#e6b85c] px-2 py-1 text-xs">Suspend 24h</button><button disabled={moderatingUserId === user._id} onClick={() => moderateUser(user, 'ban_global', 168)} className="rounded border border-[#e6b85c] px-2 py-1 text-xs">Global ban 7d</button><button disabled={moderatingUserId === user._id} onClick={() => moderateUser(user, 'restrict_matchmaking', 168)} className="rounded border border-[#e6b85c] px-2 py-1 text-xs">Games 7d</button><button disabled={moderatingUserId === user._id} onClick={() => moderateUser(user, 'ban')} className="rounded border border-[#e16363] px-2 py-1 text-xs text-[#ff8e8e]">Permanent ban</button><button disabled={moderatingUserId === user._id} onClick={() => moderateUser(user, 'clear')} className="rounded border border-[#48cda1] px-2 py-1 text-xs text-[#48cda1]">Clear limits</button></div></article>)}</div></section>
 
         <section className="mb-7 overflow-hidden rounded-xl bg-[#1d232b]">
           <div className="flex flex-wrap justify-between gap-3 border-b border-[#323b47] p-5"><h2 className="text-xl font-bold">Users</h2><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or email" className="w-full rounded-lg bg-[#121418] px-3 py-2 text-sm outline-none sm:w-64" /></div>

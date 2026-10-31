@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node --test games/*.test.js",
+    "test": "node --test games/*.test.js services/*.test.js",
     "start": "nodemon index.js"
   },
   "author": "",

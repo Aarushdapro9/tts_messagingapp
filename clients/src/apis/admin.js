@@ -23,6 +23,23 @@ export const updateUserApproval = async (userId, approved) =>
 export const deleteUserAccount = async (userId) =>
   (await adminApi().delete(`/api/admin/users/${userId}`)).data;
 
+export const updateUserModeration = async (userId, action) =>
+  (await adminApi().patch(`/api/admin/users/${userId}/moderation`, action)).data;
+
+export const getReports = async () => (await adminApi().get('/api/admin/reports')).data;
+export const getAuditLogs = async () => (await adminApi().get('/api/admin/audit-logs')).data;
+export const updateReport = async (reportId, update) =>
+  (await adminApi().patch(`/api/admin/reports/${reportId}`, update)).data;
+export const createReport = async (report) =>
+  (await adminApi().post('/api/admin/reports', report)).data;
+export const getSystemSettings = async () => (await adminApi().get('/api/admin/settings')).data;
+export const updateSystemSettings = async (settings) =>
+  (await adminApi().patch('/api/admin/settings', settings)).data;
+export const downloadOwnerExport = async () =>
+  adminApi().get('/api/admin/export', { responseType: 'blob' });
+export const cancelGameAsAdmin = async (matchId) =>
+  (await adminApi().post(`/api/admin/games/${matchId}/cancel`)).data;
+
 export const createAppAlert = async (alert) =>
   (await adminApi().post('/api/admin/alerts', alert)).data;
 

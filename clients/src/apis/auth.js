@@ -48,6 +48,10 @@ export const updateUser = async (id, body) => {
     toast.error('Something Went Wrong.try Again!');
   }
 };
+export const toggleUserBlock = async (userId) => {
+  const token = localStorage.getItem('userToken');
+  return API(token).post(`/api/users/${userId}/block`);
+};
 export const checkValid = async () => {
   const data = await validUser();
   if (!data?.user) {

@@ -94,6 +94,7 @@ function Home() {
         themeSettings: data?.user?.themeSettings,
         approved: data?.user?.approved,
         onboardingChatId: data?.user?.onboardingChatId,
+        blockedUserIds: data?.user?.blockedUserIds,
       }
       dispatch(setActiveUser(user))
       const chatsRequest = dispatch(fetchChats())

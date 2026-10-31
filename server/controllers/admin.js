@@ -9,6 +9,7 @@ import {
   withoutPassword,
 } from '../storage/store.js';
 import { getUserTitle, isAdminUser, isOwnerEmail } from '../middleware/user.js';
+import { accountStatus, appendAudit, appendModerationAction, ensureModerationState } from '../services/moderation.js';
 
 function safeAdminUser(user) {
   return {
@@ -17,6 +18,8 @@ function safeAdminUser(user) {
     isAdmin: isAdminUser(user),
     isOwner: isOwnerEmail(user.email),
     approved: user.approved !== false,
+    status: accountStatus(user),
+    lastActiveAt: user.lastActiveAt || null,
   };
 }
 
@@ -33,6 +36,7 @@ function safeAlert(alert) {
 export const getAdminOverview = async (req, res) => {
   try {
     const database = await getDatabase();
+    ensureModerationState(database);
     const users = database.users
       .map(safeAdminUser)
       .sort((first, second) => (first.name || first.email).localeCompare(second.name || second.email));
@@ -46,6 +50,13 @@ export const getAdminOverview = async (req, res) => {
       capabilities: {
         canManageRoles: isOwnerEmail(req.rootUser?.email),
         currentUserId: req.rootUserId,
+      },
+      stats: {
+        reportsPending: database.reports.filter((report) => report.status === 'pending').length,
+        suspended: users.filter((user) => user.status === 'Suspended').length,
+        banned: users.filter((user) => user.status === 'Banned').length,
+        messagesToday: database.messages.filter((message) => new Date(message.createdAt).toDateString() === new Date().toDateString()).length,
+        completedGames: (database.games || []).filter((game) => ['COMPLETED', 'DRAW', 'FORFEITED'].includes(game.status)).length,
       },
     });
   } catch (error) {
@@ -69,6 +80,7 @@ export const updateUserRole = async (req, res) => {
     storedAccount.title = title;
     storedAccount.isAdmin = Boolean(req.body.isAdmin);
     storedAccount.updatedAt = new Date().toISOString();
+    appendAudit(database, req.rootUserId, 'user.role.updated', 'user', storedAccount._id, { title, isAdmin: storedAccount.isAdmin });
     return safeAdminUser(storedAccount);
   });
 
@@ -84,6 +96,7 @@ export const updateUserApproval = async (req, res) => {
     if (!storedAccount || isOwnerEmail(storedAccount.email)) return null;
     storedAccount.approved = Boolean(req.body.approved);
     storedAccount.updatedAt = new Date().toISOString();
+    appendAudit(database, req.rootUserId, 'user.approval.updated', 'user', storedAccount._id, { approved: storedAccount.approved });
     return safeAdminUser(storedAccount);
   });
   if (!account) return res.status(404).json({ message: 'That user cannot be changed.' });
@@ -135,6 +148,7 @@ export const deleteUserAccount = async (req, res) => {
       recipientIds: Array.isArray(alert.recipientIds) ? alert.recipientIds.filter((id) => id !== deletedUserId) : alert.recipientIds,
       dismissedBy: (alert.dismissedBy || []).filter((id) => id !== deletedUserId),
     }));
+    appendAudit(database, req.rootUserId, 'user.deleted', 'user', deletedUserId, { removedChatCount: removedChatIds.size });
     publishAndPruneMessages(database);
     return { deletedUserId, removedChatIds: [...removedChatIds] };
   });
@@ -183,6 +197,7 @@ export const createAppAlert = async (req, res) => {
     };
     database.alerts = Array.isArray(database.alerts) ? database.alerts : [];
     database.alerts.push(nextAlert);
+    appendAudit(database, req.rootUserId, 'alert.created', 'alert', nextAlert._id, { type: nextAlert.type });
     return safeAlert(nextAlert);
   });
 
@@ -216,4 +231,159 @@ export const dismissAppAlert = async (req, res) => {
   });
   if (!dismissed) return res.status(404).json({ message: 'Alert not found.' });
   return res.status(204).end();
+};
+
+const moderationKinds = new Set(['suspend', 'ban', 'clear', 'mute_chat', 'ban_global', 'restrict_matchmaking']);
+
+export const updateUserModeration = async (req, res) => {
+  const { kind, until, note = '' } = req.body;
+  if (!moderationKinds.has(kind)) return res.status(400).json({ message: 'Unknown moderation action.' });
+  const result = await updateDatabase((database) => {
+    const user = findUser(database, req.params.userId);
+    if (!user || user._id === req.rootUserId || isOwnerEmail(user.email)) return null;
+    user.restrictions ||= {};
+    if (kind === 'clear') user.restrictions = {};
+    else if (kind === 'ban') user.restrictions.bannedAt = new Date().toISOString();
+    else {
+      const parsedUntil = new Date(until).getTime();
+      if (!Number.isFinite(parsedUntil) || parsedUntil <= Date.now()) return 'invalidUntil';
+      const field = { suspend: 'suspendedUntil', mute_chat: 'chatMutedUntil', ban_global: 'globalChatBannedUntil', restrict_matchmaking: 'matchmakingRestrictedUntil' }[kind];
+      user.restrictions[field] = new Date(parsedUntil).toISOString();
+    }
+    user.updatedAt = new Date().toISOString();
+    appendModerationAction(database, req.rootUserId, user._id, kind, { until: until || null, note: String(note).slice(0, 500) });
+    return safeAdminUser(user);
+  });
+  if (result === 'invalidUntil') return res.status(400).json({ message: 'Choose a future end time.' });
+  if (!result) return res.status(404).json({ message: 'That account cannot be moderated.' });
+  return res.status(200).json({ user: result });
+};
+
+export const getAuditLogs = async (_req, res) => {
+  const database = await getDatabase();
+  ensureModerationState(database);
+  return res.status(200).json({ logs: database.auditLogs.slice(-500).reverse() });
+};
+
+export const getReports = async (_req, res) => {
+  const database = await getDatabase();
+  ensureModerationState(database);
+  return res.status(200).json({ reports: database.reports.slice().reverse() });
+};
+
+export const updateReport = async (req, res) => {
+  const { status, note = '' } = req.body;
+  if (!['pending', 'reviewing', 'resolved', 'dismissed'].includes(status)) return res.status(400).json({ message: 'Invalid report status.' });
+  const report = await updateDatabase((database) => {
+    const item = (database.reports || []).find((entry) => entry.id === req.params.reportId);
+    if (!item) return null;
+    item.status = status; item.moderatorNotes ||= [];
+    if (note.trim()) item.moderatorNotes.push({ actorId: req.rootUserId, note: note.trim().slice(0, 1000), createdAt: new Date().toISOString() });
+    item.updatedAt = new Date().toISOString();
+    appendAudit(database, req.rootUserId, 'report.updated', 'report', item.id, { status });
+    return item;
+  });
+  if (!report) return res.status(404).json({ message: 'Report not found.' });
+  return res.status(200).json({ report });
+};
+
+export const createReport = async (req, res) => {
+  const { targetType, targetId, reason, priority = 'normal' } = req.body;
+  if (!['user', 'message', 'conversation', 'game'].includes(targetType) || !targetId || !reason?.trim()) return res.status(400).json({ message: 'Choose a target and provide a reason.' });
+  const report = await updateDatabase((database) => {
+    ensureModerationState(database);
+    const item = { id: createId(), reporterId: req.rootUserId, targetType, targetId, reason: reason.trim().slice(0, 1000), priority: ['low', 'normal', 'high'].includes(priority) ? priority : 'normal', status: 'pending', moderatorNotes: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    database.reports.push(item);
+    appendAudit(database, req.rootUserId, 'report.created', 'report', item.id, { targetType, targetId });
+    return item;
+  });
+  return res.status(201).json({ report });
+};
+
+function publicSystemSettings(database) {
+  ensureModerationState(database);
+  return {
+    registrationMode: database.settings.registrationMode,
+    maintenanceMode: Boolean(database.settings.maintenanceMode),
+    globalChatLocked: Boolean(database.settings.globalChatLocked),
+    globalChatSlowModeSeconds: Number(database.settings.globalChatSlowModeSeconds || 0),
+    featureFlags: { ...database.settings.featureFlags },
+  };
+}
+
+export const getSystemSettings = async (_req, res) => {
+  const database = await getDatabase();
+  return res.status(200).json({ settings: publicSystemSettings(database) });
+};
+
+export const updateSystemSettings = async (req, res) => {
+  const result = await updateDatabase((database) => {
+    ensureModerationState(database);
+    const next = req.body || {};
+    if (next.registrationMode !== undefined) {
+      if (!['open', 'invite_only'].includes(next.registrationMode)) return 'invalid';
+      database.settings.registrationMode = next.registrationMode;
+    }
+    for (const field of ['maintenanceMode', 'globalChatLocked']) {
+      if (next[field] !== undefined) {
+        if (typeof next[field] !== 'boolean') return 'invalid';
+        database.settings[field] = next[field];
+      }
+    }
+    if (next.globalChatSlowModeSeconds !== undefined) {
+      const seconds = Number(next.globalChatSlowModeSeconds);
+      if (!Number.isInteger(seconds) || seconds < 0 || seconds > 300) return 'invalid';
+      database.settings.globalChatSlowModeSeconds = seconds;
+    }
+    if (next.featureFlags !== undefined) {
+      if (!next.featureFlags || typeof next.featureFlags !== 'object') return 'invalid';
+      for (const field of ['games', 'polls']) {
+        if (next.featureFlags[field] !== undefined) {
+          if (typeof next.featureFlags[field] !== 'boolean') return 'invalid';
+          database.settings.featureFlags[field] = next.featureFlags[field];
+        }
+      }
+    }
+    appendAudit(database, req.rootUserId, 'system.settings.updated', 'system', 'settings', publicSystemSettings(database));
+    return publicSystemSettings(database);
+  });
+  if (result === 'invalid') return res.status(400).json({ message: 'One or more settings are invalid.' });
+  return res.status(200).json({ settings: result });
+};
+
+export const exportOwnerData = async (_req, res) => {
+  const database = await getDatabase();
+  ensureModerationState(database);
+  const exportData = {
+    exportedAt: new Date().toISOString(),
+    users: database.users.map((user) => withoutPassword(user)),
+    chats: database.chats,
+    messages: database.messages,
+    reports: database.reports,
+    moderationActions: database.moderationActions,
+    auditLogs: database.auditLogs,
+    games: database.games || [],
+  };
+  res.setHeader('Content-Disposition', 'attachment; filename="messaging-app-owner-export.json"');
+  return res.status(200).json(exportData);
+};
+
+export const cancelGameAsAdmin = async (req, res) => {
+  const result = await updateDatabase((database) => {
+    const game = (database.games || []).find((item) => item.id === req.params.matchId);
+    if (!game) return null;
+    if (!['INVITED', 'ACTIVE'].includes(game.status)) return 'completed';
+    game.status = 'CANCELLED';
+    game.activePlayerId = null;
+    game.completedAt = new Date().toISOString();
+    game.updatedAt = game.completedAt;
+    game.revision = Number(game.revision || 0) + 1;
+    const invite = database.messages.find((message) => message.type === 'game_invite' && message.gameId === game.id);
+    if (invite) { invite.gameStatus = game.status; invite.updatedAt = game.updatedAt; }
+    appendAudit(database, req.rootUserId, 'game.cancelled', 'game', game.id, { status: game.status });
+    return { id: game.id, status: game.status };
+  });
+  if (result === 'completed') return res.status(409).json({ message: 'Completed matches cannot be cancelled.' });
+  if (!result) return res.status(404).json({ message: 'Match not found.' });
+  return res.status(200).json({ match: result });
 };

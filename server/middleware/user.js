@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import { getDatabase } from '../storage/store.js';
+import { accountStatus } from '../services/moderation.js';
 
 export const Auth = async (req, res, next) => {
   try {
@@ -35,6 +36,10 @@ export const Auth = async (req, res, next) => {
       (user) => (userId && user._id === userId) || user.email === email
     );
     if (!rootUser) return res.status(401).json({ error: 'Invalid token' });
+    if (accountStatus(rootUser) === 'Banned') return res.status(403).json({ error: 'This account is unavailable.' });
+    if (database.settings?.maintenanceMode && !isOwnerEmail(rootUser.email)) {
+      return res.status(503).json({ error: 'The app is temporarily in maintenance mode.' });
+    }
     req.rootUser = rootUser;
     req.rootUserId = rootUser._id;
     req.token = token;

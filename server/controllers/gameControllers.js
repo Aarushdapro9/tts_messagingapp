@@ -12,6 +12,7 @@ import {
   applyTicTacToeMove,
   createTicTacToeState,
 } from '../games/ticTacToe.js';
+import { hasActiveRestriction } from '../services/moderation.js';
 
 const GAME_TYPE = 'tic-tac-toe';
 const SCHEMA_VERSION = 1;
@@ -88,6 +89,13 @@ export const createMatch = async (req, res) => {
   if (!chatId) return sendResult(res, error('INVALID_ACTION', 'Choose a private conversation.'));
 
   const result = await updateDatabase((database) => {
+    const requester = findUser(database, req.rootUserId);
+    if (database.settings?.featureFlags?.games === false) {
+      return noDatabaseWrite(error('GAMES_DISABLED', 'Games are temporarily unavailable.', 503));
+    }
+    if (hasActiveRestriction(requester, 'matchmakingRestrictedUntil')) {
+      return noDatabaseWrite(error('MATCHMAKING_RESTRICTED', 'Your account is temporarily restricted from starting games.', 403));
+    }
     const chat = resolveDirectConversation(database, chatId, req.rootUserId);
     if (!chat) return noDatabaseWrite(error('NOT_A_PARTICIPANT', 'Games are available in private two-person conversations only.', 403));
     const opponentId = chat.users.find((id) => id !== req.rootUserId);
