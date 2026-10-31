@@ -32,7 +32,6 @@ function normalizeDatabase(parsed) {
 function supabaseHeaders(extra = {}) {
   return {
     apikey: supabaseServiceRoleKey,
-    Authorization: `Bearer ${supabaseServiceRoleKey}`,
     ...extra,
   };
 }
