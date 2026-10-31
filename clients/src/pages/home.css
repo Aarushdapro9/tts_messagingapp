@@ -209,6 +209,10 @@
 .game-catalog-card small { color: var(--theme-muted); font-size: 11px; }
 .game-catalog-card em { margin-left: auto; color: var(--theme-muted); font-size: 10px; font-style: normal; }
 .game-catalog-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: var(--theme-accent); color: #fff; font-size: 12px; font-weight: 800; }
+.mini-golf-map-options { display: grid; gap: 5px; padding: 2px 14px 10px 58px; }
+.mini-golf-map-options button { display: grid; gap: 2px; padding: 8px 10px; border: 1px solid color-mix(in srgb, var(--theme-muted) 28%, transparent); border-radius: 10px; text-align: left; }
+.mini-golf-map-options button:not(:disabled):hover { border-color: var(--theme-accent); background: color-mix(in srgb, var(--theme-accent) 10%, transparent); }
+.mini-golf-map-options small { color: var(--theme-muted); font-size: 10px; }
 
 .game-invite-message {
   display: flex;
@@ -264,6 +268,26 @@
 .game-invite-actions button:last-child, .game-forfeit { border: 1px solid color-mix(in srgb, var(--theme-muted) 45%, transparent); color: var(--theme-text); }
 .game-waiting, .game-result, .game-loading { margin: 22px 0; text-align: center; color: var(--theme-muted); }
 .game-forfeit { display: block; margin: 18px auto 0; font-size: 12px; }
+.mini-golf-course { margin-top: 16px; }
+.mini-golf-map-name { margin-bottom: 5px; color: var(--theme-accent); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.mini-golf-meta { display: flex; justify-content: space-between; gap: 12px; color: var(--theme-muted); font-size: 12px; }
+.mini-golf-meta b { color: var(--theme-text); }
+.mini-golf-fairway { position: relative; height: 132px; margin: 12px 0; overflow: hidden; border: 7px solid #b98b57; border-radius: 46px 18px 46px 18px; background: repeating-linear-gradient(135deg, #3c9e65 0 14px, #358f5b 14px 28px); box-shadow: inset 0 0 0 4px rgba(255,255,255,.16); }
+.mini-golf-map-neon-night { border-color: #7d4abb; background: repeating-linear-gradient(135deg, #241443 0 14px, #3a1e65 14px 28px); box-shadow: inset 0 0 0 4px rgba(99, 231, 255, .23), 0 0 18px rgba(185, 91, 255, .35); }
+.mini-golf-map-forest-run { border-color: #6e4d2f; background: repeating-linear-gradient(135deg, #365d32 0 14px, #294d2d 14px 28px); box-shadow: inset 0 0 0 4px rgba(213, 236, 165, .18); }
+.mini-golf-flag { position: absolute; top: 8px; right: 10px; font-size: 28px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+.mini-golf-ball { position: absolute; bottom: 20px; width: 17px; height: 17px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,.4); transition: left .35s ease; }
+.mini-golf-ball-one { background: #fff; border: 2px solid #dbe5df; }
+.mini-golf-ball-two { bottom: 52px; background: #f3c65a; border: 2px solid #d49d20; }
+.mini-golf-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mini-golf-stats div { display: grid; gap: 3px; padding: 9px; border-radius: 10px; background: color-mix(in srgb, var(--theme-sidebar) 72%, var(--theme-surface)); font-size: 11px; }
+.mini-golf-stats span, .mini-golf-score, .mini-golf-help { color: var(--theme-muted); font-size: 11px; }
+.mini-golf-score { margin: 12px 0; }
+.mini-golf-powers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.mini-golf-powers button { border-radius: 9px; padding: 9px 2px; background: color-mix(in srgb, var(--theme-accent) 16%, var(--theme-surface)); color: var(--theme-text); font-size: 11px; font-weight: 800; }
+.mini-golf-powers button:not(:disabled):hover { background: var(--theme-accent); color: #fff; }
+.mini-golf-powers button:disabled { cursor: default; opacity: .5; }
+.mini-golf-help { margin: 10px 0 0; text-align: center; }
 
 .chat-shell[data-device='tablet'] {
   width: 100%;

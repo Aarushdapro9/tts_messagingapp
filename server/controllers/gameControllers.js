@@ -12,14 +12,39 @@ import {
   applyTicTacToeMove,
   createTicTacToeState,
 } from '../games/ticTacToe.js';
+import {
+  MINI_GOLF_RULESET_VERSION,
+  applyMiniGolfShot,
+  createMiniGolfState,
+  getMiniGolfMap,
+} from '../games/miniGolf.js';
 import { hasActiveRestriction } from '../services/moderation.js';
 
-const GAME_TYPE = 'tic-tac-toe';
 const SCHEMA_VERSION = 1;
 const MATCH_STATUSES = new Set(['CREATED', 'INVITED', 'ACTIVE', 'COMPLETED', 'DRAW', 'FORFEITED', 'EXPIRED', 'CANCELLED']);
 
 function error(code, message, status = 400) {
   return { error: true, code, message, status };
+}
+
+function gameDefinition(gameType, mapId) {
+  if (gameType === 'tic-tac-toe') return {
+    rulesetVersion: TIC_TAC_TOE_RULESET_VERSION,
+    gameConfig: { boardSize: 3 },
+    createState: createTicTacToeState,
+    inviteText: 'Tic-Tac-Toe invitation',
+  };
+  if (gameType === 'mini-golf') {
+    const map = getMiniGolfMap(mapId);
+    if (!map) return null;
+    return {
+      rulesetVersion: MINI_GOLF_RULESET_VERSION,
+      gameConfig: { mapId: map.id, mapName: map.name, holes: map.holes.length, course: map.holes, scoring: 'lowest-strokes' },
+      createState: () => createMiniGolfState(map.id),
+      inviteText: `Mini Golf: ${map.name}`,
+    };
+  }
+  return null;
 }
 
 function canAccessMatch(match, userId) {
@@ -82,9 +107,10 @@ function sendResult(res, result, successStatus = 200) {
 }
 
 export const createMatch = async (req, res) => {
-  const { chatId, gameType } = req.body;
-  if (gameType !== GAME_TYPE) {
-    return sendResult(res, error('INVALID_ACTION', 'Only Tic-Tac-Toe is available right now.'));
+  const { chatId, gameType, mapId } = req.body;
+  const game = gameDefinition(gameType, mapId);
+  if (!game) {
+    return sendResult(res, error('INVALID_ACTION', 'That game is not available.'));
   }
   if (!chatId) return sendResult(res, error('INVALID_ACTION', 'Choose a private conversation.'));
 
@@ -105,9 +131,9 @@ export const createMatch = async (req, res) => {
     const match = {
       id: createId(),
       conversationId: chatId,
-      gameType: GAME_TYPE,
+      gameType,
       schemaVersion: SCHEMA_VERSION,
-      rulesetVersion: TIC_TAC_TOE_RULESET_VERSION,
+      rulesetVersion: game.rulesetVersion,
       physicsVersion: null,
       player1Id: req.rootUserId,
       player2Id: opponentId,
@@ -115,8 +141,8 @@ export const createMatch = async (req, res) => {
       status: 'INVITED',
       currentTurn: 0,
       revision: 0,
-      gameConfig: { boardSize: 3 },
-      authoritativeState: createTicTacToeState(),
+      gameConfig: game.gameConfig,
+      authoritativeState: game.createState(),
       winnerId: null,
       createdAt: now,
       updatedAt: now,
@@ -135,7 +161,7 @@ export const createMatch = async (req, res) => {
       gameTurn: 0,
       gameActivePlayerId: null,
       gameWinnerId: null,
-      message: 'Tic-Tac-Toe invitation',
+      message: game.inviteText,
       createdAt: now,
       updatedAt: now,
       deliveredAt: now,
@@ -196,7 +222,7 @@ export const submitAction = async (req, res) => {
   if (typeof actionId !== 'string' || actionId.length < 8 || actionId.length > 100) {
     return sendResult(res, error('INVALID_ACTION', 'A valid action ID is required.'));
   }
-  if (!Number.isInteger(expectedRevision) || !Number.isInteger(turnNumber) || actionType !== 'MOVE') {
+  if (!Number.isInteger(expectedRevision) || !Number.isInteger(turnNumber)) {
     return sendResult(res, error('INVALID_ACTION', 'The game action is invalid.'));
   }
 
@@ -217,26 +243,27 @@ export const submitAction = async (req, res) => {
     if (turnNumber !== match.currentTurn || match.activePlayerId !== req.rootUserId) return noDatabaseWrite(error('NOT_YOUR_TURN', 'Wait for the other player to move.', 409));
 
     const mark = match.player1Id === req.rootUserId ? 1 : 2;
-    const move = applyTicTacToeMove(match.authoritativeState, mark, actionPayload?.cell);
-    if (move.error) return noDatabaseWrite(error(move.error, move.message));
+    const action = match.gameType === 'tic-tac-toe'
+      ? actionType === 'MOVE' ? applyTicTacToeMove(match.authoritativeState, mark, actionPayload?.cell) : { error: 'INVALID_ACTION', message: 'Choose a valid Tic-Tac-Toe move.' }
+      : match.gameType === 'mini-golf'
+        ? actionType === 'SHOT' ? applyMiniGolfShot(match.authoritativeState, mark, actionPayload?.power) : { error: 'INVALID_ACTION', message: 'Choose a valid Mini Golf shot.' }
+        : { error: 'INVALID_ACTION', message: 'This game is unavailable.' };
+    if (action.error) return noDatabaseWrite(error(action.error, action.message));
 
     const now = new Date().toISOString();
-    match.authoritativeState = move.state;
+    match.authoritativeState = action.state;
     match.currentTurn += 1;
     match.revision += 1;
     match.updatedAt = now;
-    if (move.completed) {
-      match.status = 'COMPLETED';
-      match.winnerId = req.rootUserId;
-      match.activePlayerId = null;
-      match.completedAt = now;
-    } else if (move.draw) {
-      match.status = 'DRAW';
-      match.winnerId = null;
+    if (action.completed || action.draw) {
+      match.status = action.draw ? 'DRAW' : 'COMPLETED';
+      const winnerMark = action.winnerMark || (action.completed ? mark : null);
+      match.winnerId = winnerMark ? (winnerMark === 1 ? match.player1Id : match.player2Id) : null;
       match.activePlayerId = null;
       match.completedAt = now;
     } else {
-      match.activePlayerId = match.player1Id === req.rootUserId ? match.player2Id : match.player1Id;
+      const nextMark = action.nextPlayerMark || (match.player1Id === req.rootUserId ? 2 : 1);
+      match.activePlayerId = nextMark === 1 ? match.player1Id : match.player2Id;
     }
     updateInviteMessage(database, match);
     const payload = actionResult(database, match, req.rootUserId);
@@ -247,7 +274,7 @@ export const submitAction = async (req, res) => {
       actionNumber: match.currentTurn,
       expectedRevision,
       actionType,
-      actionPayload: { cell: actionPayload.cell },
+      actionPayload: match.gameType === 'mini-golf' ? { power: actionPayload.power } : { cell: actionPayload.cell },
       resultingRevision: match.revision,
       resultPayload: payload,
       createdAt: now,

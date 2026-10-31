@@ -9,8 +9,8 @@ function api() {
   });
 }
 
-export async function createGameMatch(chatId, gameType) {
-  const { data } = await api().post('/api/games/matches', { chatId, gameType });
+export async function createGameMatch(chatId, gameType, mapId) {
+  const { data } = await api().post('/api/games/matches', { chatId, gameType, mapId });
   return data;
 }
 
@@ -34,14 +34,14 @@ export async function declineGameMatch(matchId) {
   return data.match;
 }
 
-export async function submitGameAction(match, cell) {
+export async function submitGameAction(match, actionType, actionPayload) {
   const actionId = window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const { data } = await api().post(`/api/games/matches/${match.id}/actions`, {
     actionId,
     expectedRevision: match.revision,
     turnNumber: match.currentTurn,
-    actionType: 'MOVE',
-    actionPayload: { cell },
+    actionType,
+    actionPayload,
     clientRulesetVersion: match.rulesetVersion,
   });
   return data.match;
