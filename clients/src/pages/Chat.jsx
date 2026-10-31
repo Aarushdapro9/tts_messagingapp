@@ -12,6 +12,7 @@ import Loading from '../components/ui/Loading'
 import Typing from '../components/ui/Typing'
 import RankBadge from '../components/RankBadge'
 import GameLauncher from '../components/games/GameLauncher'
+import { fetchConversationMatches } from '../apis/games'
 import { createPoll, deleteMessage, fetchMessages, sendMessage, togglePinnedMessage, voteOnPoll } from '../apis/messages'
 import { fetchChats, setActiveChat, setNotifications } from '../redux/chatsSlice'
 import { getChatName } from '../utils/logics'
@@ -55,6 +56,24 @@ function Chat({ className }) {
       if (Array.isArray(nextMessages)) setMessages(nextMessages)
     } catch {
       // A background sync should stay quiet; a manual action reports its own error.
+    }
+  }, [activeChat?._id])
+
+  const openGameInvite = useCallback(async (invite) => {
+    if (invite.gameId) {
+      setOpenGame({ id: invite.gameId })
+      return
+    }
+
+    try {
+      // Older invitations were saved without a game ID. Only those cards need
+      // this recovery request; current invitations keep their direct link.
+      const matches = await fetchConversationMatches(activeChat?._id)
+      const match = matches.find((item) => item.status === 'INVITED' || item.status === 'ACTIVE') || matches[0]
+      if (!match) throw new Error('No match found')
+      setOpenGame({ id: match.id, initialMatch: match })
+    } catch {
+      toast.error('This invitation no longer has an available match. Start a new game to play.')
     }
   }, [activeChat?._id])
 
@@ -193,7 +212,7 @@ function Chat({ className }) {
     </div>
     {pinnedMessages.length > 0 && <div className='mx-3 mt-2 rounded-lg border border-[#cfe7dc] bg-[#f1fbf6] px-3 py-2 text-xs text-[#295743]'><b>📌 Pinned</b> · {pinnedMessages.map((item) => item.type === 'poll' ? 'Poll' : item.message).join(' · ')}</div>}
     <div className='scrollbar-hide w-full h-[calc(100dvh-205px)] md:h-[calc(100dvh-155px)] flex flex-col overflow-y-scroll p-3 md:p-4'>
-      <MessageHistory messages={messages} onVote={onVote} onTogglePin={onTogglePin} canDelete={activeUser.isAdmin} onDelete={onDeleteMessage} onOpenGame={(matchId) => setOpenGame({ id: matchId })} />
+      <MessageHistory messages={messages} onVote={onVote} onTogglePin={onTogglePin} canDelete={activeUser.isAdmin} onDelete={onDeleteMessage} onOpenGame={openGameInvite} />
       <div className='ml-7 -mb-10'>{isTyping ? <Typing width='100' height='100' /> : null}</div>
     </div>
     <div className='chat-composer absolute left-3 right-3 bottom-3 md:left-4 md:right-auto md:bottom-4'>

@@ -28,6 +28,7 @@ function MessageHistory({ messages, onVote, onTogglePin, canDelete, onDelete, on
     {messages?.map((message, index) => {
       const mine = message.sender?._id === activeUser.id
       const ownerMessage = mine && activeUser.isOwner
+      const isGameInvite = message.type === 'game_invite' || Boolean(message.gameId) || message.message === 'Tic-Tac-Toe invitation'
       return <div className='flex items-center gap-x-[6px]' key={message._id}>
         {(isSameSender(messages, message, index, activeUser.id) || isLastMessage(messages, index, activeUser.id)) && <Tooltip label={`View ${message.sender?.name}'s profile`} placement='bottom-start' hasArrow><button type='button' onClick={() => dispatch(setSelectedUser(message.sender))} className='mt-[43px] mr-1 rounded-full focus:outline-none focus:ring-2 focus:ring-[#319268]' aria-label={`View ${message.sender?.name}'s profile`}><Avatar style={{ width: '32px', height: '32px' }} cursor='pointer' name={message.sender?.name} src={message.sender?.profilePic} borderRadius='25px' /></button></Tooltip>}
         <div className='relative tracking-wider text-[15px] font-medium' style={{ background: ownerMessage ? 'linear-gradient(135deg, #050505 0%, #16051f 58%, #2e0b42 100%)' : mine ? theme.outgoing : theme.incoming, border: ownerMessage ? '1px solid rgba(214, 129, 255, 0.7)' : 'none', boxShadow: ownerMessage ? '0 0 10px rgba(190, 95, 255, 0.38)' : 'none', marginLeft: isSameSenderMargin(messages, message, index, activeUser.id), marginTop: isSameUser(messages, message, index) ? 3 : 10, borderRadius: mine ? `${theme.radius}px ${theme.radius}px 0 ${theme.radius}px` : `${theme.radius}px ${theme.radius}px ${theme.radius}px 0`, padding: '10px 18px', maxWidth: '460px', color: ownerMessage ? '#fff' : mine ? theme.outgoingText : theme.incomingText }}>
@@ -37,7 +38,7 @@ function MessageHistory({ messages, onVote, onTogglePin, canDelete, onDelete, on
           {message.scheduledFor && !message.deliveredAt ? <p className='mb-1 text-[10px] opacity-75'>Scheduled for {new Date(message.scheduledFor).toLocaleString()}</p> : null}
           {message.type === 'poll'
             ? <Poll message={message} activeUser={activeUser} onVote={onVote} />
-            : message.type === 'game_invite'
+            : isGameInvite
               ? <GameInviteMessage message={message} onOpen={onOpenGame} />
               : message.message}
           {message.expiresAt && <p className='mt-1 text-[10px] opacity-70'>Disappears {new Date(message.expiresAt).toLocaleString()}</p>}

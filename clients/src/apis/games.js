@@ -19,6 +19,11 @@ export async function fetchGameMatch(matchId) {
   return data.match;
 }
 
+export async function fetchConversationMatches(conversationId) {
+  const { data } = await api().get(`/api/games/conversations/${conversationId}/matches`);
+  return data.matches || [];
+}
+
 export async function acceptGameMatch(matchId) {
   const { data } = await api().post(`/api/games/matches/${matchId}/accept`);
   return data.match;

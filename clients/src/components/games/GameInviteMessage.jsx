@@ -9,7 +9,7 @@ const friendlyStatus = {
 
 export default function GameInviteMessage({ message, onOpen }) {
   const name = message.gameType === 'tic-tac-toe' ? 'Tic-Tac-Toe' : 'Game';
-  return <button type='button' className='game-invite-message' onClick={() => onOpen(message.gameId)}>
+  return <button type='button' className='game-invite-message' onClick={() => onOpen(message)}>
     <span className='game-invite-symbol'>X O</span>
     <span><b>{name}</b><small>{friendlyStatus[message.gameStatus] || 'Open match'}</small></span>
     <span className='game-invite-open'>Open</span>
