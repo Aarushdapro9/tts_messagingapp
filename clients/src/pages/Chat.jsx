@@ -46,7 +46,7 @@ function Chat({ className }) {
   const [showPoll, setShowPoll] = useState(false)
   const [pollQuestion, setPollQuestion] = useState('')
   const [pollOptions, setPollOptions] = useState(['', ''])
-  const [openGameId, setOpenGameId] = useState(null)
+  const [openGame, setOpenGame] = useState(null)
 
   const refreshMessages = useCallback(async () => {
     if (!activeChat?._id) return
@@ -193,7 +193,7 @@ function Chat({ className }) {
     </div>
     {pinnedMessages.length > 0 && <div className='mx-3 mt-2 rounded-lg border border-[#cfe7dc] bg-[#f1fbf6] px-3 py-2 text-xs text-[#295743]'><b>📌 Pinned</b> · {pinnedMessages.map((item) => item.type === 'poll' ? 'Poll' : item.message).join(' · ')}</div>}
     <div className='scrollbar-hide w-full h-[calc(100dvh-205px)] md:h-[calc(100dvh-155px)] flex flex-col overflow-y-scroll p-3 md:p-4'>
-      <MessageHistory messages={messages} onVote={onVote} onTogglePin={onTogglePin} canDelete={activeUser.isAdmin} onDelete={onDeleteMessage} onOpenGame={setOpenGameId} />
+      <MessageHistory messages={messages} onVote={onVote} onTogglePin={onTogglePin} canDelete={activeUser.isAdmin} onDelete={onDeleteMessage} onOpenGame={(matchId) => setOpenGame({ id: matchId })} />
       <div className='ml-7 -mb-10'>{isTyping ? <Typing width='100' height='100' /> : null}</div>
     </div>
     <div className='chat-composer absolute left-3 right-3 bottom-3 md:left-4 md:right-auto md:bottom-4'>
@@ -208,11 +208,11 @@ function Chat({ className }) {
         <select aria-label='Message expiry' value={expiresInMinutes} onChange={(event) => setExpiresInMinutes(event.target.value)} className='min-w-0 flex-1 bg-transparent text-[11px] outline-none'>{expiryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
         <button onClick={() => setShowSchedule((current) => !current)} className='text-[11px] text-[#319268]'>Later</button>
         {activeChat.isGroup && <button onClick={() => setShowPoll((current) => !current)} className='text-[11px] text-[#319268]'>Poll</button>}
-        {!activeChat.isGroup && !activeChat.isGlobal && <GameLauncher chatId={activeChat._id} onMatchCreated={(matchId) => { dispatch(fetchChats()); refreshMessages(); setOpenGameId(matchId) }} />}
+        {!activeChat.isGroup && !activeChat.isGlobal && <GameLauncher chatId={activeChat._id} onMatchCreated={(match) => { dispatch(fetchChats()); refreshMessages(); setOpenGame({ id: match.id, initialMatch: match }) }} />}
         <button onClick={sendCurrentMessage} className='rounded border-2 border-[#d4d4d4] px-2 py-1 text-[12px] font-medium text-[#4d5e54]'>Send</button>
       </div>
     </div>
-    {openGameId && <Suspense fallback={<div className='game-screen-backdrop'><div className='game-loading'>Loading game…</div></div>}><GameScreen matchId={openGameId} activeUserId={activeUser.id} onClose={() => { setOpenGameId(null); refreshMessages(); dispatch(fetchChats()) }} /></Suspense>}
+    {openGame && <Suspense fallback={<div className='game-screen-backdrop'><div className='game-loading'>Loading game…</div></div>}><GameScreen matchId={openGame.id} initialMatch={openGame.initialMatch} activeUserId={activeUser.id} onClose={() => { setOpenGame(null); refreshMessages(); dispatch(fetchChats()) }} /></Suspense>}
   </div>
 }
 

@@ -17,7 +17,9 @@ export default function GameLauncher({ chatId, onMatchCreated }) {
     try {
       const { match } = await createGameMatch(chatId, gameType);
       setOpen(false);
-      onMatchCreated(match.id);
+      // The creation response is an authoritative snapshot, so opening it does not
+      // need a second immediate request while a serverless write settles.
+      onMatchCreated(match);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to create this match.');
     } finally {

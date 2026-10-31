@@ -12,9 +12,10 @@ function playerName(player) {
   return player?.name || 'Player';
 }
 
-export default function GameScreen({ matchId, activeUserId, onClose }) {
-  const [match, setMatch] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function GameScreen({ matchId, initialMatch = null, activeUserId, onClose }) {
+  const hasInitialMatch = initialMatch?.id === matchId;
+  const [match, setMatch] = useState(() => hasInitialMatch ? initialMatch : null);
+  const [loading, setLoading] = useState(() => !hasInitialMatch);
   const [acting, setActing] = useState(false);
 
   const refresh = useCallback(async (quiet = false) => {
@@ -28,10 +29,10 @@ export default function GameScreen({ matchId, activeUserId, onClose }) {
   }, [matchId]);
 
   useEffect(() => {
-    refresh();
+    if (!hasInitialMatch) refresh();
     const timer = window.setInterval(() => refresh(true), 30_000);
     return () => window.clearInterval(timer);
-  }, [refresh]);
+  }, [hasInitialMatch, refresh]);
 
   const answerInvite = async (accept) => {
     setActing(true);
