@@ -66,14 +66,15 @@ export default function GameScreen({ matchId, initialMatch = null, activeUserId,
     ? (match.activePlayerId === activeUserId ? 'Your turn' : `${playerName(match.activePlayerId === match.player1?._id ? match.player1 : match.player2)}'s turn`)
     : match.status === 'COMPLETED' ? `${playerName(match.winnerId === match.player1?._id ? match.player1 : match.player2)} won`
     : match.status === 'DRAW' ? 'Draw' : match.status === 'INVITED' ? 'Invitation waiting' : 'Match closed';
+  const isInvitee = match?.viewerRole === 'INVITEE' || match?.player2?._id === activeUserId;
 
   return <div className='game-screen-backdrop' role='presentation'>
     <section className='game-screen' role='dialog' aria-modal='true' aria-label='Tic-Tac-Toe match'>
       <header><div><span className='game-eyebrow'>GAMES</span><h2>Tic-Tac-Toe</h2><p>{status}</p></div><button type='button' onClick={onClose} aria-label='Return to chat'>×</button></header>
       {loading ? <div className='game-loading'>Loading match…</div> : match && <>
         <div className='game-players'><span className={match.activePlayerId === match.player1?._id ? 'game-player-active' : ''}>{playerName(match.player1)} <b>×</b></span><span className={match.activePlayerId === match.player2?._id ? 'game-player-active' : ''}>{playerName(match.player2)} <b>○</b></span></div>
-        {match.status === 'INVITED' && match.player2?._id === activeUserId && <div className='game-invite-actions'><button type='button' disabled={acting} onClick={() => answerInvite(true)}>Accept</button><button type='button' disabled={acting} onClick={() => answerInvite(false)}>Decline</button></div>}
-        {match.status === 'INVITED' && match.player1?._id === activeUserId && <p className='game-waiting'>Waiting for {playerName(match.player2)} to accept.</p>}
+        {match.status === 'INVITED' && isInvitee && <div className='game-invite-actions'><button type='button' disabled={acting} onClick={() => answerInvite(true)}>Accept</button><button type='button' disabled={acting} onClick={() => answerInvite(false)}>Decline</button></div>}
+        {match.status === 'INVITED' && !isInvitee && <p className='game-waiting'>Waiting for {playerName(match.player2)} to accept.</p>}
         <div className='tic-tac-toe-board' aria-label='Tic-Tac-Toe board'>
           {match.authoritativeState.board.map((mark, cell) => <button key={cell} type='button' disabled={acting || match.status !== 'ACTIVE' || match.activePlayerId !== activeUserId || Boolean(mark)} onClick={() => move(cell)} aria-label={`Square ${cell + 1}`} className={mark === 1 ? 'mark-x' : mark === 2 ? 'mark-o' : ''}>{mark === 1 ? '×' : mark === 2 ? '○' : ''}</button>)}
         </div>

@@ -29,7 +29,8 @@ function isDirectConversation(chat) {
   return Boolean(chat && !chat.isGroup && !chat.isGlobal && chat.users?.length === 2);
 }
 
-function matchResponse(database, match) {
+function matchResponse(database, match, viewerId = null) {
+  const viewerRole = viewerId === match.player1Id ? 'CREATOR' : viewerId === match.player2Id ? 'INVITEE' : null;
   return {
     id: match.id,
     conversationId: match.conversationId,
@@ -39,6 +40,7 @@ function matchResponse(database, match) {
     physicsVersion: match.physicsVersion,
     player1: withoutPassword(findUser(database, match.player1Id)),
     player2: withoutPassword(findUser(database, match.player2Id)),
+    viewerRole,
     activePlayerId: match.activePlayerId,
     status: match.status,
     currentTurn: match.currentTurn,
@@ -69,8 +71,8 @@ function resolveDirectConversation(database, chatId, userId) {
   return chat;
 }
 
-function actionResult(database, match) {
-  return { match: matchResponse(database, match) };
+function actionResult(database, match, viewerId) {
+  return { match: matchResponse(database, match, viewerId) };
 }
 
 function sendResult(res, result, successStatus = 200) {
@@ -135,7 +137,7 @@ export const createMatch = async (req, res) => {
     database.messages.push(invite);
     chat.latestMessage = invite._id;
     chat.updatedAt = now;
-    return { match: matchResponse(database, match), invite: expandMessage(database, invite) };
+    return { match: matchResponse(database, match, req.rootUserId), invite: expandMessage(database, invite) };
   });
   return sendResult(res, result, 201);
 };
@@ -144,7 +146,7 @@ export const getMatch = async (req, res) => {
   const database = await getDatabase();
   const match = database.games.find((item) => item.id === req.params.matchId);
   if (!canAccessMatch(match, req.rootUserId)) return sendResult(res, error('NOT_A_PARTICIPANT', 'Match not found.', 404));
-  return res.status(200).json({ match: matchResponse(database, match) });
+  return res.status(200).json({ match: matchResponse(database, match, req.rootUserId) });
 };
 
 export const getConversationMatches = async (req, res) => {
@@ -154,7 +156,7 @@ export const getConversationMatches = async (req, res) => {
   const matches = database.games
     .filter((match) => match.conversationId === chat._id && canAccessMatch(match, req.rootUserId))
     .sort((first, second) => new Date(second.updatedAt) - new Date(first.updatedAt))
-    .map((match) => matchResponse(database, match));
+    .map((match) => matchResponse(database, match, req.rootUserId));
   return res.status(200).json({ matches });
 };
 
@@ -172,7 +174,7 @@ function respondToInvite(status) {
       match.updatedAt = now;
       match.revision += 1;
       updateInviteMessage(database, match);
-      return actionResult(database, match);
+      return actionResult(database, match, req.rootUserId);
     });
     return sendResult(res, result);
   };
@@ -229,7 +231,7 @@ export const submitAction = async (req, res) => {
       match.activePlayerId = match.player1Id === req.rootUserId ? match.player2Id : match.player1Id;
     }
     updateInviteMessage(database, match);
-    const payload = actionResult(database, match);
+    const payload = actionResult(database, match, req.rootUserId);
     database.gameActions.push({
       id: actionId,
       matchId: match.id,
@@ -260,7 +262,7 @@ export const forfeitMatch = async (req, res) => {
     match.updatedAt = now;
     match.revision += 1;
     updateInviteMessage(database, match);
-    return actionResult(database, match);
+    return actionResult(database, match, req.rootUserId);
   });
   return sendResult(res, result);
 };
