@@ -4,6 +4,7 @@ import {
   expandMessage,
   findUser,
   getDatabase,
+  publishAndPruneMessages,
   updateDatabase,
   withoutPassword,
 } from '../storage/store.js';
@@ -44,6 +45,7 @@ export const getAdminOverview = async (req, res) => {
       chats,
       capabilities: {
         canManageRoles: isOwnerEmail(req.rootUser?.email),
+        currentUserId: req.rootUserId,
       },
     });
   } catch (error) {
@@ -86,6 +88,60 @@ export const updateUserApproval = async (req, res) => {
   });
   if (!account) return res.status(404).json({ message: 'That user cannot be changed.' });
   return res.status(200).json({ user: account });
+};
+
+export const deleteUserAccount = async (req, res) => {
+  if (req.params.userId === req.rootUserId) {
+    return res.status(400).json({ message: 'You cannot delete your own account from the admin panel.' });
+  }
+
+  const result = await updateDatabase((database) => {
+    const account = findUser(database, req.params.userId);
+    if (!account) return null;
+    if (isOwnerEmail(account.email)) return 'owner';
+
+    const deletedUserId = account._id;
+    const removedChatIds = new Set();
+    for (const chat of database.chats) {
+      if (chat.isGlobal || !chat.users?.includes(deletedUserId)) continue;
+      chat.users = chat.users.filter((id) => id !== deletedUserId);
+      if (chat.groupAdmin === deletedUserId) chat.groupAdmin = chat.users[0] || null;
+      if (chat.isOnboarding || !chat.isGroup || chat.users.length < 2) removedChatIds.add(chat._id);
+    }
+    database.chats = database.chats.filter((chat) => !removedChatIds.has(chat._id));
+
+    const removedGameIds = new Set(
+      (database.games || [])
+        .filter((game) => game.player1Id === deletedUserId || game.player2Id === deletedUserId)
+        .map((game) => game.id)
+    );
+    database.games = (database.games || []).filter((game) => !removedGameIds.has(game.id));
+    database.gameActions = (database.gameActions || []).filter((action) => !removedGameIds.has(action.matchId));
+
+    database.messages = database.messages.filter((message) =>
+      message.sender !== deletedUserId &&
+      !removedChatIds.has(message.chatId) &&
+      !removedGameIds.has(message.gameId)
+    );
+    database.users = database.users.filter((user) => user._id !== deletedUserId).map((user) => ({
+      ...user,
+      contacts: (user.contacts || []).filter((id) => id !== deletedUserId),
+      chatFolders: user.chatFolders
+        ? Object.fromEntries(Object.entries(user.chatFolders).map(([folder, ids]) => [folder, (ids || []).filter((id) => !removedChatIds.has(id))]))
+        : user.chatFolders,
+    }));
+    database.alerts = (database.alerts || []).map((alert) => ({
+      ...alert,
+      recipientIds: Array.isArray(alert.recipientIds) ? alert.recipientIds.filter((id) => id !== deletedUserId) : alert.recipientIds,
+      dismissedBy: (alert.dismissedBy || []).filter((id) => id !== deletedUserId),
+    }));
+    publishAndPruneMessages(database);
+    return { deletedUserId, removedChatIds: [...removedChatIds] };
+  });
+
+  if (result === 'owner') return res.status(403).json({ message: 'The Owner account cannot be deleted.' });
+  if (!result) return res.status(404).json({ message: 'Account not found.' });
+  return res.status(200).json(result);
 };
 
 export const getAdminChatMessages = async (req, res) => {

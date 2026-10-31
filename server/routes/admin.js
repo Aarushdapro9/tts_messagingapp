@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   createAppAlert,
+  deleteUserAccount,
   dismissAppAlert,
   getAdminChatMessages,
   getAdminOverview,
@@ -19,5 +20,6 @@ router.get('/alerts/pending', Auth, getPendingAlerts);
 router.post('/alerts/:alertId/dismiss', Auth, dismissAppAlert);
 router.patch('/users/:userId/role', Auth, Owner, updateUserRole);
 router.patch('/users/:userId/approval', Auth, Owner, updateUserApproval);
+router.delete('/users/:userId', Auth, Admin, deleteUserAccount);
 
 export default router;

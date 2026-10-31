@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { createAppAlert, getAdminChatMessages, getAdminOverview, updateUserRole } from '../apis/admin';
+import { createAppAlert, deleteUserAccount, getAdminChatMessages, getAdminOverview, updateUserRole } from '../apis/admin';
 
 function chatName(chat) {
   if (chat.isGlobal) return 'Global Chat';
@@ -25,6 +25,7 @@ function Admin() {
   const [savingUserId, setSavingUserId] = useState('');
   const [alertDraft, setAlertDraft] = useState({ type: 'notification', title: '', message: '' });
   const [sendingAlert, setSendingAlert] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState('');
 
   const loadOverview = useCallback(async () => {
     setLoading(true);
@@ -117,6 +118,25 @@ function Admin() {
     }
   };
 
+  const deleteAccount = async (user) => {
+    if (!window.confirm(`Permanently delete ${user.name}'s account and its messages, chats, and matches? This cannot be undone.`)) return;
+    setDeletingUserId(user._id);
+    try {
+      const result = await deleteUserAccount(user._id);
+      setOverview((current) => ({
+        ...current,
+        users: current.users.filter((item) => item._id !== result.deletedUserId),
+        chats: current.chats.filter((chat) => !result.removedChatIds.includes(chat._id)),
+      }));
+      setSelectedChat((current) => result.removedChatIds.includes(current?._id) ? null : current);
+      toast.success('Account deleted.');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to delete this account.');
+    } finally {
+      setDeletingUserId('');
+    }
+  };
+
   if (loading) {
     return <div className="flex min-h-[100dvh] items-center justify-center bg-[#121418] text-white">Loading admin panel…</div>;
   }
@@ -153,7 +173,8 @@ function Admin() {
           <div className="flex flex-wrap justify-between gap-3 border-b border-[#323b47] p-5"><h2 className="text-xl font-bold">Users</h2><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or email" className="w-full rounded-lg bg-[#121418] px-3 py-2 text-sm outline-none sm:w-64" /></div>
           <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-left"><thead className="text-xs uppercase text-[#9eabba]"><tr><th className="p-4">Name</th><th className="p-4">Email</th><th className="p-4">Title</th><th className="p-4">Access</th><th className="p-4">Joined</th><th className="p-4">Actions</th></tr></thead><tbody>{visibleUsers.map((user) => {
             const draft = roleDrafts[user._id] || { title: user.title || 'Member', isAdmin: Boolean(user.isAdmin) };
-            return <tr key={user._id} className="border-t border-[#323b47] text-sm"><td className="p-4 font-semibold">{user.name}</td><td className="p-4 text-[#c5ced9]">{user.email}</td><td className="p-4">{canManageRoles && !user.isOwner ? <input value={draft.title} maxLength="32" onChange={(event) => changeRoleDraft(user, { title: event.target.value })} className="w-32 rounded bg-[#121418] px-2 py-1 text-sm outline-none" /> : <span>{user.title}</span>}</td><td className="p-4">{user.isOwner ? <span className="rounded-full bg-[#f4c95d] px-2 py-1 text-xs font-bold text-[#29220d]">Owner</span> : canManageRoles ? <label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={draft.isAdmin} onChange={(event) => changeRoleDraft(user, { isAdmin: event.target.checked })} /> Administrator</label> : user.isAdmin ? <span className="text-[#48cda1]">Administrator</span> : <span className="text-[#9eabba]">Member</span>}</td><td className="p-4 text-[#9eabba]">{formatDate(user.createdAt)}</td><td className="p-4">{canManageRoles && !user.isOwner ? <button onClick={() => saveRole(user)} disabled={savingUserId === user._id} className="rounded bg-[#48cda1] px-3 py-1 text-xs font-bold text-[#111b21] disabled:opacity-50">{savingUserId === user._id ? 'Saving…' : 'Save'}</button> : '—'}</td></tr>;
+            const canDeleteAccount = !user.isOwner && user._id !== overview?.capabilities?.currentUserId;
+            return <tr key={user._id} className="border-t border-[#323b47] text-sm"><td className="p-4 font-semibold">{user.name}</td><td className="p-4 text-[#c5ced9]">{user.email}</td><td className="p-4">{canManageRoles && !user.isOwner ? <input value={draft.title} maxLength="32" onChange={(event) => changeRoleDraft(user, { title: event.target.value })} className="w-32 rounded bg-[#121418] px-2 py-1 text-sm outline-none" /> : <span>{user.title}</span>}</td><td className="p-4">{user.isOwner ? <span className="rounded-full bg-[#f4c95d] px-2 py-1 text-xs font-bold text-[#29220d]">Owner</span> : canManageRoles ? <label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={draft.isAdmin} onChange={(event) => changeRoleDraft(user, { isAdmin: event.target.checked })} /> Administrator</label> : user.isAdmin ? <span className="text-[#48cda1]">Administrator</span> : <span className="text-[#9eabba]">Member</span>}</td><td className="p-4 text-[#9eabba]">{formatDate(user.createdAt)}</td><td className="p-4">{user.isOwner ? '—' : <div className="flex gap-2">{canManageRoles && <button onClick={() => saveRole(user)} disabled={savingUserId === user._id} className="rounded bg-[#48cda1] px-3 py-1 text-xs font-bold text-[#111b21] disabled:opacity-50">{savingUserId === user._id ? 'Saving…' : 'Save'}</button>}{canDeleteAccount && <button onClick={() => deleteAccount(user)} disabled={deletingUserId === user._id} className="rounded border border-[#e16363] px-3 py-1 text-xs font-bold text-[#ff8e8e] disabled:opacity-50">{deletingUserId === user._id ? 'Deleting…' : 'Delete'}</button>}</div>}</td></tr>;
           })}</tbody></table></div>
         </section>
 

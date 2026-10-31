@@ -26,7 +26,7 @@ function canAccessMatch(match, userId) {
 }
 
 function isDirectConversation(chat) {
-  return Boolean(chat && !chat.isGroup && !chat.isGlobal && !chat.isOnboarding && chat.users?.length === 2);
+  return Boolean(chat && !chat.isGroup && !chat.isGlobal && chat.users?.length === 2);
 }
 
 function matchResponse(database, match) {
