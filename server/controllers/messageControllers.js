@@ -2,6 +2,7 @@ import {
   createId,
   expandMessage,
   findUser,
+  getDatabase,
   publishAndPruneMessages,
   updateDatabase,
 } from '../storage/store.js';
@@ -63,16 +64,15 @@ export const sendMessage = async (req, res) => {
 
 export const getMessages = async (req, res) => {
   const { chatId } = req.params;
-  const messages = await updateDatabase((database) => {
-    publishAndPruneMessages(database);
-    const chat = database.chats.find((item) => item._id === chatId);
-    if (!canUseChat(database, chat, req.rootUserId)) return null;
-    return database.messages
-      .filter((message) => message.chatId === chatId && (message.deliveredAt || message.sender === req.rootUserId))
-      .sort((first, second) => new Date(first.createdAt) - new Date(second.createdAt))
-      .map((message) => expandMessage(database, message));
-  });
-  if (!messages) return res.status(404).json({ message: 'Chat not found' });
+  const database = await getDatabase();
+  const chat = database.chats.find((item) => item._id === chatId);
+  if (!canUseChat(database, chat, req.rootUserId)) return res.status(404).json({ message: 'Chat not found' });
+  const now = Date.now();
+  const messages = database.messages
+    .filter((message) => message.chatId === chatId && (message.deliveredAt || message.sender === req.rootUserId))
+    .filter((message) => !message.expiresAt || new Date(message.expiresAt).getTime() > now)
+    .sort((first, second) => new Date(first.createdAt) - new Date(second.createdAt))
+    .map((message) => expandMessage(database, message));
   return res.status(200).json(messages);
 };
 

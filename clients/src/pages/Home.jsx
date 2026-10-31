@@ -58,14 +58,25 @@ function Home() {
     setShowUsers(false)
   }
   useEffect(() => {
+    const query = search.trim()
+    if (!query && !showUsers) {
+      setSearchResults([])
+      setIsLoading(false)
+      return undefined
+    }
+    let cancelled = false
     const searchChange = async () => {
       setIsLoading(true)
-      const { data } = await searchUsers(search)
-      setSearchResults(data)
-      setIsLoading(false)
+      try {
+        const { data } = await searchUsers(query)
+        if (!cancelled) setSearchResults(data)
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
     }
-    searchChange()
-  }, [search])
+    const timeout = window.setTimeout(searchChange, 250)
+    return () => { cancelled = true; window.clearTimeout(timeout) }
+  }, [search, showUsers])
   useEffect(() => {
     const isValid = async () => {
       const data = await validUser()
@@ -85,8 +96,9 @@ function Home() {
         onboardingChatId: data?.user?.onboardingChatId,
       }
       dispatch(setActiveUser(user))
+      const chatsRequest = dispatch(fetchChats())
       if (data?.user?.approved === false && data?.user?.onboardingChatId) {
-        const action = await dispatch(fetchChats())
+        const action = await chatsRequest
         const onboardingChat = action.payload?.find((chat) => chat._id === data.user.onboardingChatId)
         if (onboardingChat) dispatch(setActiveChat(onboardingChat))
       }
@@ -115,10 +127,11 @@ function Home() {
   }, [activeUser.id])
 
   useEffect(() => {
+    if (!activeUser.id) return undefined
     const syncChats = () => dispatch(fetchChats())
-    const interval = window.setInterval(syncChats, 20_000)
+    const interval = window.setInterval(syncChats, 30_000)
     return () => window.clearInterval(interval)
-  }, [dispatch])
+  }, [activeUser.id, dispatch])
 
   const dismissCurrentAlert = async () => {
     const currentAlert = appAlerts[0]
@@ -149,7 +162,7 @@ function Home() {
                   <div className='flex'>
                     <a className='flex items-center relative  -top-4 block h-[90px]' href='/'>
 
-                      <h3 className='text-[20px] text-[#1f2228] font-body font-extrabold tracking-wider'>Messages</h3>
+                      <h3 className='app-title text-[20px] font-body font-extrabold tracking-wider'>Messages</h3>
                     </a>
                   </div>
                   <div className='absolute top-4 right-5 flex items-center gap-x-3'>
@@ -203,7 +216,7 @@ function Home() {
                   <div className='-mt-6 relative pt-6 px-4'>
                     <form onSubmit={(e) => e.preventDefault()}>
 
-                      <input onChange={handleSearch} className='w-[99.5%] bg-[#f6f6f6] text-[#111b21] tracking-wider pl-9 py-[8px] rounded-[9px] outline-0' type="text" name="search" placeholder="Search" />
+                      <input onChange={handleSearch} className='sidebar-search w-[99.5%] tracking-wider pl-9 py-[8px] rounded-[9px] outline-0' type="text" name="search" placeholder="Search" />
 
                     </form>
 

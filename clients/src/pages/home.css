@@ -50,7 +50,6 @@
   font-family: var(--theme-font);
 }
 
-.themed-app .chat-sidebar,
 .themed-app .chat-sidebar {
   background-color: var(--theme-sidebar) !important;
   color: var(--theme-text);
@@ -89,6 +88,57 @@
 .themed-app .chat-page input,
 .themed-app .chat-sidebar input,
 .themed-app .chat-page textarea {
+  color: var(--theme-text) !important;
+}
+
+.themed-app .app-title,
+.themed-app .chat-title {
+  color: var(--theme-text) !important;
+}
+
+.themed-app .sidebar-search {
+  background: color-mix(in srgb, var(--theme-surface) 82%, var(--theme-sidebar)) !important;
+  border: 1px solid color-mix(in srgb, var(--theme-muted) 35%, transparent);
+  color: var(--theme-text) !important;
+}
+
+.themed-app .sidebar-search::placeholder,
+.themed-app .chat-message-field::placeholder {
+  color: var(--theme-muted);
+  opacity: 1;
+}
+
+.themed-app .folder-tab {
+  background: color-mix(in srgb, var(--theme-surface) 72%, var(--theme-sidebar));
+  color: var(--theme-text);
+}
+
+.themed-app .folder-tab-active {
+  background: var(--theme-accent);
+  color: #fff;
+}
+
+.themed-app .chat-list-item {
+  background: color-mix(in srgb, var(--theme-surface) 92%, var(--theme-sidebar));
+  border-bottom: 1px solid color-mix(in srgb, var(--theme-muted) 20%, transparent);
+}
+
+.themed-app .chat-list-item:hover,
+.themed-app .chat-list-item-active {
+  background: color-mix(in srgb, var(--theme-accent) 16%, var(--theme-surface));
+}
+
+.themed-app .chat-list-title {
+  color: var(--theme-text) !important;
+}
+
+.themed-app .chat-list-preview,
+.themed-app .chat-list-time {
+  color: var(--theme-muted) !important;
+}
+
+.themed-app .chat-message-field {
+  background: transparent !important;
   color: var(--theme-text) !important;
 }
 

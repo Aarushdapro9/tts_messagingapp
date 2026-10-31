@@ -17,6 +17,7 @@ const usesBlobStore = Boolean(
   )
 );
 const emptyDatabase = () => ({ users: [], chats: [], messages: [], alerts: [] });
+const maxStoreWriteAttempts = 3;
 
 let writeQueue = Promise.resolve();
 
@@ -36,8 +37,8 @@ function supabaseHeaders(extra = {}) {
   };
 }
 
-async function readSupabaseDatabase() {
-  const response = await fetch(`${supabaseUrl}/rest/v1/app_state?id=eq.primary&select=data`, {
+async function readSupabaseState() {
+  const response = await fetch(`${supabaseUrl}/rest/v1/app_state?id=eq.primary&select=data,updated_at`, {
     headers: supabaseHeaders(),
   });
   if (!response.ok) {
@@ -45,7 +46,28 @@ async function readSupabaseDatabase() {
     throw new Error(`Supabase database read failed (${response.status}): ${details || 'No error details returned.'}`);
   }
   const rows = await response.json();
-  return rows[0]?.data ? normalizeDatabase(rows[0].data) : null;
+  return rows[0]?.data ? { database: normalizeDatabase(rows[0].data), updatedAt: rows[0].updated_at } : null;
+}
+
+async function readSupabaseDatabase() {
+  return (await readSupabaseState())?.database || null;
+}
+
+async function updateSupabaseDatabase(database, expectedUpdatedAt) {
+  if (!expectedUpdatedAt) return false;
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/app_state?id=eq.primary&updated_at=eq.${encodeURIComponent(expectedUpdatedAt)}`,
+    {
+      method: 'PATCH',
+      headers: supabaseHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
+      }),
+      body: JSON.stringify({ data: normalizeDatabase(database), updated_at: new Date().toISOString() }),
+    }
+  );
+  if (!response.ok) throw new Error(`Supabase database write failed (${response.status}).`);
+  return (await response.json()).length === 1;
 }
 
 async function readDatabase() {
@@ -117,6 +139,16 @@ export async function getDatabase() {
 }
 
 export async function updateDatabase(mutator) {
+  if (usesSupabaseStore) {
+    for (let attempt = 0; attempt < maxStoreWriteAttempts; attempt += 1) {
+      const state = await readSupabaseState();
+      const database = state?.database || emptyDatabase();
+      const result = await mutator(database);
+      if (await updateSupabaseDatabase(database, state?.updatedAt)) return result;
+    }
+    throw new Error('Supabase database changed during this update. Please retry the request.');
+  }
+
   const task = writeQueue.then(async () => {
     const database = await readDatabase();
     const result = await mutator(database);
