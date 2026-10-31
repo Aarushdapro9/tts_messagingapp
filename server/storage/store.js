@@ -8,36 +8,60 @@ const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const defaultDataFile = path.join(moduleDirectory, '..', 'data', 'database.json');
 const dataFile = process.env.DATA_FILE || defaultDataFile;
 const blobPath = 'chat/database.json';
+const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '');
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const usesSupabaseStore = Boolean(supabaseUrl && supabaseServiceRoleKey);
 const usesBlobStore = Boolean(
-  process.env.BLOB_READ_WRITE_TOKEN ||
+  !usesSupabaseStore && (process.env.BLOB_READ_WRITE_TOKEN ||
     (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN)
+  )
 );
 const emptyDatabase = () => ({ users: [], chats: [], messages: [], alerts: [] });
 
 let writeQueue = Promise.resolve();
 
+function normalizeDatabase(parsed) {
+  return {
+    users: Array.isArray(parsed?.users) ? parsed.users : [],
+    chats: Array.isArray(parsed?.chats) ? parsed.chats : [],
+    messages: Array.isArray(parsed?.messages) ? parsed.messages : [],
+    alerts: Array.isArray(parsed?.alerts) ? parsed.alerts : [],
+  };
+}
+
+function supabaseHeaders(extra = {}) {
+  return {
+    apikey: supabaseServiceRoleKey,
+    Authorization: `Bearer ${supabaseServiceRoleKey}`,
+    ...extra,
+  };
+}
+
+async function readSupabaseDatabase() {
+  const response = await fetch(`${supabaseUrl}/rest/v1/app_state?id=eq.primary&select=data`, {
+    headers: supabaseHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Supabase database read failed (${response.status}). Ensure the app_state table exists and the service-role key is valid.`);
+  }
+  const rows = await response.json();
+  return rows[0]?.data ? normalizeDatabase(rows[0].data) : null;
+}
+
 async function readDatabase() {
+  if (usesSupabaseStore) {
+    return (await readSupabaseDatabase()) || emptyDatabase();
+  }
   if (usesBlobStore) {
     const result = await getBlob(blobPath, { access: 'private', useCache: false });
     if (!result || result.statusCode === 304 || !result.stream) return emptyDatabase();
-    const parsed = JSON.parse(await new Response(result.stream).text());
-    return {
-      users: Array.isArray(parsed.users) ? parsed.users : [],
-      chats: Array.isArray(parsed.chats) ? parsed.chats : [],
-      messages: Array.isArray(parsed.messages) ? parsed.messages : [],
-      alerts: Array.isArray(parsed.alerts) ? parsed.alerts : [],
-    };
+    return normalizeDatabase(JSON.parse(await new Response(result.stream).text()));
   }
 
   try {
     const raw = await readFile(dataFile, 'utf8');
     const parsed = JSON.parse(raw);
-    return {
-      users: Array.isArray(parsed.users) ? parsed.users : [],
-      chats: Array.isArray(parsed.chats) ? parsed.chats : [],
-      messages: Array.isArray(parsed.messages) ? parsed.messages : [],
-      alerts: Array.isArray(parsed.alerts) ? parsed.alerts : [],
-    };
+    return normalizeDatabase(parsed);
   } catch (error) {
     if (error.code === 'ENOENT') return emptyDatabase();
     throw error;
@@ -45,6 +69,20 @@ async function readDatabase() {
 }
 
 async function writeDatabase(database) {
+  if (usesSupabaseStore) {
+    const response = await fetch(`${supabaseUrl}/rest/v1/app_state?on_conflict=id`, {
+      method: 'POST',
+      headers: supabaseHeaders({
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal',
+      }),
+      body: JSON.stringify({ id: 'primary', data: normalizeDatabase(database), updated_at: new Date().toISOString() }),
+    });
+    if (!response.ok) {
+      throw new Error(`Supabase database write failed (${response.status}).`);
+    }
+    return;
+  }
   if (usesBlobStore) {
     await putBlob(blobPath, JSON.stringify(database), {
       access: 'private',
@@ -61,10 +99,15 @@ async function writeDatabase(database) {
 }
 
 export async function initializeStore() {
-  const database = await readDatabase();
-  if (!usesBlobStore) await writeDatabase(database);
+  if (usesSupabaseStore) {
+    const existing = await readSupabaseDatabase();
+    if (!existing) await writeDatabase(emptyDatabase());
+  } else {
+    const database = await readDatabase();
+    if (!usesBlobStore) await writeDatabase(database);
+  }
   console.log(
-    usesBlobStore ? 'Vercel Blob database ready' : `File database ready at ${dataFile}`
+    usesSupabaseStore ? 'Supabase database ready' : usesBlobStore ? 'Vercel Blob database ready' : `File database ready at ${dataFile}`
   );
 }
 
