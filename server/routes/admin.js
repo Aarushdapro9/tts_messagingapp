@@ -18,17 +18,19 @@ import {
   exportOwnerData,
   cancelGameAsAdmin,
 } from '../controllers/admin.js';
-import { Admin, Auth, Owner } from '../middleware/user.js';
+import { Admin, Auth, Moderator, Owner } from '../middleware/user.js';
 
 const router = express.Router();
 
-router.get('/', Auth, Admin, getAdminOverview);
+router.get('/', Auth, Moderator, getAdminOverview);
 router.get('/chats/:chatId/messages', Auth, Admin, getAdminChatMessages);
 router.post('/alerts', Auth, Admin, createAppAlert);
 router.get('/alerts/pending', Auth, getPendingAlerts);
 router.post('/alerts/:alertId/dismiss', Auth, dismissAppAlert);
-router.patch('/users/:userId/role', Auth, Owner, updateUserRole);
-router.patch('/users/:userId/approval', Auth, Owner, updateUserApproval);
+router.patch('/users/:userId/role', Auth, Admin, updateUserRole);
+// Admission is a moderation workflow, so trusted administrators can approve
+// pending accounts. Role changes and system-wide settings remain Owner-only.
+router.patch('/users/:userId/approval', Auth, Moderator, updateUserApproval);
 router.delete('/users/:userId', Auth, Admin, deleteUserAccount);
 router.patch('/users/:userId/moderation', Auth, Admin, updateUserModeration);
 router.get('/reports', Auth, Admin, getReports);

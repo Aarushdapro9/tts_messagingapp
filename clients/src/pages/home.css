@@ -283,12 +283,13 @@
 .mini-golf-board { display: block; width: 100%; max-height: 50dvh; height: auto; touch-action: none; user-select: none; cursor: crosshair; }
 .mini-golf-grass { fill: #6eaf57; }
 .mini-golf-wall { fill: #325b37; stroke: rgba(255, 255, 255, .26); stroke-width: 6; }
+.mini-golf-moving-wall { fill: #f4f5f1; stroke: #9da49f; stroke-width: 3; }
 .mini-golf-sand { fill: #e9cc78; stroke: #c7a453; stroke-width: 7; }
 .mini-golf-water { fill: #54b9d2; stroke: #b7f2f5; stroke-width: 9; }
 .mini-golf-ice { fill: #b5e7ef; opacity: .9; stroke: #e7fbff; stroke-width: 7; }
 .mini-golf-slope { fill: rgba(255, 255, 255, .18); stroke: rgba(255, 255, 255, .6); stroke-width: 6; stroke-dasharray: 12 10; }
 .mini-golf-cup-shadow { fill: #1e2430; opacity: .3; }
-.mini-golf-cup { fill: #18221f; stroke: #fff; stroke-width: 5; }
+.mini-golf-cup { fill: #ba2727; stroke: #ff8a8a; stroke-width: 4; }
 .mini-golf-pin { fill: #ff6b63; stroke: #fff; stroke-width: 5; stroke-linejoin: round; }
 .mini-golf-ball { stroke-width: 5; transition: cx .38s ease-out, cy .38s ease-out; }
 .mini-golf-ball-one { fill: #fff; stroke: #d7e2d7; }
@@ -302,6 +303,9 @@
 .mini-golf-theme-alpine { border-color: #587488; }
 .mini-golf-theme-alpine .mini-golf-grass { fill: #7199a3; }
 .mini-golf-theme-alpine .mini-golf-wall { fill: #3e665f; }
+.mini-golf-theme-classic { border-color: #414141; }
+.mini-golf-theme-classic .mini-golf-grass { fill: #1b1b1b; }
+.mini-golf-theme-classic .mini-golf-wall { fill: #f4f4f4; stroke: #a7a7a7; stroke-width: 3; }
 .mini-golf-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .mini-golf-stats div { display: grid; gap: 3px; padding: 9px; border-radius: 10px; background: color-mix(in srgb, var(--theme-sidebar) 72%, var(--theme-surface)); font-size: 11px; }
 .mini-golf-stats span, .mini-golf-score, .mini-golf-help { color: var(--theme-muted); font-size: 11px; }

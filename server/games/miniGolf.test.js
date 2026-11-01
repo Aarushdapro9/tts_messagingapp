@@ -1,44 +1,46 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { applyMiniGolfShot, createMiniGolfState, getMiniGolfMap } from './miniGolf.js';
+import { applyMiniGolfShot, createMiniGolfState, getMiniGolfMap, movingObstacleRects } from './miniGolf.js';
 
 const softPutt = { angle: 0, power: 0.08 };
 
-test('Mini Golf provides three distinct selectable three-hole maps', () => {
-  for (const id of ['garden-circuit', 'neon-workshop', 'alpine-table']) assert.equal(getMiniGolfMap(id).holes.length, 3);
-  assert.equal(createMiniGolfState('neon-workshop').mapId, 'neon-workshop');
+test('Mini Golf ports the reference project as one five-level course', () => {
+  const map = getMiniGolfMap('classic-2d-mini-golf');
+  assert.equal(map.holes.length, 5);
+  assert.deepEqual(map.holes[0].cup, { x: 100, y: 100 });
+  assert.deepEqual(map.holes[4].cup, { x: 550, y: 600 });
+  assert.equal(createMiniGolfState().mapId, 'classic-2d-mini-golf');
   assert.equal(createMiniGolfState('unknown-map'), null);
 });
 
-test('Mini Golf validates a drag shot and advances turn after server physics', () => {
+test('Mini Golf validates a drag shot and advances the multiplayer turn', () => {
   assert.equal(applyMiniGolfShot(createMiniGolfState(), 1, { angle: 0, power: 2 }).error, 'INVALID_ACTION');
   const result = applyMiniGolfShot(createMiniGolfState(), 1, { angle: 0, power: 0.5 });
   assert.equal(result.state.strokes[0], 1);
   assert.equal(result.nextPlayerMark, 2);
-  assert.ok(result.state.balls[0].x > 145);
+  assert.ok(result.state.balls[0].x > 100);
+});
+
+test('Mini Golf includes the reference sine and circular moving obstacles', () => {
+  const map = getMiniGolfMap();
+  assert.equal(map.holes[1].movingObstacles.length, 14);
+  assert.equal(map.holes[3].movingObstacles.length, 11);
+  const first = movingObstacleRects(map.holes[1], 0)[0];
+  const later = movingObstacleRects(map.holes[1], 1)[0];
+  assert.notEqual(first.x, later.x);
 });
 
 test('Mini Golf resolves a stepped wall collision before finishing a shot', () => {
-  const state = createMiniGolfState('garden-circuit');
-  state.balls[0] = { x: 385, y: 160 };
-  const result = applyMiniGolfShot(state, 1, { angle: 0, power: 0.25 });
+  const state = createMiniGolfState();
+  state.balls[0] = { x: 100, y: 330 };
+  const result = applyMiniGolfShot(state, 1, { angle: Math.PI / 2, power: 0.2 });
   assert.equal(result.nextPlayerMark, 2);
-  assert.ok(result.state.balls[0].x < 410, 'the ball should reflect from the vertical hedge wall');
+  assert.ok(result.state.balls[0].y < 345, 'the ball should reflect from the first level wall');
 });
 
-test('Mini Golf returns a water shot to the tee', () => {
-  const state = createMiniGolfState('garden-circuit');
-  state.holeIndex = 1;
-  const hole = getMiniGolfMap('garden-circuit').holes[1];
-  state.balls = [{ x: 500, y: 300 }, { ...hole.start }];
-  const result = applyMiniGolfShot(state, 1, softPutt);
-  assert.equal(result.state.lastShot.water, true);
-  assert.deepEqual(result.state.balls[0], hole.start);
-});
-
-test('Mini Golf scores both players and advances to the next hole', () => {
-  let state = createMiniGolfState('garden-circuit');
-  const hole = getMiniGolfMap('garden-circuit').holes[0];
+test('Mini Golf scores both players and advances to the next level', () => {
+  let state = createMiniGolfState();
+  const hole = getMiniGolfMap().holes[0];
   state.balls[0] = { ...hole.cup };
   state = applyMiniGolfShot(state, 1, softPutt).state;
   state.balls[1] = { ...hole.cup };

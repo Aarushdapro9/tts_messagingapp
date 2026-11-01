@@ -1,3 +1,54 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html, body, #root {
+  min-height: 100%;
+  margin: 0;
+}
+
+.app-recovery {
+  box-sizing: border-box;
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 24px;
+  background: #121418;
+  color: #f7faf8;
+  font-family: Inter, system-ui, sans-serif;
+  text-align: center;
+}
+
+.app-recovery section {
+  max-width: 340px;
+}
+
+.app-recovery-eyebrow {
+  margin: 0 0 8px;
+  color: #48cda1;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.app-recovery h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.app-recovery p:not(.app-recovery-eyebrow) {
+  color: #b9c6c1;
+  line-height: 1.5;
+}
+
+.app-recovery button {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #48cda1;
+  color: #10221b;
+  font: inherit;
+  font-weight: 800;
+}

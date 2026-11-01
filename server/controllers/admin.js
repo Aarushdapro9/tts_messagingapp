@@ -8,7 +8,7 @@ import {
   updateDatabase,
   withoutPassword,
 } from '../storage/store.js';
-import { getUserTitle, isAdminUser, isOwnerEmail } from '../middleware/user.js';
+import { getUserTitle, isAdminUser, isModeratorUser, isOwnerEmail } from '../middleware/user.js';
 import { accountStatus, appendAudit, appendModerationAction, ensureModerationState } from '../services/moderation.js';
 
 function safeAdminUser(user) {
@@ -16,6 +16,7 @@ function safeAdminUser(user) {
     ...withoutPassword(user),
     title: getUserTitle(user),
     isAdmin: isAdminUser(user),
+    isModerator: Boolean(user.isModerator) && !isAdminUser(user),
     isOwner: isOwnerEmail(user.email),
     approved: user.approved !== false,
     status: accountStatus(user),
@@ -37,6 +38,17 @@ export const getAdminOverview = async (req, res) => {
   try {
     const database = await getDatabase();
     ensureModerationState(database);
+    if (!isAdminUser(req.rootUser)) {
+      const pendingUsers = database.users
+        .filter((user) => !isOwnerEmail(user.email) && user.approved === false)
+        .map((user) => ({ _id: user._id, name: user.name, title: getUserTitle(user), createdAt: user.createdAt, approved: false }));
+      return res.status(200).json({
+        users: pendingUsers,
+        chats: [],
+        capabilities: { accessLevel: 'moderator', canManageRoles: false, canApproveUsers: isModeratorUser(req.rootUser), currentUserId: req.rootUserId },
+        stats: { reportsPending: 0, suspended: 0, banned: 0 },
+      });
+    }
     const users = database.users
       .map(safeAdminUser)
       .sort((first, second) => (first.name || first.email).localeCompare(second.name || second.email));
@@ -48,7 +60,10 @@ export const getAdminOverview = async (req, res) => {
       users,
       chats,
       capabilities: {
+        accessLevel: 'admin',
         canManageRoles: isOwnerEmail(req.rootUser?.email),
+        canManageModerators: isAdminUser(req.rootUser),
+        canApproveUsers: isAdminUser(req.rootUser),
         currentUserId: req.rootUserId,
       },
       stats: {
@@ -77,16 +92,29 @@ export const updateUserRole = async (req, res) => {
   const account = await updateDatabase((database) => {
     const storedAccount = findUser(database, req.params.userId);
     if (!storedAccount || isOwnerEmail(storedAccount.email)) return null;
+    const actorIsOwner = isOwnerEmail(req.rootUser?.email);
+    // Administrators may grant/revoke the narrowly scoped Moderator role,
+    // but they cannot alter titles, create administrators, or affect another
+    // administrator. Those wider privilege changes remain Owner-only.
+    if (!actorIsOwner) {
+      if (isAdminUser(storedAccount)) return 'adminTarget';
+      storedAccount.isModerator = Boolean(req.body.isModerator);
+      storedAccount.updatedAt = new Date().toISOString();
+      appendAudit(database, req.rootUserId, 'user.moderator.updated', 'user', storedAccount._id, { isModerator: storedAccount.isModerator });
+      return safeAdminUser(storedAccount);
+    }
     storedAccount.title = title;
     storedAccount.isAdmin = Boolean(req.body.isAdmin);
+    storedAccount.isModerator = !storedAccount.isAdmin && Boolean(req.body.isModerator);
     storedAccount.updatedAt = new Date().toISOString();
-    appendAudit(database, req.rootUserId, 'user.role.updated', 'user', storedAccount._id, { title, isAdmin: storedAccount.isAdmin });
+    appendAudit(database, req.rootUserId, 'user.role.updated', 'user', storedAccount._id, { title, isAdmin: storedAccount.isAdmin, isModerator: storedAccount.isModerator });
     return safeAdminUser(storedAccount);
   });
 
   if (!account) {
     return res.status(404).json({ message: 'That user cannot be changed.' });
   }
+  if (account === 'adminTarget') return res.status(403).json({ message: 'Only the Owner can change another administrator.' });
   return res.status(200).json({ user: account });
 };
 

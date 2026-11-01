@@ -7,6 +7,7 @@ const initialState = {
   bio: '',
   name: '',
   isAdmin: false,
+  isModerator: false,
   isOwner: false,
   title: 'Member',
   approved: true,
@@ -27,6 +28,7 @@ const activeUserSlice = createSlice({
       state.bio = payload.bio;
       state.name = payload.name;
       state.isAdmin = Boolean(payload.isAdmin);
+      state.isModerator = Boolean(payload.isModerator) && !state.isAdmin;
       state.isOwner = Boolean(payload.isOwner);
       state.title = payload.title || (payload.isAdmin ? 'Administrator' : 'Member');
       state.approved = payload.approved !== false;

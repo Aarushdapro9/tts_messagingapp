@@ -5,7 +5,30 @@ import { acceptGameMatch, declineGameMatch, fetchGameMatch, forfeitGameMatch, su
 function playerName(player) { return player?.name || 'Player'; }
 function gameName(gameType) { return gameType === 'mini-golf' ? 'Mini Golf' : 'Tic-Tac-Toe'; }
 
-function SvgCourse({ hole, balls, aim, canShoot, onAimStart, onAimMove, onAimEnd }) {
+function movingObstacleRects(hole, seconds) {
+  return (hole.movingObstacles || []).flatMap((obstacle) => {
+    const phase = seconds * (obstacle.speed || 1) + (obstacle.phase || 0);
+    const offset = obstacle.type === 'circle'
+      ? { x: Math.sin(phase) * obstacle.radius, y: Math.cos(phase) * obstacle.radius }
+      : { x: Math.sin(phase) * (obstacle.amplitude?.x || 0), y: Math.sin(phase) * (obstacle.amplitude?.y || 0) };
+    const pieces = obstacle.pieces || [{ x: -(obstacle.size?.width || 0) / 2, y: -(obstacle.size?.height || 0) / 2, width: obstacle.size?.width, height: obstacle.size?.height }];
+    return pieces.map((piece, index) => ({ key: `${obstacle.id}-${index}`, x: obstacle.origin.x + offset.x + piece.x, y: obstacle.origin.y + offset.y + piece.y, width: piece.width, height: piece.height }));
+  });
+}
+
+function useLiveObstacleTime(enabled) {
+  const [seconds, setSeconds] = useState(() => Date.now() / 1000);
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const timer = window.setInterval(() => setSeconds(Date.now() / 1000), 80);
+    return () => window.clearInterval(timer);
+  }, [enabled]);
+  return seconds;
+}
+
+function SvgCourse({ hole, balls, aim, canShoot, onAimStart, onAimMove, onAimEnd, obstacleTime }) {
+  const width = hole.bounds?.width || 1200;
+  const height = hole.bounds?.height || 700;
   const ball = balls[aim?.playerIndex || 0];
   const dx = aim ? ball.x - aim.x : 0;
   const dy = aim ? ball.y - aim.y : 0;
@@ -13,16 +36,16 @@ function SvgCourse({ hole, balls, aim, canShoot, onAimStart, onAimMove, onAimEnd
   const previewLength = Math.min(220, pullLength * 1.45);
   const preview = pullLength > 0 ? { x: ball.x + (dx / pullLength) * previewLength, y: ball.y + (dy / pullLength) * previewLength } : ball;
 
-  return <svg className='mini-golf-board' viewBox='0 0 1000 600' role='img' aria-label={`${hole.name} Mini Golf hole`} onPointerDown={canShoot ? onAimStart : undefined} onPointerMove={aim ? onAimMove : undefined} onPointerUp={aim ? onAimEnd : undefined} onPointerCancel={aim ? onAimEnd : undefined}>
-    <rect className='mini-golf-grass' x='0' y='0' width='1000' height='600' rx='28' />
+  return <svg className='mini-golf-board' viewBox={`0 0 ${width} ${height}`} role='img' aria-label={`${hole.name} Mini Golf hole`} onPointerDown={canShoot ? onAimStart : undefined} onPointerMove={aim ? onAimMove : undefined} onPointerUp={aim ? onAimEnd : undefined} onPointerCancel={aim ? onAimEnd : undefined}>
+    <rect className='mini-golf-grass' x='0' y='0' width={width} height={height} rx='28' />
     {(hole.ice || []).map((zone, index) => <rect className='mini-golf-ice' key={`ice-${index}`} {...zone} rx='18' />)}
     {(hole.sand || []).map((zone, index) => <ellipse className='mini-golf-sand' key={`sand-${index}`} cx={zone.x} cy={zone.y} rx={zone.rx} ry={zone.ry} />)}
     {(hole.water || []).map((zone, index) => <ellipse className='mini-golf-water' key={`water-${index}`} cx={zone.x} cy={zone.y} rx={zone.rx} ry={zone.ry} />)}
     {(hole.slopes || []).map((zone, index) => <rect className='mini-golf-slope' key={`slope-${index}`} {...zone} rx='14' />)}
     {(hole.walls || []).map((wall, index) => <rect className='mini-golf-wall' key={`wall-${index}`} {...wall} rx='8' />)}
-    <circle className='mini-golf-cup-shadow' cx={hole.cup.x} cy={hole.cup.y} r='24' />
-    <circle className='mini-golf-cup' cx={hole.cup.x} cy={hole.cup.y} r='16' />
-    <path className='mini-golf-pin' d={`M ${hole.cup.x} ${hole.cup.y - 18} L ${hole.cup.x} ${hole.cup.y - 92} L ${hole.cup.x + 58} ${hole.cup.y - 74} L ${hole.cup.x} ${hole.cup.y - 54}`} />
+    {movingObstacleRects(hole, obstacleTime).map((wall) => <rect className='mini-golf-moving-wall' key={wall.key} {...wall} rx='4' />)}
+    <rect className='mini-golf-cup-shadow' x={hole.cup.x - 29} y={hole.cup.y - 29} width='58' height='58' rx='5' />
+    <rect className='mini-golf-cup' x={hole.cup.x - 25} y={hole.cup.y - 25} width='50' height='50' rx='3' />
     {aim && <><line className='mini-golf-aim-pull' x1={ball.x} y1={ball.y} x2={aim.x} y2={aim.y} /><line className='mini-golf-aim-shot' x1={ball.x} y1={ball.y} x2={preview.x} y2={preview.y} /></>}
     <circle className='mini-golf-ball mini-golf-ball-one' cx={balls[0].x} cy={balls[0].y} r='13' />
     <circle className='mini-golf-ball mini-golf-ball-two' cx={balls[1].x} cy={balls[1].y} r='13' />
@@ -34,6 +57,7 @@ function MiniGolfCourse({ match, activeUserId, acting, onShot }) {
   const [aim, setAim] = useState(null);
   const state = match?.authoritativeState;
   const course = Array.isArray(match?.gameConfig?.course) ? match.gameConfig.course : [];
+  const obstacleTime = useLiveObstacleTime(match?.status === 'ACTIVE');
 
   // A match opened from an older invitation may briefly lack its complete
   // server snapshot. Keep the dialog usable rather than throwing and taking
@@ -49,7 +73,9 @@ function MiniGolfCourse({ match, activeUserId, acting, onShot }) {
 
   const pointForEvent = (event) => {
     const rect = boardRef.current.getBoundingClientRect();
-    return { x: Math.max(0, Math.min(1000, (event.clientX - rect.left) * (1000 / rect.width))), y: Math.max(0, Math.min(600, (event.clientY - rect.top) * (600 / rect.height))) };
+    const width = hole?.bounds?.width || 1200;
+    const height = hole?.bounds?.height || 700;
+    return { x: Math.max(0, Math.min(width, (event.clientX - rect.left) * (width / rect.width))), y: Math.max(0, Math.min(height, (event.clientY - rect.top) * (height / rect.height))) };
   };
   const startAim = (event) => {
     if (!canShoot) return;
@@ -71,12 +97,12 @@ function MiniGolfCourse({ match, activeUserId, acting, onShot }) {
 
   if (!hole || state.balls.length !== 2 || state.strokes.length !== 2) return <p className='game-result'>This Mini Golf match uses retired rules. Start a new match to play the updated course game.</p>;
   const scores = state.scores.map((item) => `${item[0] ?? '-'} / ${item[1] ?? '-'}`);
-  const feedback = state.lastShot?.water ? 'Water hazard: ball returned to the tee.' : state.lastShot?.pickedUp ? 'Stroke limit reached: hole recorded as 8.' : state.lastShot?.sunk ? 'Nice putt - ball in the cup!' : canShoot ? 'Drag back from your ball and release to putt.' : 'Wait for your turn to take a shot.';
+  const feedback = state.lastShot?.pickedUp ? 'Stroke limit reached: level recorded as 8.' : state.lastShot?.sunk ? 'Nice putt - ball in the red box!' : canShoot ? 'Hold, drag back from your ball, then release to putt.' : 'Wait for your turn to take a shot.';
 
   return <div className='mini-golf-course'>
-    <div className='mini-golf-map-name'>{match.gameConfig?.mapName || 'Course'}</div>
+    <div className='mini-golf-map-name'>{match.gameConfig?.mapName || 'Course'} · Classic five-level mode</div>
     <div className='mini-golf-meta'><b>{hole.name} - Hole {state.holeIndex + 1} of {match.gameConfig?.holes || 3}</b><span>Par {hole.par}</span></div>
-    <div className={`mini-golf-board-wrap mini-golf-theme-${match.gameConfig?.theme || 'garden'}`}><div ref={boardRef}><SvgCourse hole={hole} balls={state.balls} aim={aim} canShoot={canShoot} onAimStart={startAim} onAimMove={moveAim} onAimEnd={finishAim} /></div></div>
+    <div className={`mini-golf-board-wrap mini-golf-theme-${match.gameConfig?.theme || 'classic'}`}><div ref={boardRef}><SvgCourse hole={hole} balls={state.balls} aim={aim} canShoot={canShoot} onAimStart={startAim} onAimMove={moveAim} onAimEnd={finishAim} obstacleTime={obstacleTime} /></div></div>
     <div className='mini-golf-stats'><div><b>{playerName(match.player1)}</b><span>{state.strokes[0]} strokes {score === null && playerIndex === 0 ? '- putting' : ''}</span></div><div><b>{playerName(match.player2)}</b><span>{state.strokes[1]} strokes {score === null && playerIndex === 1 ? '- putting' : ''}</span></div></div>
     <p className='mini-golf-score'>Hole scores: {scores.length ? scores.join(' - ') : 'No completed holes yet'}</p>
     <p className='mini-golf-help'>{feedback}</p>

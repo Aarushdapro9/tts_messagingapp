@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { createAppAlert, deleteUserAccount, downloadOwnerExport, getAdminChatMessages, getAdminOverview, getAuditLogs, getReports, getSystemSettings, updateReport, updateSystemSettings, updateUserModeration, updateUserRole } from '../apis/admin';
+import { createAppAlert, deleteUserAccount, downloadOwnerExport, getAdminChatMessages, getAdminOverview, getAuditLogs, getReports, getSystemSettings, updateReport, updateSystemSettings, updateUserApproval, updateUserModeration, updateUserRole } from '../apis/admin';
 
 function chatName(chat) {
   if (chat.isGlobal) return 'Global Chat';
@@ -31,6 +31,7 @@ function Admin() {
   const [moderatingUserId, setModeratingUserId] = useState('');
   const [systemSettings, setSystemSettings] = useState(null);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [approvingUserId, setApprovingUserId] = useState('');
 
   const loadOverview = useCallback(async () => {
     setLoading(true);
@@ -82,6 +83,7 @@ function Admin() {
       [user._id]: {
         title: user.title || 'Member',
         isAdmin: Boolean(user.isAdmin),
+        isModerator: Boolean(user.isModerator),
         ...current[user._id],
         ...changes,
       },
@@ -92,6 +94,7 @@ function Admin() {
     const role = roleDrafts[user._id] || {
       title: user.title || 'Member',
       isAdmin: Boolean(user.isAdmin),
+      isModerator: Boolean(user.isModerator),
     };
     setSavingUserId(user._id);
     try {
@@ -108,6 +111,19 @@ function Admin() {
       toast.success('Role updated.');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to update this role.');
+    } finally {
+      setSavingUserId('');
+    }
+  };
+
+  const setModeratorRole = async (user, isModerator) => {
+    setSavingUserId(user._id);
+    try {
+      const data = await updateUserRole(user._id, { title: user.title || 'Member', isAdmin: false, isModerator });
+      setOverview((current) => ({ ...current, users: current.users.map((item) => item._id === user._id ? data.user : item) }));
+      toast.success(isModerator ? `${user.name} is now a Moderator.` : `${user.name} is no longer a Moderator.`);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to update this moderator role.');
     } finally {
       setSavingUserId('');
     }
@@ -158,6 +174,19 @@ function Admin() {
     finally { setModeratingUserId(''); }
   };
 
+  const updateApproval = async (user, approved) => {
+    setApprovingUserId(user._id);
+    try {
+      const data = await updateUserApproval(user._id, approved);
+      setOverview((current) => ({ ...current, users: current.users.map((item) => item._id === user._id ? data.user : item) }));
+      toast.success(approved ? `${user.name} can now use the app.` : `${user.name}'s approval was removed.`);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to update account approval.');
+    } finally {
+      setApprovingUserId('');
+    }
+  };
+
   const resolveReport = async (report, status) => {
     try {
       const data = await updateReport(report.id, { status });
@@ -193,6 +222,14 @@ function Admin() {
   }
 
   const canManageRoles = Boolean(overview?.capabilities?.canManageRoles);
+  const canManageModerators = Boolean(overview?.capabilities?.canManageModerators);
+  const canApproveUsers = Boolean(overview?.capabilities?.canApproveUsers);
+  const pendingUsers = (overview?.users || []).filter((user) => !user.isOwner && user.approved === false);
+  const moderatorOnly = overview?.capabilities?.accessLevel === 'moderator';
+
+  if (moderatorOnly) {
+    return <main className="min-h-[100dvh] bg-[#121418] px-4 py-6 text-white sm:p-8"><div className="mx-auto max-w-2xl"><header className="mb-7 flex flex-wrap items-center justify-between gap-4"><div><p className="text-sm font-bold tracking-wide text-[#48cda1]">MODERATOR ACCESS</p><h1 className="text-3xl font-extrabold">Account admissions</h1></div><div className="flex gap-3"><button onClick={loadOverview} className="rounded-lg border border-[#536070] px-4 py-2">Refresh</button><Link to="/chats" className="rounded-lg bg-[#48cda1] px-4 py-2 font-bold text-[#111b21]">Open chats</Link></div></header><section className="rounded-xl bg-[#1d232b] p-5"><h2 className="text-xl font-bold">Pending account approvals</h2><p className="mt-1 text-sm text-[#9eabba]">Your Moderator role can only admit pending accounts. It cannot access conversations, roles, alerts, moderation, or system settings.</p><div className="mt-4 space-y-2">{pendingUsers.length ? pendingUsers.map((user) => <div key={user._id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-[#121418] p-3"><div><p className="font-bold">{user.name}</p><p className="text-xs text-[#9eabba]">Joined {formatDate(user.createdAt)}</p></div><button type="button" disabled={approvingUserId === user._id} onClick={() => updateApproval(user, true)} className="rounded bg-[#48cda1] px-3 py-2 text-xs font-bold text-[#111b21] disabled:opacity-50">{approvingUserId === user._id ? 'Saving…' : 'Admit user'}</button></div>) : <p className="text-sm text-[#9eabba]">No accounts are waiting for approval.</p>}</div></section></div></main>;
+  }
 
   return (
     <main className="min-h-[100dvh] bg-[#121418] px-4 py-6 text-white sm:p-8">
@@ -210,7 +247,12 @@ function Admin() {
           <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Private chats</p><p className="mt-1 text-3xl font-extrabold">{overview?.chats.filter((chat) => !chat.isGlobal && !chat.isGroup).length || 0}</p></div>
           <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Pending reports</p><p className="mt-1 text-3xl font-extrabold">{overview?.stats?.reportsPending || 0}</p></div>
           <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Suspended / banned</p><p className="mt-1 text-3xl font-extrabold">{(overview?.stats?.suspended || 0) + (overview?.stats?.banned || 0)}</p></div>
+          <div className="rounded-xl bg-[#1d232b] p-5"><p className="text-sm text-[#9eabba]">Awaiting approval</p><p className="mt-1 text-3xl font-extrabold">{pendingUsers.length}</p></div>
         </section>
+
+        {canApproveUsers && <section className="mb-7 rounded-xl bg-[#1d232b] p-5"><h2 className="text-xl font-bold">Pending account approvals</h2><p className="mt-1 text-sm text-[#9eabba]">Any administrator can admit a new user. Owner-only role and system controls are unchanged.</p><div className="mt-4 space-y-2">{pendingUsers.length ? pendingUsers.map((user) => <div key={user._id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-[#121418] p-3"><div><p className="font-bold">{user.name}</p><p className="text-xs text-[#9eabba]">Joined {formatDate(user.createdAt)}</p></div><div className="flex gap-2"><button type="button" disabled={approvingUserId === user._id} onClick={() => updateApproval(user, true)} className="rounded bg-[#48cda1] px-3 py-2 text-xs font-bold text-[#111b21] disabled:opacity-50">{approvingUserId === user._id ? 'Saving…' : 'Admit user'}</button><button type="button" disabled={approvingUserId === user._id} onClick={() => updateApproval(user, false)} className="rounded border border-[#536070] px-3 py-2 text-xs disabled:opacity-50">Keep pending</button></div></div>) : <p className="text-sm text-[#9eabba]">No accounts are waiting for approval.</p>}</div></section>}
+
+        {canManageModerators && <section className="mb-7 rounded-xl bg-[#1d232b] p-5"><h2 className="text-xl font-bold">Moderator roles</h2><p className="mt-1 text-sm text-[#9eabba]">Moderators can only admit pending accounts. They cannot access chats, moderation, notifications, roles, or settings.</p><div className="mt-4 grid grid-cols-1 gap-2 md:grid-cols-2">{(overview?.users || []).filter((user) => !user.isOwner && user._id !== overview?.capabilities?.currentUserId).map((user) => <div key={user._id} className="flex items-center justify-between gap-3 rounded-lg bg-[#121418] p-3"><span className="text-sm font-semibold">{user.name}</span><button type="button" disabled={savingUserId === user._id || user.isAdmin} onClick={() => setModeratorRole(user, !user.isModerator)} className="rounded border border-[#48cda1] px-3 py-1 text-xs font-bold text-[#48cda1] disabled:cursor-not-allowed disabled:opacity-50">{user.isAdmin ? 'Administrator' : user.isModerator ? 'Remove Moderator' : 'Make Moderator'}</button></div>)}</div></section>}
 
         <section className="mb-7 grid grid-cols-1 gap-7 lg:grid-cols-2">
           <div className="rounded-xl bg-[#1d232b] p-5"><h2 className="text-xl font-bold">Report queue</h2><div className="mt-3 max-h-56 space-y-2 overflow-y-auto">{reports.length ? reports.map((report) => <div key={report.id} className="rounded bg-[#121418] p-3 text-sm"><b>{report.priority} · {report.targetType}</b><p className="mt-1 text-[#c5ced9]">{report.reason}</p><div className="mt-2 flex gap-2"><button onClick={() => resolveReport(report, 'reviewing')} className="text-xs text-[#48cda1]">Review</button><button onClick={() => resolveReport(report, 'resolved')} className="text-xs text-[#48cda1]">Resolve</button><span className="ml-auto text-xs text-[#9eabba]">{report.status}</span></div></div>) : <p className="text-sm text-[#9eabba]">No reports.</p>}</div></div>
@@ -234,7 +276,7 @@ function Admin() {
         <section className="mb-7 overflow-hidden rounded-xl bg-[#1d232b]">
           <div className="flex flex-wrap justify-between gap-3 border-b border-[#323b47] p-5"><h2 className="text-xl font-bold">Users</h2><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or email" className="w-full rounded-lg bg-[#121418] px-3 py-2 text-sm outline-none sm:w-64" /></div>
           <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-left"><thead className="text-xs uppercase text-[#9eabba]"><tr><th className="p-4">Name</th><th className="p-4">Email</th><th className="p-4">Title</th><th className="p-4">Access</th><th className="p-4">Joined</th><th className="p-4">Actions</th></tr></thead><tbody>{visibleUsers.map((user) => {
-            const draft = roleDrafts[user._id] || { title: user.title || 'Member', isAdmin: Boolean(user.isAdmin) };
+            const draft = roleDrafts[user._id] || { title: user.title || 'Member', isAdmin: Boolean(user.isAdmin), isModerator: Boolean(user.isModerator) };
             const canDeleteAccount = !user.isOwner && user._id !== overview?.capabilities?.currentUserId;
             return <tr key={user._id} className="border-t border-[#323b47] text-sm"><td className="p-4 font-semibold">{user.name}</td><td className="p-4 text-[#c5ced9]">{user.email}</td><td className="p-4">{canManageRoles && !user.isOwner ? <input value={draft.title} maxLength="32" onChange={(event) => changeRoleDraft(user, { title: event.target.value })} className="w-32 rounded bg-[#121418] px-2 py-1 text-sm outline-none" /> : <span>{user.title}</span>}</td><td className="p-4">{user.isOwner ? <span className="rounded-full bg-[#f4c95d] px-2 py-1 text-xs font-bold text-[#29220d]">Owner</span> : canManageRoles ? <label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={draft.isAdmin} onChange={(event) => changeRoleDraft(user, { isAdmin: event.target.checked })} /> Administrator</label> : user.isAdmin ? <span className="text-[#48cda1]">Administrator</span> : <span className="text-[#9eabba]">Member</span>}</td><td className="p-4 text-[#9eabba]">{formatDate(user.createdAt)}</td><td className="p-4">{user.isOwner ? '—' : <div className="flex gap-2">{canManageRoles && <button onClick={() => saveRole(user)} disabled={savingUserId === user._id} className="rounded bg-[#48cda1] px-3 py-1 text-xs font-bold text-[#111b21] disabled:opacity-50">{savingUserId === user._id ? 'Saving…' : 'Save'}</button>}{canDeleteAccount && <button onClick={() => deleteAccount(user)} disabled={deletingUserId === user._id} className="rounded border border-[#e16363] px-3 py-1 text-xs font-bold text-[#ff8e8e] disabled:opacity-50">{deletingUserId === user._id ? 'Deleting…' : 'Delete'}</button>}</div>}</td></tr>;
           })}</tbody></table></div>

@@ -4,14 +4,12 @@ import { createGameMatch } from '../../apis/games';
 
 const games = [
   { id: 'tic-tac-toe', name: 'Tic-Tac-Toe', detail: 'Play now', icon: 'X O', available: true },
-  { id: 'mini-golf', name: 'Mini Golf', detail: 'Pick a three-hole course', icon: 'GOLF', available: true },
+  { id: 'mini-golf', name: 'Mini Golf', detail: 'Play the five classic levels', icon: 'GOLF', available: true },
   { id: '8-ball-pool', name: '8-Ball Pool', detail: 'Physics in development', icon: '8B', available: false },
 ];
 
 const miniGolfMaps = [
-  { id: 'garden-circuit', name: 'Garden Circuit', detail: 'Hedges, ponds, and wind lanes' },
-  { id: 'neon-workshop', name: 'Neon Workshop', detail: 'Precision walls and power zones' },
-  { id: 'alpine-table', name: 'Alpine Table', detail: 'Ice, sand, and switchbacks' },
+  { id: 'classic-2d-mini-golf', name: '2D Mini Golf', detail: 'Five original levels with moving obstacles' },
 ];
 
 export default function GameLauncher({ chatId, onMatchCreated }) {
@@ -44,7 +42,7 @@ export default function GameLauncher({ chatId, onMatchCreated }) {
           <span className='game-catalog-icon'>{game.icon}</span><span><b>{game.name}</b><small>{game.detail}</small></span><em>{choosingMap ? 'Hide courses' : 'Choose course'}</em>
         </button>
         {choosingMap && <div className='mini-golf-map-options' aria-label='Choose a Mini Golf course'>
-          {miniGolfMaps.map((map) => <button key={map.id} type='button' disabled={creating} onClick={() => start('mini-golf', map.id)}><b>{map.name}</b><small>3 holes - {map.detail}</small></button>)}
+          {miniGolfMaps.map((map) => <button key={map.id} type='button' disabled={creating} onClick={() => start('mini-golf', map.id)}><b>{map.name}</b><small>5 levels - {map.detail}</small></button>)}
         </div>}
       </div> : <button key={game.id} type='button' className='game-catalog-card' disabled={!game.available || creating} onClick={() => start(game.id)}>
         <span className='game-catalog-icon'>{game.icon}</span><span><b>{game.name}</b><small>{game.detail}</small></span>{!game.available && <em>Coming soon</em>}

@@ -28,10 +28,17 @@ import { toast } from 'react-toastify'
 import { themeCssVars } from '../utils/theme'
 
 function getDeviceType() {
-  const hasTouchInput = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0
+  // Some embedded mobile browsers do not expose matchMedia while they are
+  // starting. Treat that as an unknown desktop-size viewport instead of
+  // throwing before React can render the sign-in/chat interface.
+  if (typeof window === 'undefined') return 'desktop'
+  const supportsMatchMedia = typeof window.matchMedia === 'function'
+  const hasTouchInput = (supportsMatchMedia && window.matchMedia('(pointer: coarse)').matches)
+    || (typeof navigator !== 'undefined' && Number(navigator.maxTouchPoints) > 0)
+  const viewportWidth = Number(window.innerWidth) || 1024
   if (!hasTouchInput) return 'desktop'
-  if (window.innerWidth < 768) return 'phone'
-  if (window.innerWidth <= 1366) return 'tablet'
+  if (viewportWidth < 768) return 'phone'
+  if (viewportWidth <= 1366) return 'tablet'
   return 'desktop'
 }
 
@@ -88,6 +95,7 @@ function Home() {
         bio: data?.user?.bio,
         name: data?.user?.name,
         isAdmin: data?.user?.isAdmin,
+        isModerator: data?.user?.isModerator,
         isOwner: data?.user?.isOwner,
         title: data?.user?.title,
         theme: data?.user?.theme,

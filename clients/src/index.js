@@ -7,13 +7,16 @@ import { Provider } from 'react-redux';
 import store from './store';
 import { ToastContainer } from 'react-toastify';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import AppErrorBoundary from './components/AppErrorBoundary';
 import 'react-toastify/dist/ReactToastify.css';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const app = (
   <React.StrictMode>
     <Provider store={store}>
-      <App />
-      <ToastContainer position="top-right" />
+      <AppErrorBoundary>
+        <App />
+        <ToastContainer position="top-right" />
+      </AppErrorBoundary>
     </Provider>
   </React.StrictMode>
 );

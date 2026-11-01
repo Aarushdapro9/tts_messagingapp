@@ -71,16 +71,27 @@ export const isOwnerEmail = (email) => {
 export const isAdminUser = (user) =>
   Boolean(user && (isOwnerEmail(user.email) || isAdminEmail(user.email) || user.isAdmin));
 
+export const isModeratorUser = (user) =>
+  Boolean(user && (isAdminUser(user) || user.isModerator));
+
 export const getUserTitle = (user) => {
   if (isOwnerEmail(user?.email)) return 'Owner';
   const customTitle = typeof user?.title === 'string' ? user.title.trim() : '';
-  if (customTitle) return customTitle;
-  return isAdminUser(user) ? 'Administrator' : 'Member';
+  if (customTitle && customTitle.toLowerCase() !== 'member') return customTitle;
+  if (isAdminUser(user)) return 'Administrator';
+  return user?.isModerator ? 'Moderator' : 'Member';
 };
 
 export const Admin = (req, res, next) => {
   if (!isAdminUser(req.rootUser)) {
     return res.status(403).json({ error: 'Administrator access is required' });
+  }
+  return next();
+};
+
+export const Moderator = (req, res, next) => {
+  if (!isModeratorUser(req.rootUser)) {
+    return res.status(403).json({ error: 'Moderator access is required' });
   }
   return next();
 };

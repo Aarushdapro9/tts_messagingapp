@@ -1,8 +1,8 @@
 # Third-party notices
 
-## 2D-mini-golf controls and collision concepts
+## 2D-mini-golf browser multiplayer port
 
-The Mini Golf hold-and-release control model and stepped collision approach were adapted from [xFrednet/2D-mini-golf](https://github.com/xFrednet/2D-mini-golf). The app's JavaScript implementation, multiplayer state model, artwork, and course layouts are original.
+The Mini Golf game is a browser multiplayer port of [xFrednet/2D-mini-golf](https://github.com/xFrednet/2D-mini-golf). It retains the reference project's five level object layouts, hold-and-release control model, stepped collision approach, and sine/circular moving obstacle patterns. The JavaScript networking, authoritative turn system, match persistence, responsive SVG renderer, player scoring, and UI integration are additions for this app.
 
 MIT License
 
