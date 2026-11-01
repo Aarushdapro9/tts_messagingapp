@@ -1,10 +1,19 @@
-export const MINI_GOLF_RULESET_VERSION = 2;
+/*
+ * Shot controls and incremental collision ideas adapted from xFrednet's
+ * 2D-mini-golf (MIT License, Copyright (c) 2020 xFrednet).
+ * The complete attribution and license text is in docs/third-party-notices.md.
+ * This implementation is an original JavaScript, server-authoritative version
+ * for this app's multiplayer rules and original course layouts.
+ */
+export const MINI_GOLF_RULESET_VERSION = 3;
 
 const COURSE_SIZE = { width: 1000, height: 600 };
 const MAX_STROKES = 8;
 const BALL_RADIUS = 12;
 const CUP_RADIUS = 20;
-const SURFACE_DRAG = { grass: 0.962, sand: 0.86, ice: 0.986 };
+const SHOT_STEP_DISTANCE = 7.5;
+const MAX_SHOT_DISTANCE = 420;
+const WALL_RESTITUTION = 0.72;
 
 // Original course layouts and physics. This data deliberately does not copy
 // layouts, art, or implementation from any third-party game.
@@ -71,47 +80,56 @@ function pushOutOfRect(ball, wall, velocity) {
   if (dx * dx + dy * dy > BALL_RADIUS * BALL_RADIUS) return;
   if (Math.abs(dx) > Math.abs(dy)) {
     ball.x = nearestX + (dx >= 0 ? BALL_RADIUS : -BALL_RADIUS);
-    velocity.x *= -0.68;
+    velocity.x *= -WALL_RESTITUTION;
   } else {
     ball.y = nearestY + (dy >= 0 ? BALL_RADIUS : -BALL_RADIUS);
-    velocity.y *= -0.68;
+    velocity.y *= -WALL_RESTITUTION;
+  }
+}
+
+function normalize(vector) {
+  const length = Math.hypot(vector.x, vector.y);
+  return length > 0 ? { x: vector.x / length, y: vector.y / length } : { x: 1, y: 0 };
+}
+
+function resolveCourseBounds(ball, velocity) {
+  if (ball.x < BALL_RADIUS || ball.x > COURSE_SIZE.width - BALL_RADIUS) {
+    ball.x = Math.max(BALL_RADIUS, Math.min(COURSE_SIZE.width - BALL_RADIUS, ball.x));
+    velocity.x *= -WALL_RESTITUTION;
+  }
+  if (ball.y < BALL_RADIUS || ball.y > COURSE_SIZE.height - BALL_RADIUS) {
+    ball.y = Math.max(BALL_RADIUS, Math.min(COURSE_SIZE.height - BALL_RADIUS, ball.y));
+    velocity.y *= -WALL_RESTITUTION;
   }
 }
 
 function simulateShot(hole, initialBall, angle, power) {
   const ball = copyPoint(initialBall);
-  const velocity = { x: Math.cos(angle) * power * 31, y: Math.sin(angle) * power * 31 };
+  // Like the reference project's GolfBall, release velocity is determined by
+  // pull direction and the remaining travel distance is determined by strength.
+  const velocity = normalize({ x: Math.cos(angle), y: Math.sin(angle) });
+  let remainingDistance = Math.max(SHOT_STEP_DISTANCE, power * MAX_SHOT_DISTANCE);
   const start = hole.start;
   let water = false;
 
-  for (let step = 0; step < 240; step += 1) {
-    ball.x += velocity.x;
-    ball.y += velocity.y;
-    if (ball.x < BALL_RADIUS || ball.x > COURSE_SIZE.width - BALL_RADIUS) {
-      ball.x = Math.max(BALL_RADIUS, Math.min(COURSE_SIZE.width - BALL_RADIUS, ball.x));
-      velocity.x *= -0.68;
-    }
-    if (ball.y < BALL_RADIUS || ball.y > COURSE_SIZE.height - BALL_RADIUS) {
-      ball.y = Math.max(BALL_RADIUS, Math.min(COURSE_SIZE.height - BALL_RADIUS, ball.y));
-      velocity.y *= -0.68;
-    }
+  if (Math.hypot(ball.x - hole.cup.x, ball.y - hole.cup.y) <= CUP_RADIUS) return { ball: copyPoint(hole.cup), water, sunk: true };
+
+  while (remainingDistance > 0.001) {
+    const travel = Math.min(SHOT_STEP_DISTANCE, remainingDistance);
+    ball.x += velocity.x * travel;
+    ball.y += velocity.y * travel;
+    resolveCourseBounds(ball, velocity);
     (hole.walls || []).forEach((wall) => pushOutOfRect(ball, wall, velocity));
     if ((hole.water || []).some((zone) => inEllipse(zone, ball))) {
       water = true;
       return { ball: copyPoint(start), water, sunk: false };
     }
-    const ice = (hole.ice || []).some((zone) => inRect(zone, ball));
-    const sand = (hole.sand || []).some((zone) => inEllipse(zone, ball));
     const slope = (hole.slopes || []).find((zone) => inRect(zone, ball));
-    if (slope) { velocity.x += slope.ax || 0; velocity.y += slope.ay || 0; }
-    const drag = ice ? SURFACE_DRAG.ice : sand ? SURFACE_DRAG.sand : SURFACE_DRAG.grass;
-    velocity.x *= drag;
-    velocity.y *= drag;
-    const speed = Math.hypot(velocity.x, velocity.y);
-    if (Math.hypot(ball.x - hole.cup.x, ball.y - hole.cup.y) <= CUP_RADIUS && speed < 6.5) {
+    if (slope) Object.assign(velocity, normalize({ x: velocity.x + (slope.ax || 0) * 0.45, y: velocity.y + (slope.ay || 0) * 0.45 }));
+    if (Math.hypot(ball.x - hole.cup.x, ball.y - hole.cup.y) <= CUP_RADIUS) {
       return { ball: copyPoint(hole.cup), water, sunk: true };
     }
-    if (speed < 0.22) break;
+    remainingDistance -= travel;
   }
   return { ball, water, sunk: false };
 }

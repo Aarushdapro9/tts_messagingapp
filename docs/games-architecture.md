@@ -24,7 +24,7 @@ The current `app_state` record uses optimistic compare-and-swap. The game action
 - **Implemented:** shared game-session shape, invitation lifecycle, participant checks, revision checks, idempotency, server-authoritative Tic-Tac-Toe moves, draw/win determination, direct-chat game launcher, invitation card, resumable match overlay, forfeit, and unit tests for the core board rules.
 - **Tested locally:** all four Tic-Tac-Toe rules unit tests passed; server syntax checks and the Create React App production build passed.
 - **Partially implemented:** chat notification delivery uses existing refresh rather than a game-specific event.
-- **Not implemented:** Mini Golf and 8-Ball Pool. They remain labelled as upcoming in the launcher until their deterministic physics, authoritative validators, test fixtures, and rules adjudicators are complete.
+- **Implemented:** Mini Golf with three selectable three-hole courses, server-authoritative hold-and-release shots, stepped collision and wall reflection, water/sand/ice/slope hazards, turn validation, scoring, and unit tests. 8-Ball Pool remains upcoming.
 
 ## Match lifecycle
 

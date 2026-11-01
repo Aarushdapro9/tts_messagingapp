@@ -239,6 +239,10 @@
 
 .game-screen {
   width: min(470px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   border: 1px solid color-mix(in srgb, var(--theme-accent) 42%, transparent);
   border-radius: 24px;
   padding: 20px;
@@ -248,11 +252,13 @@
 }
 
 .game-screen header { display: flex; justify-content: space-between; gap: 12px; }
+.game-screen-top { position: sticky; top: -20px; z-index: 2; margin: -20px -20px 6px; padding: 20px 20px 10px; background: var(--theme-surface); box-shadow: 0 8px 14px color-mix(in srgb, var(--theme-surface) 88%, transparent); }
 .game-screen header h2 { margin: 2px 0; font-size: 24px; font-weight: 800; }
 .game-screen header p { margin: 0; color: var(--theme-muted); font-size: 13px; }
 .game-screen header > button { align-self: flex-start; font-size: 28px; line-height: 1; }
 .game-eyebrow { color: var(--theme-accent); font-size: 10px; font-weight: 900; letter-spacing: .12em; }
 .game-players { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 18px 0; }
+.game-screen-top .game-players { margin: 16px 0 0; }
 .game-players span { padding: 9px; border: 1px solid color-mix(in srgb, var(--theme-muted) 28%, transparent); border-radius: 12px; color: var(--theme-muted); font-size: 12px; }
 .game-players b { float: right; color: var(--theme-accent); font-size: 18px; line-height: .75; }
 .game-players .game-player-active { border-color: var(--theme-accent); background: color-mix(in srgb, var(--theme-accent) 12%, transparent); color: var(--theme-text); }
@@ -274,7 +280,7 @@
 .mini-golf-meta { display: flex; justify-content: space-between; gap: 12px; color: var(--theme-muted); font-size: 12px; }
 .mini-golf-meta b { color: var(--theme-text); }
 .mini-golf-board-wrap { margin: 12px 0; overflow: hidden; border: 7px solid #557e47; border-radius: 22px; box-shadow: 0 10px 24px rgba(0, 0, 0, .2); }
-.mini-golf-board { display: block; width: 100%; height: auto; touch-action: none; user-select: none; cursor: crosshair; }
+.mini-golf-board { display: block; width: 100%; max-height: 50dvh; height: auto; touch-action: none; user-select: none; cursor: crosshair; }
 .mini-golf-grass { fill: #6eaf57; }
 .mini-golf-wall { fill: #325b37; stroke: rgba(255, 255, 255, .26); stroke-width: 6; }
 .mini-golf-sand { fill: #e9cc78; stroke: #c7a453; stroke-width: 7; }

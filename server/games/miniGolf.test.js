@@ -18,6 +18,14 @@ test('Mini Golf validates a drag shot and advances turn after server physics', (
   assert.ok(result.state.balls[0].x > 145);
 });
 
+test('Mini Golf resolves a stepped wall collision before finishing a shot', () => {
+  const state = createMiniGolfState('garden-circuit');
+  state.balls[0] = { x: 385, y: 160 };
+  const result = applyMiniGolfShot(state, 1, { angle: 0, power: 0.25 });
+  assert.equal(result.nextPlayerMark, 2);
+  assert.ok(result.state.balls[0].x < 410, 'the ball should reflect from the vertical hedge wall');
+});
+
 test('Mini Golf returns a water shot to the tee', () => {
   const state = createMiniGolfState('garden-circuit');
   state.holeIndex = 1;
