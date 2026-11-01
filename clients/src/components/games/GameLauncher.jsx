@@ -9,9 +9,9 @@ const games = [
 ];
 
 const miniGolfMaps = [
-  { id: 'sunset-links', name: 'Sunset Links', detail: 'Balanced fairways' },
-  { id: 'neon-night', name: 'Neon Night', detail: 'Fast with shifting wind' },
-  { id: 'forest-run', name: 'Forest Run', detail: 'Long woodland shots' },
+  { id: 'garden-circuit', name: 'Garden Circuit', detail: 'Hedges, ponds, and wind lanes' },
+  { id: 'neon-workshop', name: 'Neon Workshop', detail: 'Precision walls and power zones' },
+  { id: 'alpine-table', name: 'Alpine Table', detail: 'Ice, sand, and switchbacks' },
 ];
 
 export default function GameLauncher({ chatId, onMatchCreated }) {

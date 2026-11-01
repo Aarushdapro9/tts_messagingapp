@@ -1,75 +1,155 @@
-export const MINI_GOLF_RULESET_VERSION = 1;
+export const MINI_GOLF_RULESET_VERSION = 2;
 
-// Course data is server-owned. Every shot is calculated from this definition.
+const COURSE_SIZE = { width: 1000, height: 600 };
+const MAX_STROKES = 8;
+const BALL_RADIUS = 12;
+const CUP_RADIUS = 20;
+const SURFACE_DRAG = { grass: 0.962, sand: 0.86, ice: 0.986 };
+
+// Original course layouts and physics. This data deliberately does not copy
+// layouts, art, or implementation from any third-party game.
 export const MINI_GOLF_MAPS = [
-  { id: 'sunset-links', name: 'Sunset Links', holes: [{ distance: 48, par: 3, wind: 0 }, { distance: 62, par: 4, wind: -2 }, { distance: 55, par: 3, wind: 2 }] },
-  { id: 'neon-night', name: 'Neon Night', holes: [{ distance: 42, par: 3, wind: 3 }, { distance: 66, par: 4, wind: 0 }, { distance: 51, par: 3, wind: -3 }] },
-  { id: 'forest-run', name: 'Forest Run', holes: [{ distance: 53, par: 4, wind: -1 }, { distance: 47, par: 3, wind: 1 }, { distance: 70, par: 4, wind: -2 }] },
+  {
+    id: 'garden-circuit', name: 'Garden Circuit', theme: 'garden',
+    holes: [
+      { name: 'Hedge Turn', par: 3, start: { x: 145, y: 455 }, cup: { x: 835, y: 145 }, walls: [{ x: 410, y: 70, width: 44, height: 350 }, { x: 610, y: 250, width: 44, height: 280 }], sand: [{ x: 690, y: 105, rx: 95, ry: 55 }], water: [] },
+      { name: 'Lily Split', par: 3, start: { x: 150, y: 290 }, cup: { x: 850, y: 290 }, walls: [{ x: 350, y: 100, width: 36, height: 140 }, { x: 350, y: 360, width: 36, height: 140 }, { x: 650, y: 100, width: 36, height: 140 }, { x: 650, y: 360, width: 36, height: 140 }], sand: [], water: [{ x: 500, y: 300, rx: 102, ry: 140 }] },
+      { name: 'Breeze Lane', par: 4, start: { x: 130, y: 470 }, cup: { x: 870, y: 135 }, walls: [{ x: 250, y: 70, width: 36, height: 330 }, { x: 500, y: 200, width: 36, height: 330 }, { x: 750, y: 70, width: 36, height: 330 }], sand: [{ x: 390, y: 435, rx: 105, ry: 60 }], water: [], slopes: [{ x: 600, y: 70, width: 115, height: 150, ax: 0, ay: 0.16 }] },
+    ],
+  },
+  {
+    id: 'neon-workshop', name: 'Neon Workshop', theme: 'neon',
+    holes: [
+      { name: 'Circuit Breaker', par: 3, start: { x: 125, y: 300 }, cup: { x: 875, y: 300 }, walls: [{ x: 300, y: 95, width: 42, height: 275 }, { x: 480, y: 230, width: 42, height: 275 }, { x: 660, y: 95, width: 42, height: 275 }], sand: [], water: [], slopes: [{ x: 540, y: 80, width: 90, height: 145, ax: 0, ay: 0.14 }] },
+      { name: 'Magnet Bay', par: 4, start: { x: 135, y: 465 }, cup: { x: 845, y: 145 }, walls: [{ x: 240, y: 85, width: 42, height: 250 }, { x: 455, y: 265, width: 42, height: 250 }, { x: 675, y: 85, width: 42, height: 250 }], sand: [{ x: 560, y: 140, rx: 90, ry: 60 }], water: [{ x: 500, y: 400, rx: 115, ry: 72 }] },
+      { name: 'Pulse Run', par: 3, start: { x: 140, y: 160 }, cup: { x: 850, y: 440 }, walls: [{ x: 285, y: 185, width: 390, height: 36 }, { x: 285, y: 385, width: 390, height: 36 }, { x: 675, y: 185, width: 36, height: 235 }], sand: [], water: [{ x: 485, y: 300, rx: 70, ry: 58 }], slopes: [{ x: 760, y: 110, width: 130, height: 120, ax: -0.12, ay: 0 }] },
+    ],
+  },
+  {
+    id: 'alpine-table', name: 'Alpine Table', theme: 'alpine',
+    holes: [
+      { name: 'Snowbank Bend', par: 3, start: { x: 150, y: 440 }, cup: { x: 845, y: 160 }, walls: [{ x: 345, y: 75, width: 38, height: 300 }, { x: 590, y: 225, width: 38, height: 300 }], sand: [], water: [], ice: [{ x: 650, y: 80, width: 220, height: 150 }] },
+      { name: 'Pine Bridge', par: 4, start: { x: 140, y: 300 }, cup: { x: 865, y: 300 }, walls: [{ x: 325, y: 85, width: 40, height: 190 }, { x: 325, y: 325, width: 40, height: 190 }, { x: 635, y: 85, width: 40, height: 190 }, { x: 635, y: 325, width: 40, height: 190 }], sand: [{ x: 485, y: 300, rx: 90, ry: 80 }], water: [] },
+      { name: 'Summit Switchback', par: 4, start: { x: 135, y: 475 }, cup: { x: 865, y: 125 }, walls: [{ x: 220, y: 90, width: 38, height: 280 }, { x: 465, y: 230, width: 38, height: 280 }, { x: 710, y: 90, width: 38, height: 280 }], sand: [{ x: 340, y: 445, rx: 70, ry: 48 }], water: [], ice: [{ x: 765, y: 90, width: 125, height: 170 }], slopes: [{ x: 535, y: 85, width: 110, height: 130, ax: 0, ay: 0.14 }] },
+    ],
+  },
 ];
 
-export function getMiniGolfMap(mapId = 'sunset-links') {
+export function getMiniGolfMap(mapId = 'garden-circuit') {
   return MINI_GOLF_MAPS.find((map) => map.id === mapId) || null;
 }
 
-export function createMiniGolfState(mapId = 'sunset-links') {
+function copyPoint(point) {
+  return { x: point.x, y: point.y };
+}
+
+function createHolePositions(hole) {
+  return { balls: [copyPoint(hole.start), copyPoint(hole.start)], strokes: [0, 0] };
+}
+
+export function createMiniGolfState(mapId = 'garden-circuit') {
   const map = getMiniGolfMap(mapId);
   if (!map) return null;
-  return { mapId: map.id, holeIndex: 0, distances: [map.holes[0].distance, map.holes[0].distance], strokes: [0, 0], scores: [] };
+  return { mapId: map.id, holeIndex: 0, ...createHolePositions(map.holes[0]), scores: [], lastShot: null };
 }
 
-export function miniGolfHole(mapId, index) {
-  return getMiniGolfMap(mapId)?.holes[index] || null;
+function inEllipse(zone, point) {
+  const dx = (point.x - zone.x) / zone.rx;
+  const dy = (point.y - zone.y) / zone.ry;
+  return dx * dx + dy * dy <= 1;
 }
 
-export function applyMiniGolfShot(state, player, power) {
-  if (player !== 1 && player !== 2) return { error: 'INVALID_ACTION', message: 'Invalid player.' };
-  if (!Number.isInteger(power) || power < 1 || power > 5) {
-    return { error: 'INVALID_ACTION', message: 'Choose a power between 1 and 5.' };
+function inRect(zone, point) {
+  return point.x >= zone.x && point.x <= zone.x + zone.width && point.y >= zone.y && point.y <= zone.y + zone.height;
+}
+
+function pushOutOfRect(ball, wall, velocity) {
+  const nearestX = Math.max(wall.x, Math.min(ball.x, wall.x + wall.width));
+  const nearestY = Math.max(wall.y, Math.min(ball.y, wall.y + wall.height));
+  const dx = ball.x - nearestX;
+  const dy = ball.y - nearestY;
+  if (dx * dx + dy * dy > BALL_RADIUS * BALL_RADIUS) return;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    ball.x = nearestX + (dx >= 0 ? BALL_RADIUS : -BALL_RADIUS);
+    velocity.x *= -0.68;
+  } else {
+    ball.y = nearestY + (dy >= 0 ? BALL_RADIUS : -BALL_RADIUS);
+    velocity.y *= -0.68;
   }
-  if (!state || !Number.isInteger(state.holeIndex) || !Array.isArray(state.distances) || !Array.isArray(state.strokes) || !Array.isArray(state.scores)) {
+}
+
+function simulateShot(hole, initialBall, angle, power) {
+  const ball = copyPoint(initialBall);
+  const velocity = { x: Math.cos(angle) * power * 31, y: Math.sin(angle) * power * 31 };
+  const start = hole.start;
+  let water = false;
+
+  for (let step = 0; step < 240; step += 1) {
+    ball.x += velocity.x;
+    ball.y += velocity.y;
+    if (ball.x < BALL_RADIUS || ball.x > COURSE_SIZE.width - BALL_RADIUS) {
+      ball.x = Math.max(BALL_RADIUS, Math.min(COURSE_SIZE.width - BALL_RADIUS, ball.x));
+      velocity.x *= -0.68;
+    }
+    if (ball.y < BALL_RADIUS || ball.y > COURSE_SIZE.height - BALL_RADIUS) {
+      ball.y = Math.max(BALL_RADIUS, Math.min(COURSE_SIZE.height - BALL_RADIUS, ball.y));
+      velocity.y *= -0.68;
+    }
+    (hole.walls || []).forEach((wall) => pushOutOfRect(ball, wall, velocity));
+    if ((hole.water || []).some((zone) => inEllipse(zone, ball))) {
+      water = true;
+      return { ball: copyPoint(start), water, sunk: false };
+    }
+    const ice = (hole.ice || []).some((zone) => inRect(zone, ball));
+    const sand = (hole.sand || []).some((zone) => inEllipse(zone, ball));
+    const slope = (hole.slopes || []).find((zone) => inRect(zone, ball));
+    if (slope) { velocity.x += slope.ax || 0; velocity.y += slope.ay || 0; }
+    const drag = ice ? SURFACE_DRAG.ice : sand ? SURFACE_DRAG.sand : SURFACE_DRAG.grass;
+    velocity.x *= drag;
+    velocity.y *= drag;
+    const speed = Math.hypot(velocity.x, velocity.y);
+    if (Math.hypot(ball.x - hole.cup.x, ball.y - hole.cup.y) <= CUP_RADIUS && speed < 6.5) {
+      return { ball: copyPoint(hole.cup), water, sunk: true };
+    }
+    if (speed < 0.22) break;
+  }
+  return { ball, water, sunk: false };
+}
+
+function validShot(payload) {
+  return Number.isFinite(payload?.angle) && Math.abs(payload.angle) <= Math.PI && Number.isFinite(payload?.power) && payload.power >= 0.08 && payload.power <= 1;
+}
+
+export function applyMiniGolfShot(state, player, payload) {
+  if (player !== 1 && player !== 2) return { error: 'INVALID_ACTION', message: 'Invalid player.' };
+  if (!validShot(payload)) return { error: 'INVALID_ACTION', message: 'Drag back from your ball to take a valid putt.' };
+  if (!state || !Number.isInteger(state.holeIndex) || !Array.isArray(state.balls) || !Array.isArray(state.strokes) || !Array.isArray(state.scores)) {
     return { error: 'INVALID_ACTION', message: 'The Mini Golf match state is invalid.' };
   }
-  // Matches created before map selection safely use the original course.
-  const map = getMiniGolfMap(state.mapId || 'sunset-links');
-  const hole = miniGolfHole(map?.id, state.holeIndex);
-  if (!map || !hole || state.distances.length !== 2 || state.strokes.length !== 2) {
-    return { error: 'INVALID_ACTION', message: 'The current hole is invalid.' };
-  }
+  const map = getMiniGolfMap(state.mapId || 'garden-circuit');
+  const hole = map?.holes[state.holeIndex];
+  if (!hole || state.balls.length !== 2 || state.strokes.length !== 2) return { error: 'INVALID_ACTION', message: 'The current hole is invalid.' };
 
   const playerIndex = player - 1;
   const holeScore = state.scores[state.holeIndex] || [null, null];
   if (holeScore[playerIndex] !== null) return { error: 'INVALID_ACTION', message: 'You have already finished this hole.' };
   const strokes = [...state.strokes];
-  const distances = [...state.distances];
   strokes[playerIndex] += 1;
-  const travel = Math.max(5, power * 10 + hole.wind);
-  distances[playerIndex] = Math.max(0, distances[playerIndex] - travel);
+  const result = simulateShot(hole, state.balls[playerIndex], payload.angle, payload.power);
+  const balls = state.balls.map(copyPoint);
+  balls[playerIndex] = result.ball;
   const scores = state.scores.map((score) => [...score]);
-  if (distances[playerIndex] === 0) scores[state.holeIndex] = playerIndex === 0 ? [strokes[playerIndex], holeScore[1]] : [holeScore[0], strokes[playerIndex]];
+  const pickedUp = strokes[playerIndex] >= MAX_STROKES;
+  if (result.sunk || pickedUp) scores[state.holeIndex] = playerIndex === 0 ? [result.sunk ? strokes[0] : MAX_STROKES, holeScore[1]] : [holeScore[0], result.sunk ? strokes[1] : MAX_STROKES];
+  const updatedState = { ...state, mapId: map.id, balls, strokes, scores, lastShot: { player, power: payload.power, water: result.water, sunk: result.sunk, pickedUp } };
+  const completeHole = updatedState.scores[state.holeIndex]?.every(Number.isInteger);
+  if (!completeHole) return { state: updatedState, completed: false, nextPlayerMark: player === 1 ? 2 : 1 };
 
-  const updatedState = { ...state, mapId: map.id, distances, strokes, scores };
-  const completeHole = updatedState.scores[state.holeIndex]?.every((score) => Number.isInteger(score));
-  if (!completeHole) {
-    return { state: updatedState, completed: false, nextPlayerMark: player === 1 ? 2 : 1 };
-  }
-
-  const isFinalHole = state.holeIndex === map.holes.length - 1;
-  if (isFinalHole) {
+  if (state.holeIndex === map.holes.length - 1) {
     const totals = [0, 1].map((index) => updatedState.scores.reduce((total, score) => total + score[index], 0));
-    return {
-      state: { ...updatedState, totals },
-      completed: true,
-      draw: totals[0] === totals[1],
-      winnerMark: totals[0] === totals[1] ? null : totals[0] < totals[1] ? 1 : 2,
-      nextPlayerMark: null,
-    };
+    return { state: { ...updatedState, totals }, completed: true, draw: totals[0] === totals[1], winnerMark: totals[0] === totals[1] ? null : totals[0] < totals[1] ? 1 : 2, nextPlayerMark: null };
   }
 
   const nextHoleIndex = state.holeIndex + 1;
-  const nextHole = map.holes[nextHoleIndex];
-  return {
-    state: { ...updatedState, holeIndex: nextHoleIndex, distances: [nextHole.distance, nextHole.distance], strokes: [0, 0] },
-    completed: false,
-    nextPlayerMark: 1,
-  };
+  return { state: { ...updatedState, holeIndex: nextHoleIndex, ...createHolePositions(map.holes[nextHoleIndex]), lastShot: updatedState.lastShot }, completed: false, nextPlayerMark: 1 };
 }

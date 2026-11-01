@@ -39,7 +39,7 @@ function gameDefinition(gameType, mapId) {
     if (!map) return null;
     return {
       rulesetVersion: MINI_GOLF_RULESET_VERSION,
-      gameConfig: { mapId: map.id, mapName: map.name, holes: map.holes.length, course: map.holes, scoring: 'lowest-strokes' },
+      gameConfig: { mapId: map.id, mapName: map.name, theme: map.theme, holes: map.holes.length, course: map.holes, scoring: 'lowest-strokes' },
       createState: () => createMiniGolfState(map.id),
       inviteText: `Mini Golf: ${map.name}`,
     };
@@ -274,7 +274,7 @@ export const submitAction = async (req, res) => {
       actionNumber: match.currentTurn,
       expectedRevision,
       actionType,
-      actionPayload: match.gameType === 'mini-golf' ? { power: actionPayload.power } : { cell: actionPayload.cell },
+      actionPayload: match.gameType === 'mini-golf' ? { angle: actionPayload.angle, power: actionPayload.power } : { cell: actionPayload.cell },
       resultingRevision: match.revision,
       resultPayload: payload,
       createdAt: now,
