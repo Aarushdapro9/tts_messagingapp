@@ -296,6 +296,8 @@
 .mini-golf-ball-two { fill: #f7c550; stroke: #aa6d19; }
 .mini-golf-ball-active-ring { fill: none; stroke: #4ff0c4; stroke-width: 5; stroke-dasharray: 8 6; animation: mini-golf-active-ball 1.2s linear infinite; pointer-events: none; }
 .mini-golf-ball-label { fill: #fff; font-size: 24px; font-weight: 800; text-anchor: middle; paint-order: stroke; stroke: rgba(0, 0, 0, .58); stroke-width: 6px; pointer-events: none; }
+.mini-golf-hit-area { cursor: crosshair; touch-action: none; }
+.mini-golf-hit-area:active { cursor: grabbing; }
 .mini-golf-aim-pull { stroke: rgba(255, 255, 255, .8); stroke-width: 8; stroke-dasharray: 13 10; }
 .mini-golf-aim-shot { stroke: #fff; stroke-width: 7; stroke-dasharray: 18 13; opacity: .9; }
 @keyframes mini-golf-active-ball { to { stroke-dashoffset: -28; } }

@@ -50,7 +50,7 @@ function SvgCourse({ hole, balls, playerIndex, aim, canShoot, onAimStart, onAimM
   const previewLength = Math.min(220, pullLength * 1.45);
   const preview = pullLength > 0 ? { x: ball.x + (dx / pullLength) * previewLength, y: ball.y + (dy / pullLength) * previewLength } : ball;
 
-  return <svg ref={boardRef} className='mini-golf-board' viewBox={`0 0 ${width} ${height}`} role='img' aria-label={`${hole.name} Mini Golf hole`} onPointerDown={canShoot ? onAimStart : undefined} onPointerMove={onAimMove} onPointerUp={onAimEnd} onPointerCancel={onAimCancel}>
+  return <svg ref={boardRef} className='mini-golf-board' viewBox={`0 0 ${width} ${height}`} role='img' aria-label={`${hole.name} Mini Golf hole`}>
     <rect className='mini-golf-grass' x='0' y='0' width={width} height={height} rx='28' />
     {(hole.ice || []).map((zone, index) => <rect className='mini-golf-ice' key={`ice-${index}`} {...zone} rx='18' />)}
     {(hole.sand || []).map((zone, index) => <ellipse className='mini-golf-sand' key={`sand-${index}`} cx={zone.x} cy={zone.y} rx={zone.rx} ry={zone.ry} />)}
@@ -64,6 +64,8 @@ function SvgCourse({ hole, balls, playerIndex, aim, canShoot, onAimStart, onAimM
     {canShoot && <><circle className='mini-golf-ball-active-ring' cx={displayBalls[playerIndex].x} cy={displayBalls[playerIndex].y} r='24' /><text className='mini-golf-ball-label' x={displayBalls[playerIndex].x} y={displayBalls[playerIndex].y - 31}>Your ball</text></>}
     <circle className='mini-golf-ball mini-golf-ball-one' cx={displayBalls[0].x} cy={displayBalls[0].y} r='13' />
     <circle className='mini-golf-ball mini-golf-ball-two' cx={displayBalls[1].x} cy={displayBalls[1].y} r='13' />
+    {/* A transparent hit layer avoids browser-specific SVG child hit testing. */}
+    <rect className='mini-golf-hit-area' x='0' y='0' width={width} height={height} fill='transparent' onPointerDown={canShoot ? onAimStart : undefined} onPointerMove={onAimMove} onPointerUp={onAimEnd} onPointerCancel={onAimCancel} onLostPointerCapture={onAimCancel} />
   </svg>;
 }
 
@@ -101,11 +103,11 @@ function MiniGolfCourse({ match, activeUserId, acting, onShot }) {
     if (!canShoot) return;
     const pointer = pointForEvent(event);
     const ball = state.balls[playerIndex];
-    const displayBall = displayBallPositions(state.balls)[playerIndex];
-    if (Math.hypot(pointer.x - displayBall.x, pointer.y - displayBall.y) > 42) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    updateAim({ x: ball.x, y: ball.y, playerIndex, pointerId: event.pointerId, grabOffset: { x: pointer.x - displayBall.x, y: pointer.y - displayBall.y } });
+    // Dragging can begin anywhere on the course. The pull distance is measured
+    // from the active ball, which also keeps the control usable at small sizes.
+    updateAim({ x: ball.x, y: ball.y, playerIndex, pointerId: event.pointerId, grabOffset: { x: pointer.x - ball.x, y: pointer.y - ball.y } });
   };
   const moveAim = (event) => {
     const current = aimRef.current;
