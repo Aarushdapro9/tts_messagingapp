@@ -18,6 +18,7 @@ import {
   createMiniGolfState,
   getMiniGolfMap,
 } from '../games/miniGolf.js';
+import { expireGameInvitation, gameInvitationExpiresAt, hasGameInvitationExpired } from '../games/invitationExpiry.js';
 import { hasActiveRestriction } from '../services/moderation.js';
 
 const SCHEMA_VERSION = 1;
@@ -91,6 +92,12 @@ function updateInviteMessage(database, match) {
   message.updatedAt = match.updatedAt;
 }
 
+function expireInviteIfNeeded(database, match, now = Date.now()) {
+  if (!expireGameInvitation(match, now)) return false;
+  updateInviteMessage(database, match);
+  return true;
+}
+
 function resolveDirectConversation(database, chatId, userId) {
   const chat = database.chats.find((item) => item._id === chatId);
   if (!isDirectConversation(chat) || !chat.users.includes(userId)) return null;
@@ -127,7 +134,8 @@ export const createMatch = async (req, res) => {
     const opponentId = chat.users.find((id) => id !== req.rootUserId);
     if (!findUser(database, opponentId)) return noDatabaseWrite(error('NOT_A_PARTICIPANT', 'The other player is unavailable.', 404));
 
-    const now = new Date().toISOString();
+    const nowTime = Date.now();
+    const now = new Date(nowTime).toISOString();
     const match = {
       id: createId(),
       conversationId: chatId,
@@ -147,7 +155,7 @@ export const createMatch = async (req, res) => {
       createdAt: now,
       updatedAt: now,
       completedAt: null,
-      expiresAt: null,
+      expiresAt: gameInvitationExpiresAt(nowTime),
     };
     database.games.push(match);
     const invite = {
@@ -180,6 +188,15 @@ export const getMatch = async (req, res) => {
   const database = await getDatabase();
   const match = database.games.find((item) => item.id === req.params.matchId);
   if (!canAccessMatch(match, req.rootUserId)) return sendResult(res, error('NOT_A_PARTICIPANT', 'Match not found.', 404));
+  if (hasGameInvitationExpired(match)) {
+    const result = await updateDatabase((currentDatabase) => {
+      const currentMatch = currentDatabase.games.find((item) => item.id === req.params.matchId);
+      if (!canAccessMatch(currentMatch, req.rootUserId)) return noDatabaseWrite(error('NOT_A_PARTICIPANT', 'Match not found.', 404));
+      expireInviteIfNeeded(currentDatabase, currentMatch);
+      return actionResult(currentDatabase, currentMatch, req.rootUserId);
+    });
+    return sendResult(res, result);
+  }
   return res.status(200).json({ match: matchResponse(database, match, req.rootUserId) });
 };
 
@@ -187,6 +204,22 @@ export const getConversationMatches = async (req, res) => {
   const database = await getDatabase();
   const chat = resolveDirectConversation(database, req.params.conversationId, req.rootUserId);
   if (!chat) return sendResult(res, error('NOT_A_PARTICIPANT', 'Conversation not found.', 404));
+  const hasExpiredInvitation = database.games.some((match) => match.conversationId === chat._id && canAccessMatch(match, req.rootUserId) && hasGameInvitationExpired(match));
+  if (hasExpiredInvitation) {
+    const result = await updateDatabase((currentDatabase) => {
+      const currentChat = resolveDirectConversation(currentDatabase, req.params.conversationId, req.rootUserId);
+      if (!currentChat) return noDatabaseWrite(error('NOT_A_PARTICIPANT', 'Conversation not found.', 404));
+      currentDatabase.games
+        .filter((match) => match.conversationId === currentChat._id && canAccessMatch(match, req.rootUserId))
+        .forEach((match) => expireInviteIfNeeded(currentDatabase, match));
+      const matches = currentDatabase.games
+        .filter((match) => match.conversationId === currentChat._id && canAccessMatch(match, req.rootUserId))
+        .sort((first, second) => new Date(second.updatedAt) - new Date(first.updatedAt))
+        .map((match) => matchResponse(currentDatabase, match, req.rootUserId));
+      return { matches };
+    });
+    return sendResult(res, result);
+  }
   const matches = database.games
     .filter((match) => match.conversationId === chat._id && canAccessMatch(match, req.rootUserId))
     .sort((first, second) => new Date(second.updatedAt) - new Date(first.updatedAt))
@@ -200,6 +233,7 @@ function respondToInvite(status) {
       const match = database.games.find((item) => item.id === req.params.matchId);
       if (!canAccessMatch(match, req.rootUserId)) return noDatabaseWrite(error('NOT_A_PARTICIPANT', 'Match not found.', 404));
       if (match.player2Id !== req.rootUserId) return noDatabaseWrite(error('NOT_A_PARTICIPANT', 'Only the invited player can respond.', 403));
+      if (expireInviteIfNeeded(database, match)) return error('INVITATION_EXPIRED', 'This game invitation expired after one hour.', 409);
       if (match.status !== 'INVITED') return noDatabaseWrite(error('INVALID_ACTION', 'This invitation has already been answered.', 409));
 
       const now = new Date().toISOString();

@@ -279,8 +279,8 @@
 .mini-golf-map-name { margin-bottom: 5px; color: var(--theme-accent); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .mini-golf-meta { display: flex; justify-content: space-between; gap: 12px; color: var(--theme-muted); font-size: 12px; }
 .mini-golf-meta b { color: var(--theme-text); }
-.mini-golf-board-wrap { margin: 12px 0; overflow: hidden; border: 7px solid #557e47; border-radius: 22px; box-shadow: 0 10px 24px rgba(0, 0, 0, .2); }
-.mini-golf-board { display: block; width: 100%; max-height: 50dvh; height: auto; touch-action: none; user-select: none; cursor: crosshair; }
+.mini-golf-board-wrap { margin: 12px 0; overflow: hidden; border: 7px solid #557e47; border-radius: 22px; box-shadow: 0 10px 24px rgba(0, 0, 0, .2); touch-action: none; }
+.mini-golf-board { display: block; width: 100%; max-height: 50dvh; height: auto; touch-action: none; user-select: none; cursor: crosshair; -webkit-user-select: none; }
 .mini-golf-grass { fill: #6eaf57; }
 .mini-golf-wall { fill: #325b37; stroke: rgba(255, 255, 255, .26); stroke-width: 6; }
 .mini-golf-moving-wall { fill: #f4f5f1; stroke: #9da49f; stroke-width: 3; }
@@ -294,8 +294,11 @@
 .mini-golf-ball { stroke-width: 5; transition: cx .38s ease-out, cy .38s ease-out; }
 .mini-golf-ball-one { fill: #fff; stroke: #d7e2d7; }
 .mini-golf-ball-two { fill: #f7c550; stroke: #aa6d19; }
+.mini-golf-ball-active-ring { fill: none; stroke: #4ff0c4; stroke-width: 5; stroke-dasharray: 8 6; animation: mini-golf-active-ball 1.2s linear infinite; pointer-events: none; }
+.mini-golf-ball-label { fill: #fff; font-size: 24px; font-weight: 800; text-anchor: middle; paint-order: stroke; stroke: rgba(0, 0, 0, .58); stroke-width: 6px; pointer-events: none; }
 .mini-golf-aim-pull { stroke: rgba(255, 255, 255, .8); stroke-width: 8; stroke-dasharray: 13 10; }
 .mini-golf-aim-shot { stroke: #fff; stroke-width: 7; stroke-dasharray: 18 13; opacity: .9; }
+@keyframes mini-golf-active-ball { to { stroke-dashoffset: -28; } }
 .mini-golf-theme-neon { border-color: #a24fff; }
 .mini-golf-theme-neon .mini-golf-grass { fill: #201747; }
 .mini-golf-theme-neon .mini-golf-wall { fill: #6639a7; }

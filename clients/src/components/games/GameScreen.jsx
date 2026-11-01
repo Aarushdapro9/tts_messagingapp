@@ -5,6 +5,19 @@ import { acceptGameMatch, declineGameMatch, fetchGameMatch, forfeitGameMatch, su
 function playerName(player) { return player?.name || 'Player'; }
 function gameName(gameType) { return gameType === 'mini-golf' ? 'Mini Golf' : 'Tic-Tac-Toe'; }
 
+// Both players tee off from the same server-authoritative position. Offset only
+// their visual markers while they overlap so it is always obvious which ball
+// belongs to the active player. Game physics continue to use the true position.
+function displayBallPositions(balls) {
+  if (!Array.isArray(balls) || balls.length !== 2) return balls || [];
+  const [first, second] = balls;
+  if (Math.hypot(first.x - second.x, first.y - second.y) > 4) return balls;
+  return [
+    { ...first, x: first.x - 16, y: first.y },
+    { ...second, x: second.x + 16, y: second.y },
+  ];
+}
+
 function movingObstacleRects(hole, seconds) {
   return (hole.movingObstacles || []).flatMap((obstacle) => {
     const phase = seconds * (obstacle.speed || 1) + (obstacle.phase || 0);
@@ -26,17 +39,18 @@ function useLiveObstacleTime(enabled) {
   return seconds;
 }
 
-function SvgCourse({ hole, balls, aim, canShoot, onAimStart, onAimMove, onAimEnd, obstacleTime }) {
+function SvgCourse({ hole, balls, playerIndex, aim, canShoot, onAimStart, onAimMove, onAimEnd, onAimCancel, obstacleTime, boardRef }) {
   const width = hole.bounds?.width || 1200;
   const height = hole.bounds?.height || 700;
   const ball = balls[aim?.playerIndex || 0];
+  const displayBalls = displayBallPositions(balls);
   const dx = aim ? ball.x - aim.x : 0;
   const dy = aim ? ball.y - aim.y : 0;
   const pullLength = Math.hypot(dx, dy);
   const previewLength = Math.min(220, pullLength * 1.45);
   const preview = pullLength > 0 ? { x: ball.x + (dx / pullLength) * previewLength, y: ball.y + (dy / pullLength) * previewLength } : ball;
 
-  return <svg className='mini-golf-board' viewBox={`0 0 ${width} ${height}`} role='img' aria-label={`${hole.name} Mini Golf hole`} onPointerDown={canShoot ? onAimStart : undefined} onPointerMove={aim ? onAimMove : undefined} onPointerUp={aim ? onAimEnd : undefined} onPointerCancel={aim ? onAimEnd : undefined}>
+  return <svg ref={boardRef} className='mini-golf-board' viewBox={`0 0 ${width} ${height}`} role='img' aria-label={`${hole.name} Mini Golf hole`} onPointerDown={canShoot ? onAimStart : undefined} onPointerMove={onAimMove} onPointerUp={onAimEnd} onPointerCancel={onAimCancel}>
     <rect className='mini-golf-grass' x='0' y='0' width={width} height={height} rx='28' />
     {(hole.ice || []).map((zone, index) => <rect className='mini-golf-ice' key={`ice-${index}`} {...zone} rx='18' />)}
     {(hole.sand || []).map((zone, index) => <ellipse className='mini-golf-sand' key={`sand-${index}`} cx={zone.x} cy={zone.y} rx={zone.rx} ry={zone.ry} />)}
@@ -47,14 +61,16 @@ function SvgCourse({ hole, balls, aim, canShoot, onAimStart, onAimMove, onAimEnd
     <rect className='mini-golf-cup-shadow' x={hole.cup.x - 29} y={hole.cup.y - 29} width='58' height='58' rx='5' />
     <rect className='mini-golf-cup' x={hole.cup.x - 25} y={hole.cup.y - 25} width='50' height='50' rx='3' />
     {aim && <><line className='mini-golf-aim-pull' x1={ball.x} y1={ball.y} x2={aim.x} y2={aim.y} /><line className='mini-golf-aim-shot' x1={ball.x} y1={ball.y} x2={preview.x} y2={preview.y} /></>}
-    <circle className='mini-golf-ball mini-golf-ball-one' cx={balls[0].x} cy={balls[0].y} r='13' />
-    <circle className='mini-golf-ball mini-golf-ball-two' cx={balls[1].x} cy={balls[1].y} r='13' />
+    {canShoot && <><circle className='mini-golf-ball-active-ring' cx={displayBalls[playerIndex].x} cy={displayBalls[playerIndex].y} r='24' /><text className='mini-golf-ball-label' x={displayBalls[playerIndex].x} y={displayBalls[playerIndex].y - 31}>Your ball</text></>}
+    <circle className='mini-golf-ball mini-golf-ball-one' cx={displayBalls[0].x} cy={displayBalls[0].y} r='13' />
+    <circle className='mini-golf-ball mini-golf-ball-two' cx={displayBalls[1].x} cy={displayBalls[1].y} r='13' />
   </svg>;
 }
 
 function MiniGolfCourse({ match, activeUserId, acting, onShot }) {
   const boardRef = useRef(null);
   const [aim, setAim] = useState(null);
+  const aimRef = useRef(null);
   const state = match?.authoritativeState;
   const course = Array.isArray(match?.gameConfig?.course) ? match.gameConfig.course : [];
   const obstacleTime = useLiveObstacleTime(match?.status === 'ACTIVE');
@@ -77,32 +93,53 @@ function MiniGolfCourse({ match, activeUserId, acting, onShot }) {
     const height = hole?.bounds?.height || 700;
     return { x: Math.max(0, Math.min(width, (event.clientX - rect.left) * (width / rect.width))), y: Math.max(0, Math.min(height, (event.clientY - rect.top) * (height / rect.height))) };
   };
+  const updateAim = (nextAim) => {
+    aimRef.current = nextAim;
+    setAim(nextAim);
+  };
   const startAim = (event) => {
     if (!canShoot) return;
-    event.currentTarget.setPointerCapture?.(event.pointerId);
-    setAim({ ...pointForEvent(event), playerIndex, pointerId: event.pointerId });
-  };
-  const moveAim = (event) => { if (aim?.pointerId === event.pointerId) setAim((current) => current ? { ...current, ...pointForEvent(event) } : null); };
-  const finishAim = (event) => {
-    if (!aim || aim.pointerId !== event.pointerId) return;
     const pointer = pointForEvent(event);
     const ball = state.balls[playerIndex];
-    const dx = ball.x - pointer.x;
-    const dy = ball.y - pointer.y;
+    const displayBall = displayBallPositions(state.balls)[playerIndex];
+    if (Math.hypot(pointer.x - displayBall.x, pointer.y - displayBall.y) > 42) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    updateAim({ x: ball.x, y: ball.y, playerIndex, pointerId: event.pointerId, grabOffset: { x: pointer.x - displayBall.x, y: pointer.y - displayBall.y } });
+  };
+  const moveAim = (event) => {
+    const current = aimRef.current;
+    if (!current || current.pointerId !== event.pointerId) return;
+    event.preventDefault();
+    const pointer = pointForEvent(event);
+    updateAim({ ...current, x: pointer.x - current.grabOffset.x, y: pointer.y - current.grabOffset.y });
+  };
+  const finishAim = (event) => {
+    const current = aimRef.current;
+    if (!current || current.pointerId !== event.pointerId) return;
+    event.preventDefault();
+    const pointer = pointForEvent(event);
+    const pullPoint = { x: pointer.x - current.grabOffset.x, y: pointer.y - current.grabOffset.y };
+    const ball = state.balls[current.playerIndex];
+    const dx = ball.x - pullPoint.x;
+    const dy = ball.y - pullPoint.y;
     const distance = Math.hypot(dx, dy);
-    setAim(null);
+    updateAim(null);
     if (distance < 14) return;
     onShot({ angle: Math.atan2(dy, dx), power: Math.min(1, distance / 170) });
+  };
+  const cancelAim = (event) => {
+    if (aimRef.current?.pointerId === event.pointerId) updateAim(null);
   };
 
   if (!hole || state.balls.length !== 2 || state.strokes.length !== 2) return <p className='game-result'>This Mini Golf match uses retired rules. Start a new match to play the updated course game.</p>;
   const scores = state.scores.map((item) => `${item[0] ?? '-'} / ${item[1] ?? '-'}`);
-  const feedback = state.lastShot?.pickedUp ? 'Stroke limit reached: level recorded as 8.' : state.lastShot?.sunk ? 'Nice putt - ball in the red box!' : canShoot ? 'Hold, drag back from your ball, then release to putt.' : 'Wait for your turn to take a shot.';
+  const feedback = state.lastShot?.pickedUp ? 'Stroke limit reached: level recorded as 8.' : state.lastShot?.sunk ? 'Nice putt - ball in the red box!' : canShoot ? 'Grab the glowing ball labelled “Your ball”, pull back, then release to putt.' : 'Wait for your turn to take a shot.';
 
   return <div className='mini-golf-course'>
     <div className='mini-golf-map-name'>{match.gameConfig?.mapName || 'Course'} · Classic five-level mode</div>
     <div className='mini-golf-meta'><b>{hole.name} - Hole {state.holeIndex + 1} of {match.gameConfig?.holes || 3}</b><span>Par {hole.par}</span></div>
-    <div className={`mini-golf-board-wrap mini-golf-theme-${match.gameConfig?.theme || 'classic'}`}><div ref={boardRef}><SvgCourse hole={hole} balls={state.balls} aim={aim} canShoot={canShoot} onAimStart={startAim} onAimMove={moveAim} onAimEnd={finishAim} obstacleTime={obstacleTime} /></div></div>
+    <div className={`mini-golf-board-wrap mini-golf-theme-${match.gameConfig?.theme || 'classic'}`}><SvgCourse boardRef={boardRef} hole={hole} balls={state.balls} playerIndex={playerIndex} aim={aim} canShoot={canShoot} onAimStart={startAim} onAimMove={moveAim} onAimEnd={finishAim} onAimCancel={cancelAim} obstacleTime={obstacleTime} /></div>
     <div className='mini-golf-stats'><div><b>{playerName(match.player1)}</b><span>{state.strokes[0]} strokes {score === null && playerIndex === 0 ? '- putting' : ''}</span></div><div><b>{playerName(match.player2)}</b><span>{state.strokes[1]} strokes {score === null && playerIndex === 1 ? '- putting' : ''}</span></div></div>
     <p className='mini-golf-score'>Hole scores: {scores.length ? scores.join(' - ') : 'No completed holes yet'}</p>
     <p className='mini-golf-help'>{feedback}</p>
@@ -128,7 +165,7 @@ export default function GameScreen({ matchId, initialMatch = null, activeUserId,
   const submitAction = async (actionType, actionPayload) => { if (!match || acting || match.activePlayerId !== activeUserId) return; setActing(true); try { setMatch(await submitGameAction(match, actionType, actionPayload)); } catch (error) { toast.error(error.response?.data?.message || 'That action was not accepted.'); await refresh(true); } finally { setActing(false); } };
   const forfeit = async () => { if (!window.confirm('Forfeit this match?')) return; setActing(true); try { setMatch(await forfeitGameMatch(matchId)); } catch (error) { toast.error(error.response?.data?.message || 'Unable to forfeit the match.'); } finally { setActing(false); } };
 
-  const status = !match ? '' : match.status === 'ACTIVE' ? (match.activePlayerId === activeUserId ? 'Your turn' : `${playerName(match.activePlayerId === match.player1?._id ? match.player1 : match.player2)}'s turn`) : match.status === 'COMPLETED' ? `${playerName(match.winnerId === match.player1?._id ? match.player1 : match.player2)} won` : match.status === 'DRAW' ? 'Draw' : match.status === 'INVITED' ? 'Invitation waiting' : 'Match closed';
+  const status = !match ? '' : match.status === 'ACTIVE' ? (match.activePlayerId === activeUserId ? 'Your turn' : `${playerName(match.activePlayerId === match.player1?._id ? match.player1 : match.player2)}'s turn`) : match.status === 'COMPLETED' ? `${playerName(match.winnerId === match.player1?._id ? match.player1 : match.player2)} won` : match.status === 'DRAW' ? 'Draw' : match.status === 'INVITED' ? 'Invitation waiting' : match.status === 'EXPIRED' ? 'Invitation expired after one hour' : 'Match closed';
   // The server calculates this from the authenticated session. Do not infer it
   // from client-side ids: a stale profile can otherwise expose invitation
   // controls to the match creator.
@@ -143,6 +180,6 @@ export default function GameScreen({ matchId, initialMatch = null, activeUserId,
       {match.status === 'INVITED' && !isInvitee && <p className='game-waiting'>Waiting for {playerName(match.player2)} to accept.</p>}
       {match.status !== 'INVITED' && (isMiniGolf ? <MiniGolfCourse match={match} activeUserId={activeUserId} acting={acting} onShot={(shot) => submitAction('SHOT', shot)} /> : <TicTacToeBoard match={match} activeUserId={activeUserId} acting={acting} onMove={(cell) => submitAction('MOVE', { cell })} />)}
       {match.status === 'ACTIVE' && <button type='button' className='game-forfeit' onClick={forfeit} disabled={acting}>Forfeit match</button>}
-      {match.status !== 'ACTIVE' && match.status !== 'INVITED' && <p className='game-result'>This result is saved in your conversation.</p>}</>}
+      {match.status !== 'ACTIVE' && match.status !== 'INVITED' && <p className='game-result'>{match.status === 'EXPIRED' ? 'This unanswered invitation expired after one hour.' : 'This result is saved in your conversation.'}</p>}</>}
   </section></div>;
 }
