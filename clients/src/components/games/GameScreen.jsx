@@ -32,8 +32,16 @@ function SvgCourse({ hole, balls, aim, canShoot, onAimStart, onAimMove, onAimEnd
 function MiniGolfCourse({ match, activeUserId, acting, onShot }) {
   const boardRef = useRef(null);
   const [aim, setAim] = useState(null);
-  const state = match.authoritativeState;
-  const course = match.gameConfig?.course || [];
+  const state = match?.authoritativeState;
+  const course = Array.isArray(match?.gameConfig?.course) ? match.gameConfig.course : [];
+
+  // A match opened from an older invitation may briefly lack its complete
+  // server snapshot. Keep the dialog usable rather than throwing and taking
+  // down the entire React tree.
+  if (!state || !Number.isInteger(state.holeIndex) || !Array.isArray(state.balls) || !Array.isArray(state.strokes) || !Array.isArray(state.scores)) {
+    return <p className='game-result'>Loading the Mini Golf course…</p>;
+  }
+
   const hole = course[state.holeIndex];
   const playerIndex = match.player1?._id === activeUserId ? 0 : 1;
   const score = state.scores?.[state.holeIndex]?.[playerIndex] ?? null;
@@ -61,7 +69,7 @@ function MiniGolfCourse({ match, activeUserId, acting, onShot }) {
     onShot({ angle: Math.atan2(dy, dx), power: Math.min(1, distance / 170) });
   };
 
-  if (!hole || !Array.isArray(state.balls)) return <p className='game-result'>This Mini Golf match uses retired rules. Start a new match to play the updated course game.</p>;
+  if (!hole || state.balls.length !== 2 || state.strokes.length !== 2) return <p className='game-result'>This Mini Golf match uses retired rules. Start a new match to play the updated course game.</p>;
   const scores = state.scores.map((item) => `${item[0] ?? '-'} / ${item[1] ?? '-'}`);
   const feedback = state.lastShot?.water ? 'Water hazard: ball returned to the tee.' : state.lastShot?.pickedUp ? 'Stroke limit reached: hole recorded as 8.' : state.lastShot?.sunk ? 'Nice putt - ball in the cup!' : canShoot ? 'Drag back from your ball and release to putt.' : 'Wait for your turn to take a shot.';
 
@@ -73,6 +81,13 @@ function MiniGolfCourse({ match, activeUserId, acting, onShot }) {
     <p className='mini-golf-score'>Hole scores: {scores.length ? scores.join(' - ') : 'No completed holes yet'}</p>
     <p className='mini-golf-help'>{feedback}</p>
   </div>;
+}
+
+function TicTacToeBoard({ match, activeUserId, acting, onMove }) {
+  const board = match?.authoritativeState?.board;
+  if (!Array.isArray(board) || board.length !== 9) return <p className='game-result'>Loading the match board…</p>;
+
+  return <div className='tic-tac-toe-board' aria-label='Tic-Tac-Toe board'>{board.map((mark, cell) => <button key={cell} type='button' disabled={acting || match.status !== 'ACTIVE' || match.activePlayerId !== activeUserId || Boolean(mark)} onClick={() => onMove(cell)} aria-label={`Square ${cell + 1}`} className={mark === 1 ? 'mark-x' : mark === 2 ? 'mark-o' : ''}>{mark === 1 ? 'X' : mark === 2 ? 'O' : ''}</button>)}</div>;
 }
 
 export default function GameScreen({ matchId, initialMatch = null, activeUserId, onClose }) {
@@ -99,7 +114,7 @@ export default function GameScreen({ matchId, initialMatch = null, activeUserId,
     {loading ? <div className='game-loading'>Loading match...</div> : match && <><div className='game-players'><span className={match.activePlayerId === match.player1?._id ? 'game-player-active' : ''}>{playerName(match.player1)} <b>{isMiniGolf ? '1' : 'X'}</b></span><span className={match.activePlayerId === match.player2?._id ? 'game-player-active' : ''}>{playerName(match.player2)} <b>{isMiniGolf ? '2' : 'O'}</b></span></div>
       {match.status === 'INVITED' && isInvitee && <div className='game-invite-actions'><button type='button' disabled={acting} onClick={() => answerInvite(true)}>Accept</button><button type='button' disabled={acting} onClick={() => answerInvite(false)}>Decline</button></div>}
       {match.status === 'INVITED' && !isInvitee && <p className='game-waiting'>Waiting for {playerName(match.player2)} to accept.</p>}
-      {match.status !== 'INVITED' && (isMiniGolf ? <MiniGolfCourse match={match} activeUserId={activeUserId} acting={acting} onShot={(shot) => submitAction('SHOT', shot)} /> : <div className='tic-tac-toe-board' aria-label='Tic-Tac-Toe board'>{match.authoritativeState.board.map((mark, cell) => <button key={cell} type='button' disabled={acting || match.status !== 'ACTIVE' || match.activePlayerId !== activeUserId || Boolean(mark)} onClick={() => submitAction('MOVE', { cell })} aria-label={`Square ${cell + 1}`} className={mark === 1 ? 'mark-x' : mark === 2 ? 'mark-o' : ''}>{mark === 1 ? 'X' : mark === 2 ? 'O' : ''}</button>)}</div>)}
+      {match.status !== 'INVITED' && (isMiniGolf ? <MiniGolfCourse match={match} activeUserId={activeUserId} acting={acting} onShot={(shot) => submitAction('SHOT', shot)} /> : <TicTacToeBoard match={match} activeUserId={activeUserId} acting={acting} onMove={(cell) => submitAction('MOVE', { cell })} />)}
       {match.status === 'ACTIVE' && <button type='button' className='game-forfeit' onClick={forfeit} disabled={acting}>Forfeit match</button>}
       {match.status !== 'ACTIVE' && match.status !== 'INVITED' && <p className='game-result'>This result is saved in your conversation.</p>}</>}
   </section></div>;

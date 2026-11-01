@@ -246,7 +246,7 @@ export const submitAction = async (req, res) => {
     const action = match.gameType === 'tic-tac-toe'
       ? actionType === 'MOVE' ? applyTicTacToeMove(match.authoritativeState, mark, actionPayload?.cell) : { error: 'INVALID_ACTION', message: 'Choose a valid Tic-Tac-Toe move.' }
       : match.gameType === 'mini-golf'
-        ? actionType === 'SHOT' ? applyMiniGolfShot(match.authoritativeState, mark, actionPayload?.power) : { error: 'INVALID_ACTION', message: 'Choose a valid Mini Golf shot.' }
+        ? actionType === 'SHOT' ? applyMiniGolfShot(match.authoritativeState, mark, actionPayload) : { error: 'INVALID_ACTION', message: 'Choose a valid Mini Golf shot.' }
         : { error: 'INVALID_ACTION', message: 'This game is unavailable.' };
     if (action.error) return noDatabaseWrite(error(action.error, action.message));
 
