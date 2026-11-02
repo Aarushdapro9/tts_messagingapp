@@ -3,18 +3,20 @@ import React from 'react'
 const FALLBACK_PROFILE_PIC = 'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg'
 
 const animalPresetPositions = {
-  'preset:animal-horse': '0% 0%',
-  'preset:animal-zebra': '33.333% 0%',
-  'preset:animal-antelope': '66.667% 0%',
-  'preset:animal-deer': '100% 0%',
-  'preset:animal-crocodile': '0% 50%',
-  'preset:animal-rhinoceros': '33.333% 50%',
-  'preset:animal-gazelle': '66.667% 50%',
-  'preset:animal-giraffe': '100% 50%',
-  'preset:animal-gorilla': '0% 100%',
-  'preset:animal-chimpanzee': '33.333% 100%',
-  'preset:animal-orangutan': '66.667% 100%',
-  'preset:animal-monkey': '100% 100%',
+  // The supplied sheet has generous space between portraits. These positions
+  // centre on the illustration itself instead of on the larger grid cell.
+  'preset:animal-horse': '7.3% 12.4%',
+  'preset:animal-zebra': '35.2% 12.4%',
+  'preset:animal-antelope': '63.3% 12.4%',
+  'preset:animal-deer': '91.7% 12.4%',
+  'preset:animal-crocodile': '7.3% 47.7%',
+  'preset:animal-rhinoceros': '35.2% 47.7%',
+  'preset:animal-gazelle': '63.3% 47.7%',
+  'preset:animal-giraffe': '91.7% 47.7%',
+  'preset:animal-gorilla': '7.3% 83.2%',
+  'preset:animal-chimpanzee': '35.2% 83.2%',
+  'preset:animal-orangutan': '63.3% 83.2%',
+  'preset:animal-monkey': '91.7% 83.2%',
 }
 
 function ProfileAvatar({ profilePic, name = 'User', className = '', alt, style, ...props }) {
@@ -29,7 +31,9 @@ function ProfileAvatar({ profilePic, name = 'User', className = '', alt, style, 
       style={{
         ...style,
         backgroundImage: `url(${process.env.PUBLIC_URL || ''}/avatars/animal-avatar-sheet.png)`,
-        backgroundSize: '400% 300%',
+        backgroundColor: '#f4f3f0',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: '591% 443%',
         backgroundPosition: presetPosition,
       }}
     />
