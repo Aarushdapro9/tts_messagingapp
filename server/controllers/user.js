@@ -190,6 +190,11 @@ export const validUser = async (req, res) => {
     } else if (!storedAccount.title) {
       storedAccount.title = 'Member';
     }
+    // Move pre-preset accounts off the retired anonymous image without
+    // replacing a photo that a person has already chosen for themselves.
+    if (!storedAccount.profilePic || storedAccount.profilePic === defaultProfilePic) {
+      storedAccount.profilePic = randomAnimalProfilePreset();
+    }
     storedAccount.lastActiveAt = new Date().toISOString();
     const onboardingChatId = storedAccount.approved === false
       ? createOnboardingChat(database, storedAccount, new Date().toISOString())
