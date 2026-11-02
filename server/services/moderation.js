@@ -7,6 +7,8 @@ export function ensureModerationState(database) {
   database.sessions ||= [];
   database.loginAttempts ||= [];
   database.settings ||= {};
+  database.settings.registrationMode ||= 'open';
+  database.settings.approvalRequired ??= true;
   database.settings.featureFlags ||= { games: true, polls: true };
   return database;
 }

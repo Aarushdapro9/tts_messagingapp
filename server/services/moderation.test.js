@@ -7,6 +7,7 @@ test('moderation state safely extends existing application data', () => {
   ensureModerationState(database);
   assert.deepEqual(database.reports, []);
   assert.equal(database.settings.featureFlags.games, true);
+  assert.equal(database.settings.approvalRequired, true);
 });
 
 test('account status prioritizes a permanent ban and expires temporary restrictions', () => {

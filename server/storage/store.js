@@ -17,7 +17,7 @@ const usesBlobStore = Boolean(
   )
 );
 const defaultSettings = () => ({
-  registrationMode: 'open', maintenanceMode: false, globalChatLocked: false,
+  registrationMode: 'open', approvalRequired: true, maintenanceMode: false, globalChatLocked: false,
   globalChatSlowModeSeconds: 0, featureFlags: { games: true, polls: true },
 });
 const emptyDatabase = () => ({

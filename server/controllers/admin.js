@@ -332,6 +332,7 @@ function publicSystemSettings(database) {
   ensureModerationState(database);
   return {
     registrationMode: database.settings.registrationMode,
+    approvalRequired: database.settings.approvalRequired !== false,
     maintenanceMode: Boolean(database.settings.maintenanceMode),
     globalChatLocked: Boolean(database.settings.globalChatLocked),
     globalChatSlowModeSeconds: Number(database.settings.globalChatSlowModeSeconds || 0),
@@ -351,6 +352,21 @@ export const updateSystemSettings = async (req, res) => {
     if (next.registrationMode !== undefined) {
       if (!['open', 'invite_only'].includes(next.registrationMode)) return 'invalid';
       database.settings.registrationMode = next.registrationMode;
+    }
+    if (next.approvalRequired !== undefined) {
+      if (typeof next.approvalRequired !== 'boolean') return 'invalid';
+      database.settings.approvalRequired = next.approvalRequired;
+      // Turning the gate off should take effect immediately for people who
+      // were already waiting, while turning it back on affects new accounts.
+      if (!next.approvalRequired) {
+        const now = new Date().toISOString();
+        database.users.forEach((user) => {
+          if (!isOwnerEmail(user.email) && user.approved === false) {
+            user.approved = true;
+            user.updatedAt = now;
+          }
+        });
+      }
     }
     for (const field of ['maintenanceMode', 'globalChatLocked']) {
       if (next[field] !== undefined) {

@@ -122,7 +122,9 @@ export const register = async (req, res) => {
         title: 'Member',
         isAdmin: false,
         isModerator: false,
-        approved: isOwnerEmail(normalizedEmail),
+        // Existing installations used approval by default. New registrations
+        // can skip that gate only when the Owner has explicitly switched it off.
+        approved: isOwnerEmail(normalizedEmail) || database.settings?.approvalRequired === false,
         createdAt: now,
         updatedAt: now,
       };
@@ -244,7 +246,7 @@ export const googleAuth = async (req, res) => {
         title: 'Member',
         isAdmin: false,
         isModerator: false,
-        approved: isOwnerEmail(normalizedEmail),
+        approved: isOwnerEmail(normalizedEmail) || database.settings?.approvalRequired === false,
         createdAt: now,
         updatedAt: now,
       };
