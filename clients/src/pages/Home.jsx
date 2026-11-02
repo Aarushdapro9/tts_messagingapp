@@ -26,6 +26,7 @@ import AppAlertDialog from '../components/AppAlertDialog'
 import { dismissAppAlert, getPendingAlerts } from '../apis/admin'
 import { toast } from 'react-toastify'
 import { themeCssVars } from '../utils/theme'
+import ProfileAvatar from '../components/ProfileAvatar'
 
 function getDeviceType() {
   // Some embedded mobile browsers do not expose matchMedia while they are
@@ -214,7 +215,7 @@ function Home() {
                       }
                     </div>
                     <button onClick={() => dispatch(setShowProfile(true))} className='flex items-center gap-x-1 relative'>
-                      <img className='w-[28px] h-[28px] rounded-[25px]' src={activeUser?.profilePic} alt="" />
+                      <ProfileAvatar profilePic={activeUser?.profilePic} name={activeUser?.name} className='h-[28px] w-[28px] rounded-[25px]' />
                       <IoIosArrowDown style={{ color: "#616c76", height: "14px", width: "14px" }} />
                     </button>
                   </div>

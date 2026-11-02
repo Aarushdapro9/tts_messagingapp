@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import { getUserTitle, isAdminUser, isOwnerEmail } from '../middleware/user.js';
+import { randomAnimalProfilePreset } from '../services/profilePresets.js';
 import {
   createId,
   findUser,
@@ -117,7 +118,7 @@ export const register = async (req, res) => {
         email: normalizedEmail,
         password: await bcrypt.hash(password, 12),
         bio: 'Available',
-        profilePic: defaultProfilePic,
+        profilePic: randomAnimalProfilePreset(),
         contacts: [],
         title: 'Member',
         isAdmin: false,
@@ -222,7 +223,7 @@ export const googleAuth = async (req, res) => {
       idToken: tokenId,
       audience: process.env.CLIENT_ID,
     });
-    const { email_verified, email, name, picture } = verification.getPayload();
+    const { email_verified, email, name } = verification.getPayload();
     if (!email_verified || !email) {
       return res.status(401).json({ message: 'Google email is not verified' });
     }
@@ -241,7 +242,7 @@ export const googleAuth = async (req, res) => {
         email: normalizedEmail,
         password: await bcrypt.hash(createId(), 12),
         bio: 'Available',
-        profilePic: picture || defaultProfilePic,
+        profilePic: randomAnimalProfilePreset(),
         contacts: [],
         title: 'Member',
         isAdmin: false,

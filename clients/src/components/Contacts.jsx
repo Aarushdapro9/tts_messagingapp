@@ -5,6 +5,7 @@ import { getChatName, getChatPhoto, timeSince } from '../utils/logics'
 import { getChatFolders, updateChatFolder } from '../apis/chat'
 import { setSelectedUser } from '../redux/profileSlice'
 import NoContacts from './ui/NoContacts'
+import ProfileAvatar from './ProfileAvatar'
 
 const aDay = 24 * 60 * 60 * 1000
 const folderTabs = [
@@ -59,7 +60,7 @@ function Contacts() {
           return (
           <div onClick={() => dispatch(setActiveChat(chat))} key={chat._id} className={`chat-list-item flex items-center justify-between gap-x-1 mt-3 cursor-pointer py-3 px-2 ${activeChat?._id === chat._id ? 'chat-list-item-active' : ''}`}>
             <div className='flex min-w-0 items-center gap-x-3'>
-              {profileUser ? <button type="button" onClick={(event) => { event.stopPropagation(); dispatch(setSelectedUser(profileUser)) }} className="rounded-full focus:outline-none focus:ring-2 focus:ring-[#319268]" aria-label={`View ${profileUser.name}'s profile`}><img className='w-11 h-11 rounded-[30px] shadow-lg object-cover' src={getChatPhoto(chat, activeUser)} alt="" /></button> : <img className='w-11 h-11 rounded-[30px] shadow-lg object-cover' src={getChatPhoto(chat, activeUser)} alt="" />}
+              {profileUser ? <button type="button" onClick={(event) => { event.stopPropagation(); dispatch(setSelectedUser(profileUser)) }} className="rounded-full focus:outline-none focus:ring-2 focus:ring-[#319268]" aria-label={`View ${profileUser.name}'s profile`}><ProfileAvatar profilePic={getChatPhoto(chat, activeUser)} name={profileUser.name} className='h-11 w-11 rounded-[30px] shadow-lg' /></button> : <ProfileAvatar profilePic={getChatPhoto(chat, activeUser)} name={getChatName(chat, activeUser)} className='h-11 w-11 rounded-[30px] shadow-lg' />}
               <div className="min-w-0">
                 <h5 className='chat-list-title truncate text-[14px] sm:text-[16px] font-bold'>{getChatName(chat, activeUser)}</h5>
                 <p className='chat-list-preview truncate text-[12px] sm:text-[13px] font-medium'>{chat.latestMessage?.type === 'poll' ? 'Poll' : chat.latestMessage?.message || 'No messages yet'}</p>

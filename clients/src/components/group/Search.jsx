@@ -2,6 +2,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import SkeletonLoading from '../ui/SkeletonLoading'
 import { setSelectedUser } from '../../redux/profileSlice'
+import ProfileAvatar from '../ProfileAvatar'
 import "../../pages/home.css"
 function Search({ type, isLoading, searchResults, handleClick, search, alwaysVisible = false }) {
   const dispatch = useDispatch()
@@ -17,7 +18,7 @@ function Search({ type, isLoading, searchResults, handleClick, search, alwaysVis
               <div key={e._id} className='flex items-center justify-between'>
                 <button type='button' onClick={() => dispatch(setSelectedUser(e))} className='flex items-center gap-x-2 text-left' aria-label={`View ${e.name}'s profile`}>
 
-                  <img className='w-[42px] h-[42px] rounded-[25px]' src={!e.profilePic ? "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg" : e.profilePic} alt="" />
+                  <ProfileAvatar profilePic={e.profilePic} name={e.name} className='h-[42px] w-[42px] rounded-[25px]' />
                   <div className='flex flex-col gap-y-[1px]'>
                     <h5 className='text-[15px] text-[#111b21] tracking-wide font-medium'>{e.name}</h5>
                     {e.title && e.title !== 'Member' ? <h5 className='text-[12px] text-[#68737c] tracking-wide font-normal'>{e.title}</h5> : null}

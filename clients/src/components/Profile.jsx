@@ -9,6 +9,7 @@ import { toast } from 'react-toastify'
 import { setUserNameAndBio, setUserThemeSettings } from '../redux/activeUserSlice'
 import RankBadge from './RankBadge'
 import ThemeStudio from './ThemeStudio'
+import ProfileAvatar from './ProfileAvatar'
 
 function Profile(props) {
   const dispatch = useDispatch()
@@ -58,7 +59,7 @@ function Profile(props) {
         <div className='min-h-full w-[100%]'>
         <div className=' pt-5'>
           <div className='flex items-center flex-col'>
-            <img className='w-[150px] h-[150px] rounded-[100%] -ml-5' src={activeUser?.profilePic} alt="" />
+            <ProfileAvatar profilePic={activeUser?.profilePic} name={activeUser?.name} className='h-[150px] w-[150px] rounded-[100%] -ml-5' />
             <RankBadge title={activeUser?.title} className='mt-3' />
           </div>
           <InputEdit type="name" handleChange={handleChange} input={formData.name} handleSubmit={submit} />

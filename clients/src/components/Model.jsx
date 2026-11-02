@@ -10,6 +10,7 @@ import { fetchChats } from '../redux/chatsSlice';
 import Search from './group/Search';
 import { getChatName, getChatPhoto } from '../utils/logics';
 import { setSelectedUser } from '../redux/profileSlice';
+import ProfileAvatar from './ProfileAvatar';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -102,7 +103,7 @@ function Model(props) {
 
 
       <button onClick={handleOpen}>
-        <img className='w-[40px] h-[40px] rounded-[25px]' alt="Profile Pic" src={getChatPhoto(activeChat, activeUser)} />
+        <ProfileAvatar profilePic={getChatPhoto(activeChat, activeUser)} name={getChatName(activeChat, activeUser)} className='h-[40px] w-[40px] rounded-[25px]' alt="Profile Pic" />
 
       </button>
       {
@@ -155,7 +156,7 @@ function Model(props) {
           >
             <Box sx={style}>
               <div className='w-[250px] h-[250px] flex flex-col items-center justify-center -mt-4'>
-                <img className='w-[70px] h-[70px] rounded-[35px] shadow-lg' src={getChatPhoto(activeChat, activeUser)} alt="" />
+                <ProfileAvatar profilePic={getChatPhoto(activeChat, activeUser)} name={getChatName(activeChat, activeUser)} className='h-[70px] w-[70px] rounded-[35px] shadow-lg' />
                 <h2 className='text-[17px] tracking-wider font-semibold text-[#313439]'>{getChatName(activeChat, activeUser)}</h2>
 
                 <h3 className='text-[14px] font-semibold text-[#268d61]'>{!activeChat?.isGroup && activeChat?.users[0]?._id === activeUser.id ? activeChat?.users[1]?.email : activeChat?.users[0]?.email}</h3>
