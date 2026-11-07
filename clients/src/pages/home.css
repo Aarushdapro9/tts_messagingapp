@@ -314,6 +314,15 @@
 .mini-golf-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .mini-golf-stats div { display: grid; gap: 3px; padding: 9px; border-radius: 10px; background: color-mix(in srgb, var(--theme-sidebar) 72%, var(--theme-surface)); font-size: 11px; }
 .mini-golf-stats span, .mini-golf-score, .mini-golf-help { color: var(--theme-muted); font-size: 11px; }
+.message-receipt { margin: 6px 0 0; font-size: 10px; font-weight: 700; opacity: .72; text-align: right; }
+.arcade-game { margin-top: 16px; }
+.filler-board { display: grid; grid-template-columns: repeat(8, 1fr); overflow: hidden; border: 5px solid #1d3340; border-radius: 16px; aspect-ratio: 8 / 7; }
+.filler-cell { min-width: 0; border: 1px solid rgba(255,255,255,.25); }
+.filler-owner-1 { box-shadow: inset 0 0 0 3px #fff; }.filler-owner-2 { box-shadow: inset 0 0 0 3px #17202a; }
+.filler-coral { background:#f27672; }.filler-gold { background:#edc85f; }.filler-mint { background:#5bc79c; }.filler-sky { background:#64b7e8; }.filler-violet { background:#a184e8; }.filler-rose { background:#e987b7; }
+.filler-colors { display:flex; flex-wrap:wrap; gap:9px; justify-content:center; margin:14px 0; }.filler-choice { width:37px; height:37px; border:3px solid #fff; border-radius:50%; box-shadow:0 1px 4px rgba(0,0,0,.3); }.filler-choice:disabled { opacity:.35; }
+.word-hunt-score { display:flex; justify-content:space-between; color:var(--theme-muted); font-size:12px; }.word-hunt-board { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; max-width:430px; margin:12px auto; }.word-hunt-board button { aspect-ratio:1; border-radius:14px; background:#2d9d8e; color:#fff; font-size:clamp(21px, 5vw, 34px); font-weight:800; }.word-hunt-board button.word-selected { background:#f0b74c; transform:translateY(-2px); }.word-controls,.physics-controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; }.word-controls button,.physics-controls button { border-radius:9px; background:#2d9d8e; color:#fff; padding:8px 11px; font-weight:700; }.word-controls button:disabled,.physics-controls button:disabled { opacity:.45; }
+.physics-board { width:100%; border:6px solid #344654; border-radius:18px; }.knockout-board { background:linear-gradient(135deg,#c9f3ff,#7fcce1); }.pool-board { background:#167e59; }.knockout-piece { stroke:#fff; stroke-width:5px; cursor:pointer; }.knockout-owner-1 { fill:#ee7a6d; }.knockout-owner-2 { fill:#5475d4; }.physics-selected { stroke:#ffd95d; stroke-width:8px; }.pool-ball { stroke:#fff; stroke-width:3px; }.pool-cue { fill:#fff; }.pool-solid { fill:#eb604e; }.pool-stripe { fill:#d8b641; }.pool-eight { fill:#1a1a1a; }.pool-pocket { fill:#15242c; }.physics-controls { margin-top:12px; }.physics-controls label { display:flex; gap:6px; align-items:center; font-size:12px; }.physics-controls input { accent-color:#2d9d8e; }
 .mini-golf-score { margin: 12px 0; }
 .mini-golf-help { margin: 10px 0 0; text-align: center; }
 
@@ -365,3 +374,5 @@
     min-width: 0;
   }
 }
+
+.game-rematch { display:block; margin:12px auto 0; border-radius:9px; background:var(--theme-accent); color:#fff; padding:8px 12px; font-weight:700; }

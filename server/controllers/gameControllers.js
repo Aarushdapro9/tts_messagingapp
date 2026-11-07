@@ -18,6 +18,17 @@ import {
   createMiniGolfState,
   getMiniGolfMap,
 } from '../games/miniGolf.js';
+import {
+  ARCADE_RULESET_VERSION,
+  applyEightBallShot,
+  applyFillerMove,
+  applyKnockoutPush,
+  applyWordHuntWord,
+  createEightBallState,
+  createFillerState,
+  createKnockoutState,
+  createWordHuntState,
+} from '../games/arcadeGames.js';
 import { expireGameInvitation, gameInvitationExpiresAt, hasGameInvitationExpired } from '../games/invitationExpiry.js';
 import { hasActiveRestriction } from '../services/moderation.js';
 
@@ -45,6 +56,19 @@ function gameDefinition(gameType, mapId) {
       inviteText: `Mini Golf: ${map.name}`,
     };
   }
+  const arcadeGames = {
+    knockout: { name: 'Knockout', state: createKnockoutState, text: 'Knockout invitation', description: 'Slide your seals and knock the other team out.' },
+    'crazy-8-ball': { name: 'Crazy 8 Ball', state: createEightBallState, text: 'Crazy 8 Ball invitation', description: 'Pocket balls with a server-checked cue shot.' },
+    'word-hunt': { name: 'Word Hunt', state: createWordHuntState, text: 'Word Hunt invitation', description: 'Find connected words on the shared board.' },
+    filler: { name: 'Filler', state: createFillerState, text: 'Filler invitation', description: 'Claim the board by expanding your colour.' },
+  };
+  const arcade = arcadeGames[gameType];
+  if (arcade) return {
+    rulesetVersion: ARCADE_RULESET_VERSION,
+    gameConfig: { name: arcade.name, description: arcade.description },
+    createState: arcade.state,
+    inviteText: arcade.text,
+  };
   return null;
 }
 
@@ -94,6 +118,20 @@ function updateInviteMessage(database, match) {
 
 function expireInviteIfNeeded(database, match, now = Date.now()) {
   if (!expireGameInvitation(match, now)) return false;
+  updateInviteMessage(database, match);
+  return true;
+}
+
+function finishTimedWordHuntIfNeeded(database, match, now = Date.now()) {
+  const endsAt = match?.authoritativeState?.roundEndsAt;
+  if (match?.gameType !== 'word-hunt' || match.status !== 'ACTIVE' || !endsAt || new Date(endsAt).getTime() > now) return false;
+  const scores = match.authoritativeState.scores || [0, 0];
+  match.status = scores[0] === scores[1] ? 'DRAW' : 'COMPLETED';
+  match.winnerId = scores[0] === scores[1] ? null : scores[0] > scores[1] ? match.player1Id : match.player2Id;
+  match.activePlayerId = null;
+  match.completedAt = new Date(now).toISOString();
+  match.updatedAt = match.completedAt;
+  match.revision += 1;
   updateInviteMessage(database, match);
   return true;
 }
@@ -197,6 +235,15 @@ export const getMatch = async (req, res) => {
     });
     return sendResult(res, result);
   }
+  if (finishTimedWordHuntIfNeeded(database, match)) {
+    const result = await updateDatabase((currentDatabase) => {
+      const currentMatch = currentDatabase.games.find((item) => item.id === req.params.matchId);
+      if (!canAccessMatch(currentMatch, req.rootUserId)) return noDatabaseWrite(error('NOT_A_PARTICIPANT', 'Match not found.', 404));
+      finishTimedWordHuntIfNeeded(currentDatabase, currentMatch);
+      return actionResult(currentDatabase, currentMatch, req.rootUserId);
+    });
+    return sendResult(res, result);
+  }
   return res.status(200).json({ match: matchResponse(database, match, req.rootUserId) });
 };
 
@@ -239,6 +286,9 @@ function respondToInvite(status) {
       const now = new Date().toISOString();
       match.status = status;
       match.activePlayerId = status === 'ACTIVE' ? match.player1Id : null;
+      if (status === 'ACTIVE' && match.gameType === 'word-hunt') {
+        match.authoritativeState = { ...match.authoritativeState, startedAt: now, roundEndsAt: new Date(Date.now() + 120_000).toISOString() };
+      }
       match.updatedAt = now;
       match.revision += 1;
       updateInviteMessage(database, match);
@@ -271,6 +321,7 @@ export const submitAction = async (req, res) => {
 
     const match = database.games.find((item) => item.id === req.params.matchId);
     if (!canAccessMatch(match, req.rootUserId)) return noDatabaseWrite(error('NOT_A_PARTICIPANT', 'Match not found.', 404));
+    if (finishTimedWordHuntIfNeeded(database, match)) return actionResult(database, match, req.rootUserId);
     if (!MATCH_STATUSES.has(match.status) || match.status !== 'ACTIVE') return noDatabaseWrite(error('MATCH_COMPLETED', 'This match is no longer active.', 409));
     if (clientRulesetVersion !== undefined && clientRulesetVersion !== match.rulesetVersion) return noDatabaseWrite(error('VERSION_MISMATCH', 'Update the app before playing this match.', 409));
     if (expectedRevision !== match.revision) return noDatabaseWrite(error('STALE_REVISION', 'Your game view is out of date. Refreshing it now.', 409));
@@ -281,7 +332,15 @@ export const submitAction = async (req, res) => {
       ? actionType === 'MOVE' ? applyTicTacToeMove(match.authoritativeState, mark, actionPayload?.cell) : { error: 'INVALID_ACTION', message: 'Choose a valid Tic-Tac-Toe move.' }
       : match.gameType === 'mini-golf'
         ? actionType === 'SHOT' ? applyMiniGolfShot(match.authoritativeState, mark, actionPayload) : { error: 'INVALID_ACTION', message: 'Choose a valid Mini Golf shot.' }
-        : { error: 'INVALID_ACTION', message: 'This game is unavailable.' };
+        : match.gameType === 'filler'
+          ? actionType === 'COLOR' ? applyFillerMove(match.authoritativeState, mark, actionPayload?.color) : { error: 'INVALID_ACTION', message: 'Choose a colour.' }
+          : match.gameType === 'word-hunt'
+            ? actionType === 'WORD' ? applyWordHuntWord(match.authoritativeState, mark, actionPayload?.path) : { error: 'INVALID_ACTION', message: 'Trace a word.' }
+            : match.gameType === 'knockout'
+              ? actionType === 'PUSH' ? applyKnockoutPush(match.authoritativeState, mark, actionPayload) : { error: 'INVALID_ACTION', message: 'Make a push.' }
+              : match.gameType === 'crazy-8-ball'
+                ? actionType === 'SHOT' ? applyEightBallShot(match.authoritativeState, mark, actionPayload) : { error: 'INVALID_ACTION', message: 'Take a cue shot.' }
+                : { error: 'INVALID_ACTION', message: 'This game is unavailable.' };
     if (action.error) return noDatabaseWrite(error(action.error, action.message));
 
     const now = new Date().toISOString();
@@ -308,7 +367,7 @@ export const submitAction = async (req, res) => {
       actionNumber: match.currentTurn,
       expectedRevision,
       actionType,
-      actionPayload: match.gameType === 'mini-golf' ? { angle: actionPayload.angle, power: actionPayload.power } : { cell: actionPayload.cell },
+      actionPayload: match.gameType === 'tic-tac-toe' ? { cell: actionPayload.cell } : actionPayload,
       resultingRevision: match.revision,
       resultPayload: payload,
       createdAt: now,

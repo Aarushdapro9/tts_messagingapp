@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { acceptGameMatch, declineGameMatch, fetchGameMatch, forfeitGameMatch, submitGameAction } from '../../apis/games';
+import { acceptGameMatch, createGameMatch, declineGameMatch, fetchGameMatch, forfeitGameMatch, submitGameAction } from '../../apis/games';
 
 function playerName(player) { return player?.name || 'Player'; }
-function gameName(gameType) { return gameType === 'mini-golf' ? 'Mini Golf' : 'Tic-Tac-Toe'; }
+function gameName(gameType) {
+  return ({ 'mini-golf': 'Mini Golf', 'tic-tac-toe': 'Tic-Tac-Toe', knockout: 'Knockout', 'crazy-8-ball': 'Crazy 8 Ball', 'word-hunt': 'Word Hunt', filler: 'Filler' })[gameType] || 'Game';
+}
 
 // Both players tee off from the same server-authoritative position. Offset only
 // their visual markers while they overlap so it is always obvious which ball
@@ -155,6 +157,50 @@ function TicTacToeBoard({ match, activeUserId, acting, onMove }) {
   return <div className='tic-tac-toe-board' aria-label='Tic-Tac-Toe board'>{board.map((mark, cell) => <button key={cell} type='button' disabled={acting || match.status !== 'ACTIVE' || match.activePlayerId !== activeUserId || Boolean(mark)} onClick={() => onMove(cell)} aria-label={`Square ${cell + 1}`} className={mark === 1 ? 'mark-x' : mark === 2 ? 'mark-o' : ''}>{mark === 1 ? 'X' : mark === 2 ? 'O' : ''}</button>)}</div>;
 }
 
+function FillerBoard({ match, activeUserId, acting, onAction }) {
+  const state = match.authoritativeState;
+  if (!Array.isArray(state?.board) || !Array.isArray(state?.owners)) return <p className='game-result'>Loading the Filler board...</p>;
+  const colors = ['coral', 'gold', 'mint', 'sky', 'violet', 'rose'];
+  const mine = match.player1?._id === activeUserId ? 1 : 2;
+  const canPlay = match.activePlayerId === activeUserId && !acting;
+  return <div className='arcade-game'><div className='filler-board'>{state.board.map((row, rowIndex) => row.map((color, columnIndex) => <span key={`${rowIndex}-${columnIndex}`} className={`filler-cell filler-${color} filler-owner-${state.owners[rowIndex][columnIndex]}`} />))}</div><div className='filler-colors'>{colors.map((color) => <button key={color} type='button' className={`filler-choice filler-${color}`} disabled={!canPlay || state.playerColors.includes(color)} onClick={() => onAction('COLOR', { color })} aria-label={`Choose ${color}`} />)}</div><p className='game-result'>You control {state.playerColors[mine - 1]}. Claim more of the board than your opponent.</p></div>;
+}
+
+function WordHuntBoard({ match, activeUserId, acting, onAction }) {
+  const state = match.authoritativeState;
+  const [path, setPath] = useState([]);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => setPath([]), [match.revision]);
+  useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(timer); }, []);
+  if (!Array.isArray(state?.board)) return <p className='game-result'>Loading the Word Hunt board...</p>;
+  const canPlay = match.activePlayerId === activeUserId && !acting;
+  const selected = new Set(path.map((item) => `${item.row}-${item.column}`));
+  const add = (row, column) => { if (!canPlay || selected.has(`${row}-${column}`)) return; const previous = path[path.length - 1]; if (previous && Math.max(Math.abs(previous.row - row), Math.abs(previous.column - column)) !== 1) return; setPath((current) => [...current, { row, column }]); };
+  const word = path.map(({ row, column }) => state.board[row][column]).join('');
+  const secondsLeft = state.roundEndsAt ? Math.max(0, Math.ceil((new Date(state.roundEndsAt).getTime() - now) / 1000)) : null;
+  return <div className='arcade-game'><div className='word-hunt-score'><span>{playerName(match.player1)}: {state.scores?.[0] || 0}</span><b>{secondsLeft === null ? 'Round starts when accepted' : `${secondsLeft}s`}</b><span>{playerName(match.player2)}: {state.scores?.[1] || 0}</span></div><div className='word-hunt-board'>{state.board.map((row, rowIndex) => row.map((letter, columnIndex) => <button key={`${rowIndex}-${columnIndex}`} type='button' className={selected.has(`${rowIndex}-${columnIndex}`) ? 'word-selected' : ''} disabled={!canPlay || secondsLeft === 0} onClick={() => add(rowIndex, columnIndex)}>{letter}</button>))}</div><div className='word-controls'><b>{word || 'Select connected letters'}</b><button type='button' disabled={!canPlay || secondsLeft === 0 || path.length < 3} onClick={() => onAction('WORD', { path })}>Submit word</button><button type='button' onClick={() => setPath([])}>Clear</button></div><p className='game-result'>Two-minute shared round. A word can only be claimed once.</p></div>;
+}
+
+function PhysicsGame({ match, activeUserId, acting, onAction }) {
+  const state = match.authoritativeState;
+  const [angle, setAngle] = useState(0);
+  const [power, setPower] = useState(.55);
+  const [pieceId, setPieceId] = useState(null);
+  const isKnockout = match.gameType === 'knockout';
+  const canPlay = match.activePlayerId === activeUserId && !acting;
+  const mine = match.player1?._id === activeUserId ? 1 : 2;
+  const balls = isKnockout ? state?.pieces : state?.balls;
+  if (!Array.isArray(balls)) return <p className='game-result'>Loading the table...</p>;
+  const selectedPiece = pieceId || (isKnockout ? balls.find((piece) => piece.owner === mine)?.id : 'cue');
+  return <div className='arcade-game'><svg className={`physics-board ${isKnockout ? 'knockout-board' : 'pool-board'}`} viewBox='0 0 1000 600' role='img' aria-label={isKnockout ? 'Knockout ice arena' : '8 ball table'}>{!isKnockout && [[20,20],[500,20],[980,20],[20,560],[500,560],[980,560]].map(([x,y]) => <circle className='pool-pocket' key={`${x}-${y}`} cx={x} cy={y} r='24' />)}{balls.map((piece) => <circle key={piece.id} className={isKnockout ? `knockout-piece knockout-owner-${piece.owner} ${selectedPiece === piece.id ? 'physics-selected' : ''}` : `pool-ball pool-${piece.kind}`} cx={piece.x} cy={piece.y} r={isKnockout ? 18 : 16} onClick={() => isKnockout && piece.owner === mine && setPieceId(piece.id)} />)}</svg><div className='physics-controls'><label>Aim <input type='range' min='-3.14' max='3.14' step='.05' value={angle} onChange={(event) => setAngle(Number(event.target.value))} /></label><label>Power <input type='range' min='.1' max='1' step='.05' value={power} onChange={(event) => setPower(Number(event.target.value))} /></label><button type='button' disabled={!canPlay} onClick={() => onAction(isKnockout ? 'PUSH' : 'SHOT', isKnockout ? { pieceId: selectedPiece, angle, power } : { angle, power })}>{isKnockout ? 'Launch seal' : 'Take shot'}</button></div><p className='game-result'>{isKnockout ? 'Choose one of your seals, then set direction and power.' : 'Use the sliders to set a server-checked cue shot.'}</p></div>;
+}
+
+function NativeArcadeGame({ match, activeUserId, acting, onAction }) {
+  if (match.gameType === 'filler') return <FillerBoard match={match} activeUserId={activeUserId} acting={acting} onAction={onAction} />;
+  if (match.gameType === 'word-hunt') return <WordHuntBoard match={match} activeUserId={activeUserId} acting={acting} onAction={onAction} />;
+  return <PhysicsGame match={match} activeUserId={activeUserId} acting={acting} onAction={onAction} />;
+}
+
 export default function GameScreen({ matchId, initialMatch = null, activeUserId, onClose }) {
   const hasInitialMatch = initialMatch?.id === matchId;
   const [match, setMatch] = useState(() => hasInitialMatch ? initialMatch : null);
@@ -166,6 +212,7 @@ export default function GameScreen({ matchId, initialMatch = null, activeUserId,
   const answerInvite = async (accept) => { setActing(true); try { setMatch(await (accept ? acceptGameMatch(matchId) : declineGameMatch(matchId))); } catch (error) { toast.error(error.response?.data?.message || 'Unable to update the invitation.'); } finally { setActing(false); } };
   const submitAction = async (actionType, actionPayload) => { if (!match || acting || match.activePlayerId !== activeUserId) return; setActing(true); try { setMatch(await submitGameAction(match, actionType, actionPayload)); } catch (error) { toast.error(error.response?.data?.message || 'That action was not accepted.'); await refresh(true); } finally { setActing(false); } };
   const forfeit = async () => { if (!window.confirm('Forfeit this match?')) return; setActing(true); try { setMatch(await forfeitGameMatch(matchId)); } catch (error) { toast.error(error.response?.data?.message || 'Unable to forfeit the match.'); } finally { setActing(false); } };
+  const rematch = async () => { if (!match || acting) return; setActing(true); try { const { match: next } = await createGameMatch(match.conversationId, match.gameType, match.gameConfig?.mapId); onClose({ id: next.id, initialMatch: next }); } catch (error) { toast.error(error.response?.data?.message || 'Unable to start a rematch.'); } finally { setActing(false); } };
 
   const status = !match ? '' : match.status === 'ACTIVE' ? (match.activePlayerId === activeUserId ? 'Your turn' : `${playerName(match.activePlayerId === match.player1?._id ? match.player1 : match.player2)}'s turn`) : match.status === 'COMPLETED' ? `${playerName(match.winnerId === match.player1?._id ? match.player1 : match.player2)} won` : match.status === 'DRAW' ? 'Draw' : match.status === 'INVITED' ? 'Invitation waiting' : match.status === 'EXPIRED' ? 'Invitation expired after one hour' : 'Match closed';
   // The server calculates this from the authenticated session. Do not infer it
@@ -173,6 +220,7 @@ export default function GameScreen({ matchId, initialMatch = null, activeUserId,
   // controls to the match creator.
   const isInvitee = match?.viewerRole === 'INVITEE';
   const isMiniGolf = match?.gameType === 'mini-golf';
+  const isTicTacToe = match?.gameType === 'tic-tac-toe';
 
   return <div className='game-screen-backdrop' role='presentation'><section className={`game-screen ${isMiniGolf ? 'mini-golf-screen' : ''}`} role='dialog' aria-modal='true' aria-label={`${gameName(match?.gameType)} match`}>
     <div className='game-screen-top'><header><div><span className='game-eyebrow'>GAMES</span><h2>{gameName(match?.gameType)}</h2><p>{status}</p></div><button type='button' onClick={onClose} aria-label='Return to chat'>x</button></header>
@@ -180,8 +228,8 @@ export default function GameScreen({ matchId, initialMatch = null, activeUserId,
     {loading ? <div className='game-loading'>Loading match...</div> : match && <>
       {match.status === 'INVITED' && isInvitee && <div className='game-invite-actions'><button type='button' disabled={acting} onClick={() => answerInvite(true)}>Accept</button><button type='button' disabled={acting} onClick={() => answerInvite(false)}>Decline</button></div>}
       {match.status === 'INVITED' && !isInvitee && <p className='game-waiting'>Waiting for {playerName(match.player2)} to accept.</p>}
-      {match.status !== 'INVITED' && (isMiniGolf ? <MiniGolfCourse match={match} activeUserId={activeUserId} acting={acting} onShot={(shot) => submitAction('SHOT', shot)} /> : <TicTacToeBoard match={match} activeUserId={activeUserId} acting={acting} onMove={(cell) => submitAction('MOVE', { cell })} />)}
+      {match.status !== 'INVITED' && (isMiniGolf ? <MiniGolfCourse match={match} activeUserId={activeUserId} acting={acting} onShot={(shot) => submitAction('SHOT', shot)} /> : isTicTacToe ? <TicTacToeBoard match={match} activeUserId={activeUserId} acting={acting} onMove={(cell) => submitAction('MOVE', { cell })} /> : <NativeArcadeGame match={match} activeUserId={activeUserId} acting={acting} onAction={submitAction} />)}
       {match.status === 'ACTIVE' && <button type='button' className='game-forfeit' onClick={forfeit} disabled={acting}>Forfeit match</button>}
-      {match.status !== 'ACTIVE' && match.status !== 'INVITED' && <p className='game-result'>{match.status === 'EXPIRED' ? 'This unanswered invitation expired after one hour.' : 'This result is saved in your conversation.'}</p>}</>}
+      {match.status !== 'ACTIVE' && match.status !== 'INVITED' && <div className='game-result'>{match.status === 'EXPIRED' ? 'This unanswered invitation expired after one hour.' : 'This result is saved in your conversation.'}<button type='button' className='game-rematch' disabled={acting} onClick={rematch}>Request rematch</button></div>}</>}
   </section></div>;
 }

@@ -14,7 +14,7 @@ import RankBadge from '../components/RankBadge'
 import ProfileAvatar from '../components/ProfileAvatar'
 import GameLauncher from '../components/games/GameLauncher'
 import { fetchConversationMatches } from '../apis/games'
-import { createPoll, deleteMessage, fetchMessages, sendMessage, togglePinnedMessage, voteOnPoll } from '../apis/messages'
+import { createPoll, deleteMessage, fetchMessages, markMessagesRead, sendMessage, togglePinnedMessage, voteOnPoll } from '../apis/messages'
 import { fetchChats, setActiveChat, setNotifications } from '../redux/chatsSlice'
 import { getChatName } from '../utils/logics'
 import './home.css'
@@ -28,6 +28,8 @@ const expiryOptions = [
   { value: '1440', label: 'Disappear in 1 day' },
   { value: '10080', label: 'Disappear in 7 days' },
 ]
+
+const isDirectChat = (chat) => Boolean(chat && !chat.isGroup && !chat.isGlobal && chat.users?.length === 2)
 
 function Chat({ className }) {
   const { activeChat, notifications } = useSelector((state) => state.chats)
@@ -54,7 +56,12 @@ function Chat({ className }) {
     if (!activeChat?._id) return
     try {
       const nextMessages = await fetchMessages(activeChat._id)
-      if (Array.isArray(nextMessages)) setMessages(nextMessages)
+      if (Array.isArray(nextMessages)) {
+        setMessages(nextMessages)
+        // Fetching alone is not enough: a receipt is only sent for the direct
+        // chat currently visible in this document.
+        if (isDirectChat(activeChat) && document.visibilityState === 'visible') markMessagesRead(activeChat._id).catch(() => {})
+      }
     } catch {
       // A background sync should stay quiet; a manual action reports its own error.
     }
@@ -95,8 +102,16 @@ function Chat({ className }) {
         dispatch(setNotifications(next))
       } else {
         setMessages((current) => current.some((item) => item._id === newMessage._id) ? current : [...current, newMessage])
+        if (isDirectChat(selectedChat) && document.visibilityState === 'visible') markMessagesRead(selectedChat._id).catch(() => {})
       }
       dispatch(fetchChats())
+    })
+    socket.on('messages read', ({ chatId, messageIds, readerId, readAt }) => {
+      if (activeChatRef.current?._id !== chatId || !Array.isArray(messageIds)) return
+      const readIds = new Set(messageIds)
+      setMessages((current) => current.map((item) => readIds.has(item._id)
+        ? { ...item, readBy: { ...(item.readBy || {}), [readerId]: readAt } }
+        : item))
     })
     return () => socket.disconnect()
   }, [dispatch])

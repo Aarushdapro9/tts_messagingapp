@@ -1,5 +1,25 @@
 # Games architecture audit and first-release design
 
+## Arcade game types
+
+`tic-tac-toe`, `mini-golf`, `knockout`, `crazy-8-ball`, `word-hunt`, and
+`filler` use the same direct-message invitation and authoritative match record.
+A browser submits one compact action with the current revision; the server
+validates it, advances the match, and persists the next snapshot. This avoids
+high-frequency frame or position writes and lets either player resume after a
+reconnect.
+
+The four arcade additions are native clean-room implementations. Their actions
+are `PUSH`, `SHOT`, `WORD`, and `COLOR` respectively. The winner, score, board,
+and turn are always server state.
+
+## Direct-message read receipts
+
+Direct messages use a per-reader `readBy` timestamp map. The client requests a
+batch receipt only after it loaded that direct chat while the document is
+visible. The authenticated server derives the reader, writes only newly seen
+delivered messages, and emits the receipt to the sender's Socket.IO room.
+
 ## Repository audit
 
 | Area | Existing implementation | Reuse strategy | Required changes |
@@ -24,7 +44,7 @@ The current `app_state` record uses optimistic compare-and-swap. The game action
 - **Implemented:** shared game-session shape, invitation lifecycle, participant checks, revision checks, idempotency, server-authoritative Tic-Tac-Toe moves, draw/win determination, direct-chat game launcher, invitation card, resumable match overlay, forfeit, and unit tests for the core board rules.
 - **Tested locally:** all four Tic-Tac-Toe rules unit tests passed; server syntax checks and the Create React App production build passed.
 - **Partially implemented:** chat notification delivery uses existing refresh rather than a game-specific event.
-- **Implemented:** an MIT-attributed browser multiplayer port of xFrednet's five-level 2D Mini Golf game: server-authoritative hold-and-release shots, stepped collision and wall reflection, sine/circular moving obstacles, turn validation, scoring, and unit tests. 8-Ball Pool remains upcoming.
+- **Implemented:** an MIT-attributed browser multiplayer port of xFrednet's five-level 2D Mini Golf game with fixed-step damping, collision and moving obstacles; plus native server-authoritative Knockout, Crazy 8 Ball, Word Hunt, and Filler matches.
 
 ## Match lifecycle
 

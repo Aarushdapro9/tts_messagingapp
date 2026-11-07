@@ -3,10 +3,13 @@ import {
   expandMessage,
   findUser,
   getDatabase,
+  noDatabaseWrite,
   publishAndPruneMessages,
   updateDatabase,
 } from '../storage/store.js';
 import { accountStatus, appendAudit, hasActiveRestriction } from '../services/moderation.js';
+import { markDirectMessagesRead } from '../services/readReceipts.js';
+import { emitToUser } from '../services/realtime.js';
 
 function canAccess(chat, userId) {
   return chat && (chat.isGlobal || chat.users.includes(userId));
@@ -98,6 +101,20 @@ export const getMessages = async (req, res) => {
     .sort((first, second) => new Date(first.createdAt) - new Date(second.createdAt))
     .map((message) => expandMessage(database, message));
   return res.status(200).json(messages);
+};
+
+// A receipt is only created by an authenticated reader after the chat has
+// actually been fetched and displayed. The server derives both participants.
+export const markMessagesRead = async (req, res) => {
+  const result = await updateDatabase((database) => {
+    const chat = database.chats.find((item) => item._id === req.params.chatId);
+    if (!canUseChat(database, chat, req.rootUserId)) return null;
+    const receipts = markDirectMessagesRead(database, chat, req.rootUserId);
+    return receipts.updates.length ? receipts : noDatabaseWrite(receipts);
+  });
+  if (!result) return res.status(404).json({ message: 'Chat not found.' });
+  result.updates.forEach((update) => emitToUser(update.senderId, 'messages read', { chatId: req.params.chatId, ...update }));
+  return res.status(200).json({ updated: result.updates.reduce((count, update) => count + update.messageIds.length, 0) });
 };
 
 export const createPoll = async (req, res) => {

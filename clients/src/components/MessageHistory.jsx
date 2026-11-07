@@ -22,11 +22,16 @@ function Poll({ message, activeUser, onVote }) {
 
 function MessageHistory({ messages, onVote, onTogglePin, canDelete, onDelete, onOpenGame }) {
   const activeUser = useSelector((state) => state.activeUser)
+  const activeChat = useSelector((state) => state.chats.activeChat)
   const theme = resolveTheme(activeUser.themeSettings, activeUser.theme).config
   const dispatch = useDispatch()
   return <ScrollableFeed className='scrollbar-hide'>
     {messages?.map((message, index) => {
       const mine = message.sender?._id === activeUser.id
+      const directChat = activeChat && !activeChat.isGroup && !activeChat.isGlobal && activeChat.users?.length === 2
+      const recipientId = directChat ? activeChat.users.find((user) => user?._id !== activeUser.id)?._id : null
+      const readAt = recipientId ? message.readBy?.[recipientId] : null
+      const isLatestOutgoing = mine && !messages.slice(index + 1).some((item) => item.sender?._id === activeUser.id && item.deliveredAt)
       const ownerMessage = mine && activeUser.isOwner
       const isGameInvite = message.type === 'game_invite' || Boolean(message.gameId) || message.message === 'Tic-Tac-Toe invitation'
       return <div className='flex items-center gap-x-[6px]' key={message._id}>
@@ -42,6 +47,7 @@ function MessageHistory({ messages, onVote, onTogglePin, canDelete, onDelete, on
               ? <GameInviteMessage message={message} onOpen={onOpenGame} />
               : message.message}
           {message.expiresAt && <p className='mt-1 text-[10px] opacity-70'>Disappears {new Date(message.expiresAt).toLocaleString()}</p>}
+          {directChat && isLatestOutgoing && message.deliveredAt && <p className='message-receipt'>{readAt ? `Seen ${new Date(readAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : 'Sent'}</p>}
           {message.deliveredAt && <button onClick={() => onTogglePin(message._id)} className='ml-2 text-[10px] opacity-75 hover:opacity-100'>{message.pinned ? 'Unpin' : 'Pin'}</button>}
           {canDelete && <button onClick={() => onDelete(message._id)} className='ml-2 text-[10px] font-bold opacity-75 hover:opacity-100'>Delete</button>}
         </div>

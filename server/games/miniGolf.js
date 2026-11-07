@@ -6,15 +6,23 @@
  * ports its five level layouts, drag-to-aim controls, stepped collisions and
  * moving obstacle patterns to the server-authoritative web match model.
  */
-export const MINI_GOLF_RULESET_VERSION = 4;
+export const MINI_GOLF_RULESET_VERSION = 5;
 
 const COURSE_SIZE = { width: 1200, height: 700 };
 const MAX_STROKES = 8;
 const BALL_RADIUS = 10;
 const CUP_RADIUS = 25;
-const SHOT_STEP_DISTANCE = 7.5;
-const MAX_SHOT_DISTANCE = 520;
-const WALL_RESTITUTION = 1;
+// Physics is intentionally fixed-step and server-side.  Keeping these values
+// together makes course tuning safe without making a client frame rate part of
+// an authoritative result.
+export const MINI_GOLF_PHYSICS = Object.freeze({
+  fixedStep: 1 / 60,
+  launchSpeed: 1080,
+  rollingDamping: 0.986,
+  stopSpeed: 8,
+  maxSimulationSteps: 420,
+  wallRestitution: 0.86,
+});
 
 const rect = (cx, cy, width, height) => ({ x: cx - width / 2, y: cy - height / 2, width, height });
 const cross = (size = 100, thickness = 10) => [rect(0, 0, size, thickness), rect(0, 0, thickness, size)];
@@ -104,41 +112,43 @@ function pushOutOfRect(ball, wall, velocity) {
   if (dx * dx + dy * dy > BALL_RADIUS * BALL_RADIUS) return;
   if (Math.abs(dx) > Math.abs(dy)) {
     ball.x = nearestX + (dx >= 0 ? BALL_RADIUS : -BALL_RADIUS);
-    velocity.x *= -WALL_RESTITUTION;
+    velocity.x *= -MINI_GOLF_PHYSICS.wallRestitution;
   } else {
     ball.y = nearestY + (dy >= 0 ? BALL_RADIUS : -BALL_RADIUS);
-    velocity.y *= -WALL_RESTITUTION;
+    velocity.y *= -MINI_GOLF_PHYSICS.wallRestitution;
   }
 }
 
 function resolveCourseBounds(ball, velocity) {
   if (ball.x < BALL_RADIUS || ball.x > COURSE_SIZE.width - BALL_RADIUS) {
     ball.x = Math.max(BALL_RADIUS, Math.min(COURSE_SIZE.width - BALL_RADIUS, ball.x));
-    velocity.x *= -WALL_RESTITUTION;
+    velocity.x *= -MINI_GOLF_PHYSICS.wallRestitution;
   }
   if (ball.y < BALL_RADIUS || ball.y > COURSE_SIZE.height - BALL_RADIUS) {
     ball.y = Math.max(BALL_RADIUS, Math.min(COURSE_SIZE.height - BALL_RADIUS, ball.y));
-    velocity.y *= -WALL_RESTITUTION;
+    velocity.y *= -MINI_GOLF_PHYSICS.wallRestitution;
   }
 }
 
 function simulateShot(hole, initialBall, angle, power, startSeconds) {
   const ball = copyPoint(initialBall);
-  const velocity = normalize({ x: Math.cos(angle), y: Math.sin(angle) });
-  let remainingDistance = Math.max(SHOT_STEP_DISTANCE, power * MAX_SHOT_DISTANCE);
-  let travelled = 0;
+  const direction = normalize({ x: Math.cos(angle), y: Math.sin(angle) });
+  const velocity = {
+    x: direction.x * power * MINI_GOLF_PHYSICS.launchSpeed,
+    y: direction.y * power * MINI_GOLF_PHYSICS.launchSpeed,
+  };
 
   if (Math.hypot(ball.x - hole.cup.x, ball.y - hole.cup.y) <= CUP_RADIUS) return { ball: copyPoint(hole.cup), sunk: true };
-  while (remainingDistance > 0.001) {
-    const travel = Math.min(SHOT_STEP_DISTANCE, remainingDistance);
-    ball.x += velocity.x * travel;
-    ball.y += velocity.y * travel;
+  for (let step = 0; step < MINI_GOLF_PHYSICS.maxSimulationSteps; step += 1) {
+    ball.x += velocity.x * MINI_GOLF_PHYSICS.fixedStep;
+    ball.y += velocity.y * MINI_GOLF_PHYSICS.fixedStep;
     resolveCourseBounds(ball, velocity);
-    const motionSeconds = startSeconds + travelled / 300;
+    const motionSeconds = startSeconds + step * MINI_GOLF_PHYSICS.fixedStep;
     [...(hole.walls || []), ...movingObstacleRects(hole, motionSeconds)].forEach((wall) => pushOutOfRect(ball, wall, velocity));
     if (Math.hypot(ball.x - hole.cup.x, ball.y - hole.cup.y) <= CUP_RADIUS) return { ball: copyPoint(hole.cup), sunk: true };
-    remainingDistance -= travel;
-    travelled += travel;
+    velocity.x *= MINI_GOLF_PHYSICS.rollingDamping;
+    velocity.y *= MINI_GOLF_PHYSICS.rollingDamping;
+    if (Math.hypot(velocity.x, velocity.y) < MINI_GOLF_PHYSICS.stopSpeed) break;
   }
   return { ball, sunk: false };
 }

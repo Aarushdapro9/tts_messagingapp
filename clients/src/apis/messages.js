@@ -16,6 +16,12 @@ export const fetchMessages = async (id) => {
   return data;
 };
 
+export const markMessagesRead = async (chatId) => {
+  const token = localStorage.getItem('userToken');
+  const { data } = await API(token).post(`/api/message/${chatId}/read`);
+  return data;
+};
+
 export const createPoll = async (body) => {
   const token = localStorage.getItem('userToken');
   const { data } = await API(token).post('/api/message/poll', body);

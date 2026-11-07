@@ -9,6 +9,7 @@ import adminRoutes from './routes/admin.js';
 import gameRoutes from './routes/game.js';
 import * as Server from 'socket.io';
 import { initializeStore } from './storage/store.js';
+import { setRealtimeServer } from './services/realtime.js';
 
 const app = express();
 const allowedOrigins = [
@@ -40,6 +41,7 @@ const io = new Server.Server(server, {
     origin: allowedOrigins,
   },
 });
+setRealtimeServer(io);
 io.on('connection', (socket) => {
   socket.on('setup', (userData) => {
     socket.join(userData.id);

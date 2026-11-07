@@ -5,7 +5,10 @@ import { createGameMatch } from '../../apis/games';
 const games = [
   { id: 'tic-tac-toe', name: 'Tic-Tac-Toe', detail: 'Play now', icon: 'X O', available: true },
   { id: 'mini-golf', name: 'Mini Golf', detail: 'Play the five classic levels', icon: 'GOLF', available: true },
-  { id: '8-ball-pool', name: '8-Ball Pool', detail: 'Physics in development', icon: '8B', available: false },
+  { id: 'knockout', name: 'Knockout', detail: 'Slide seals across the ice', icon: 'KO', available: true },
+  { id: 'crazy-8-ball', name: 'Crazy 8 Ball', detail: 'Server-checked cue shots', icon: '8B', available: true },
+  { id: 'word-hunt', name: 'Word Hunt', detail: 'Find connected words', icon: 'WORD', available: true },
+  { id: 'filler', name: 'Filler', detail: 'Claim the colour board', icon: 'FILL', available: true },
 ];
 
 const miniGolfMaps = [
