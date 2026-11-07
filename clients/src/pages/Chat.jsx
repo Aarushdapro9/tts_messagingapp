@@ -51,21 +51,23 @@ function Chat({ className }) {
   const [pollQuestion, setPollQuestion] = useState('')
   const [pollOptions, setPollOptions] = useState(['', ''])
   const [openGame, setOpenGame] = useState(null)
+  const activeChatId = activeChat?._id
+  const canMarkActiveChatRead = isDirectChat(activeChat)
 
   const refreshMessages = useCallback(async () => {
-    if (!activeChat?._id) return
+    if (!activeChatId) return
     try {
-      const nextMessages = await fetchMessages(activeChat._id)
+      const nextMessages = await fetchMessages(activeChatId)
       if (Array.isArray(nextMessages)) {
         setMessages(nextMessages)
         // Fetching alone is not enough: a receipt is only sent for the direct
         // chat currently visible in this document.
-        if (isDirectChat(activeChat) && document.visibilityState === 'visible') markMessagesRead(activeChat._id).catch(() => {})
+        if (canMarkActiveChatRead && document.visibilityState === 'visible') markMessagesRead(activeChatId).catch(() => {})
       }
     } catch {
       // A background sync should stay quiet; a manual action reports its own error.
     }
-  }, [activeChat?._id])
+  }, [activeChatId, canMarkActiveChatRead])
 
   const openGameInvite = useCallback(async (invite) => {
     if (invite.gameId) {
