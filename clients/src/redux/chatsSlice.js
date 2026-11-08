@@ -14,6 +14,10 @@ export const fetchChats = createAsyncThunk('redux/chats', async () => {
   } catch (error) {
     toast.error('Something Went Wrong!Try Again');
   }
+}, {
+  // Chat updates can arrive as a burst of socket events. Keep just one
+  // full-list request in flight instead of duplicating the same Supabase read.
+  condition: (_, { getState }) => !getState().chats.isLoading,
 });
 const chatsSlice = createSlice({
   name: 'chats',

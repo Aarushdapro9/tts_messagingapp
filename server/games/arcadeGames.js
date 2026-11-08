@@ -1,7 +1,7 @@
 // Native, server-authoritative implementations of the core rules used by the
 // chat arcade.  They intentionally share no source/assets with third-party
 // reference projects whose licences do not permit embedding.
-export const ARCADE_RULESET_VERSION = 1;
+export const ARCADE_RULESET_VERSION = 2;
 
 const COLORS = ['coral', 'gold', 'mint', 'sky', 'violet', 'rose'];
 const clone = (value) => structuredClone(value);
@@ -69,33 +69,83 @@ export function applyWordHuntWord(state, mark, path) {
   const word = pathWord(state.board, path).toUpperCase();
   if (!DICTIONARY.has(word) || state.found.flat().includes(word)) return { error: 'INVALID_ACTION', message: 'That word is not available on this board.' };
   const next = clone(state); next.found[mark - 1].push(word); next.scores[mark - 1] += word.length; next.turnCount += 1;
-  // A compact four-word round keeps the game practical in an asynchronous DM
-  // while the board and score remain identical for both players.
-  const complete = next.found.flat().length >= 4;
-  return complete ? { state: next, completed: next.scores[0] !== next.scores[1], draw: next.scores[0] === next.scores[1], winnerMark: next.scores[0] === next.scores[1] ? null : next.scores[0] > next.scores[1] ? 1 : 2 } : { state: next, nextPlayerMark: other(mark) };
+  // Word Hunt uses two timed turns. A valid word never hands the board to the
+  // opponent; the controller advances the turn only when its server timer ends.
+  return { state: next, nextPlayerMark: mark };
 }
 
 function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
-function simulatePuck(state, pieceId, angle, power) {
-  const next = clone(state); const piece = next.pieces.find((item) => item.id === pieceId);
-  if (!piece) return null;
-  let vx = Math.cos(angle) * power * 31; let vy = Math.sin(angle) * power * 31;
-  for (let step = 0; step < 180; step += 1) {
-    piece.x += vx; piece.y += vy;
-    for (const target of next.pieces) if (target !== piece && distance(piece, target) < 36) { const dx = target.x - piece.x || 1; const dy = target.y - piece.y || 1; const length = Math.hypot(dx, dy); target.x += (dx / length) * 22; target.y += (dy / length) * 22; vx *= 0.62; vy *= 0.62; }
-    if (piece.x < -35 || piece.x > 1035 || piece.y < -35 || piece.y > 635) break;
-    vx *= 0.976; vy *= 0.976; if (Math.hypot(vx, vy) < 0.25) break;
+const KNOCKOUT_CENTER = { x: 500, y: 300 };
+const KNOCKOUT_PIECE_RADIUS = 18;
+const KNOCKOUT_ICE_DAMPING = 0.991;
+const KNOCKOUT_MIN_ISLAND_RADIUS = 112;
+const KNOCKOUT_SHRINK_PER_ROUND = 18;
+
+function islandDistance(piece) { return Math.hypot(piece.x - KNOCKOUT_CENTER.x, piece.y - KNOCKOUT_CENTER.y); }
+
+function validKnockoutPlans(pieces, mark, plans) {
+  if (!Array.isArray(plans) || plans.length !== 3) return false;
+  const ownIds = new Set(pieces.filter((piece) => piece.owner === mark).map((piece) => piece.id));
+  const used = new Set();
+  return plans.every((plan) => Number.isFinite(plan?.angle) && Number.isFinite(plan?.power) && plan.power >= .08 && plan.power <= 1 && ownIds.has(plan.pieceId) && !used.has(plan.pieceId) && (used.add(plan.pieceId) || true));
+}
+
+function simulateKnockoutRound(state) {
+  const next = clone(state);
+  const plans = [...(next.plans?.[1] || []), ...(next.plans?.[2] || [])];
+  const velocity = new Map(plans.map((plan) => [plan.pieceId, { x: Math.cos(plan.angle) * plan.power * 30, y: Math.sin(plan.angle) * plan.power * 30 }]));
+  next.pieces.forEach((piece) => { if (!velocity.has(piece.id)) velocity.set(piece.id, { x: 0, y: 0 }); });
+
+  for (let step = 0; step < 300; step += 1) {
+    next.pieces.forEach((piece) => {
+      const speed = velocity.get(piece.id);
+      piece.x += speed.x;
+      piece.y += speed.y;
+    });
+    for (let first = 0; first < next.pieces.length; first += 1) for (let second = first + 1; second < next.pieces.length; second += 1) {
+      const a = next.pieces[first]; const b = next.pieces[second];
+      const dx = b.x - a.x; const dy = b.y - a.y; const gap = Math.hypot(dx, dy) || 0.001;
+      if (gap >= KNOCKOUT_PIECE_RADIUS * 2) continue;
+      const nx = dx / gap; const ny = dy / gap; const overlap = (KNOCKOUT_PIECE_RADIUS * 2 - gap) / 2;
+      a.x -= nx * overlap; a.y -= ny * overlap; b.x += nx * overlap; b.y += ny * overlap;
+      const av = velocity.get(a.id); const bv = velocity.get(b.id); const alongNormal = (av.x - bv.x) * nx + (av.y - bv.y) * ny;
+      if (alongNormal <= 0) continue;
+      const impulse = alongNormal * .88;
+      av.x -= impulse * nx; av.y -= impulse * ny; bv.x += impulse * nx; bv.y += impulse * ny;
+    }
+    let moving = false;
+    velocity.forEach((speed) => { speed.x *= KNOCKOUT_ICE_DAMPING; speed.y *= KNOCKOUT_ICE_DAMPING; moving ||= Math.hypot(speed.x, speed.y) > .12; });
+    if (!moving) break;
   }
-  next.pieces = next.pieces.filter((item) => item.x >= 18 && item.x <= 982 && item.y >= 18 && item.y <= 582);
+
+  const islandRadius = Math.max(KNOCKOUT_MIN_ISLAND_RADIUS, (next.islandRadius || 270) - KNOCKOUT_SHRINK_PER_ROUND);
+  next.pieces = next.pieces.filter((piece) => islandDistance(piece) <= islandRadius - KNOCKOUT_PIECE_RADIUS);
+  next.round = (next.round || 0) + 1;
+  next.turnCount = (next.turnCount || 0) + 1;
+  next.islandRadius = islandRadius;
+  next.plans = { 1: null, 2: null };
   return next;
 }
-export function createKnockoutState() { return { pieces: [1, 2].flatMap((owner) => [0, 1, 2].map((index) => ({ id: `${owner}-${index}`, owner, x: owner === 1 ? 150 : 850, y: 170 + index * 120 }))), turnCount: 0 }; }
-export function applyKnockoutPush(state, mark, payload) {
-  if (!validMark(mark) || !Number.isFinite(payload?.angle) || !Number.isFinite(payload?.power) || payload.power < .1 || payload.power > 1) return { error: 'INVALID_ACTION', message: 'Pull back a seal and release to launch it.' };
-  if (!state?.pieces?.some((piece) => piece.id === payload.pieceId && piece.owner === mark)) return { error: 'INVALID_ACTION', message: 'Choose one of your seals.' };
-  const next = simulatePuck(state, payload.pieceId, payload.angle, payload.power); next.turnCount += 1;
-  const remaining = [1, 2].map((owner) => next.pieces.filter((piece) => piece.owner === owner).length);
-  return remaining.includes(0) ? { state: next, completed: true, winnerMark: remaining[0] ? 1 : 2 } : { state: next, nextPlayerMark: other(mark) };
+
+export function createKnockoutState() {
+  return {
+    pieces: [1, 2].flatMap((owner) => [0, 1, 2].map((index) => ({ id: `${owner}-${index}`, owner, x: owner === 1 ? 355 : 645, y: 210 + index * 90 }))),
+    round: 0, turnCount: 0, islandRadius: 270, plans: { 1: null, 2: null },
+  };
+}
+
+export function applyKnockoutPlan(state, mark, plans) {
+  if (!validMark(mark) || !Array.isArray(state?.pieces) || !validKnockoutPlans(state.pieces, mark, plans)) return { error: 'INVALID_ACTION', message: 'Pull back each of your three seals before submitting the round.' };
+  const next = clone(state);
+  next.plans ||= { 1: null, 2: null };
+  if (next.plans[mark]) return { error: 'INVALID_ACTION', message: 'Your three moves are already locked in.' };
+  next.plans[mark] = plans.map(({ pieceId, angle, power }) => ({ pieceId, angle, power }));
+  if (!next.plans[other(mark)]) return { state: next, nextPlayerMark: other(mark) };
+  const resolved = simulateKnockoutRound(next);
+  const remaining = [1, 2].map((owner) => resolved.pieces.filter((piece) => piece.owner === owner).length);
+  return remaining.includes(0)
+    ? { state: resolved, completed: remaining[0] !== remaining[1], draw: remaining[0] === remaining[1], winnerMark: remaining[0] === remaining[1] ? null : remaining[0] ? 1 : 2 }
+    : { state: resolved, nextPlayerMark: 1 };
 }
 
 export function createEightBallState() {

@@ -13,11 +13,12 @@ test('Mini Golf ports the reference project as one five-level course', () => {
   assert.equal(createMiniGolfState('unknown-map'), null);
 });
 
-test('Mini Golf validates a drag shot and advances the multiplayer turn', () => {
+test('Mini Golf validates a drag shot and keeps the player on the hole', () => {
   assert.equal(applyMiniGolfShot(createMiniGolfState(), 1, { angle: 0, power: 2 }).error, 'INVALID_ACTION');
   const result = applyMiniGolfShot(createMiniGolfState(), 1, { angle: 0, power: 0.5 });
   assert.equal(result.state.strokes[0], 1);
-  assert.equal(result.nextPlayerMark, 2);
+  assert.equal(result.nextPlayerMark, 1);
+  assert.equal(applyMiniGolfShot(result.state, 2, softPutt).error, 'NOT_YOUR_TURN');
   assert.ok(result.state.balls[0].x > 100);
 });
 
@@ -34,7 +35,7 @@ test('Mini Golf resolves a stepped wall collision before finishing a shot', () =
   const state = createMiniGolfState();
   state.balls[0] = { x: 100, y: 330 };
   const result = applyMiniGolfShot(state, 1, { angle: Math.PI / 2, power: 0.2 });
-  assert.equal(result.nextPlayerMark, 2);
+  assert.equal(result.nextPlayerMark, 1);
   assert.ok(result.state.balls[0].y < 345, 'the ball should reflect from the first level wall');
 });
 

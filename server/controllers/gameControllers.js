@@ -22,7 +22,7 @@ import {
   ARCADE_RULESET_VERSION,
   applyEightBallShot,
   applyFillerMove,
-  applyKnockoutPush,
+  applyKnockoutPlan,
   applyWordHuntWord,
   createEightBallState,
   createFillerState,
@@ -122,15 +122,33 @@ function expireInviteIfNeeded(database, match, now = Date.now()) {
   return true;
 }
 
-function finishTimedWordHuntIfNeeded(database, match, now = Date.now()) {
-  const endsAt = match?.authoritativeState?.roundEndsAt;
+function advanceTimedWordHuntIfNeeded(database, match, now = Date.now()) {
+  const state = match?.authoritativeState;
+  // roundEndsAt is kept as a backwards-compatible fallback for matches that
+  // started before separate player timers were introduced.
+  const endsAt = state?.turnEndsAt || state?.roundEndsAt;
   if (match?.gameType !== 'word-hunt' || match.status !== 'ACTIVE' || !endsAt || new Date(endsAt).getTime() > now) return false;
+  const turnPlayerMark = state.turnPlayerMark === 2 ? 2 : 1;
+  const updatedAt = new Date(now).toISOString();
+  if (turnPlayerMark === 1) {
+    match.authoritativeState = {
+      ...state,
+      turnPlayerMark: 2,
+      turnEndsAt: new Date(now + 120_000).toISOString(),
+    };
+    delete match.authoritativeState.roundEndsAt;
+    match.activePlayerId = match.player2Id;
+    match.updatedAt = updatedAt;
+    match.revision += 1;
+    updateInviteMessage(database, match);
+    return true;
+  }
   const scores = match.authoritativeState.scores || [0, 0];
   match.status = scores[0] === scores[1] ? 'DRAW' : 'COMPLETED';
   match.winnerId = scores[0] === scores[1] ? null : scores[0] > scores[1] ? match.player1Id : match.player2Id;
   match.activePlayerId = null;
-  match.completedAt = new Date(now).toISOString();
-  match.updatedAt = match.completedAt;
+  match.completedAt = updatedAt;
+  match.updatedAt = updatedAt;
   match.revision += 1;
   updateInviteMessage(database, match);
   return true;
@@ -235,11 +253,11 @@ export const getMatch = async (req, res) => {
     });
     return sendResult(res, result);
   }
-  if (finishTimedWordHuntIfNeeded(database, match)) {
+  if (advanceTimedWordHuntIfNeeded(database, match)) {
     const result = await updateDatabase((currentDatabase) => {
       const currentMatch = currentDatabase.games.find((item) => item.id === req.params.matchId);
       if (!canAccessMatch(currentMatch, req.rootUserId)) return noDatabaseWrite(error('NOT_A_PARTICIPANT', 'Match not found.', 404));
-      finishTimedWordHuntIfNeeded(currentDatabase, currentMatch);
+      advanceTimedWordHuntIfNeeded(currentDatabase, currentMatch);
       return actionResult(currentDatabase, currentMatch, req.rootUserId);
     });
     return sendResult(res, result);
@@ -287,7 +305,13 @@ function respondToInvite(status) {
       match.status = status;
       match.activePlayerId = status === 'ACTIVE' ? match.player1Id : null;
       if (status === 'ACTIVE' && match.gameType === 'word-hunt') {
-        match.authoritativeState = { ...match.authoritativeState, startedAt: now, roundEndsAt: new Date(Date.now() + 120_000).toISOString() };
+        match.authoritativeState = {
+          ...match.authoritativeState,
+          startedAt: now,
+          turnPlayerMark: 1,
+          turnEndsAt: new Date(Date.now() + 120_000).toISOString(),
+        };
+        delete match.authoritativeState.roundEndsAt;
       }
       match.updatedAt = now;
       match.revision += 1;
@@ -321,7 +345,7 @@ export const submitAction = async (req, res) => {
 
     const match = database.games.find((item) => item.id === req.params.matchId);
     if (!canAccessMatch(match, req.rootUserId)) return noDatabaseWrite(error('NOT_A_PARTICIPANT', 'Match not found.', 404));
-    if (finishTimedWordHuntIfNeeded(database, match)) return actionResult(database, match, req.rootUserId);
+    if (advanceTimedWordHuntIfNeeded(database, match)) return actionResult(database, match, req.rootUserId);
     if (!MATCH_STATUSES.has(match.status) || match.status !== 'ACTIVE') return noDatabaseWrite(error('MATCH_COMPLETED', 'This match is no longer active.', 409));
     if (clientRulesetVersion !== undefined && clientRulesetVersion !== match.rulesetVersion) return noDatabaseWrite(error('VERSION_MISMATCH', 'Update the app before playing this match.', 409));
     if (expectedRevision !== match.revision) return noDatabaseWrite(error('STALE_REVISION', 'Your game view is out of date. Refreshing it now.', 409));
@@ -337,7 +361,7 @@ export const submitAction = async (req, res) => {
           : match.gameType === 'word-hunt'
             ? actionType === 'WORD' ? applyWordHuntWord(match.authoritativeState, mark, actionPayload?.path) : { error: 'INVALID_ACTION', message: 'Trace a word.' }
             : match.gameType === 'knockout'
-              ? actionType === 'PUSH' ? applyKnockoutPush(match.authoritativeState, mark, actionPayload) : { error: 'INVALID_ACTION', message: 'Make a push.' }
+            ? actionType === 'PLAN' ? applyKnockoutPlan(match.authoritativeState, mark, actionPayload?.plans) : { error: 'INVALID_ACTION', message: 'Plan all three seal moves.' }
               : match.gameType === 'crazy-8-ball'
                 ? actionType === 'SHOT' ? applyEightBallShot(match.authoritativeState, mark, actionPayload) : { error: 'INVALID_ACTION', message: 'Take a cue shot.' }
                 : { error: 'INVALID_ACTION', message: 'This game is unavailable.' };

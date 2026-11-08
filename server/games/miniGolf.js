@@ -167,6 +167,8 @@ export function applyMiniGolfShot(state, player, payload) {
 
   const playerIndex = player - 1;
   const holeScore = state.scores[state.holeIndex] || [null, null];
+  const holePlayer = holeScore[0] === null ? 1 : holeScore[1] === null ? 2 : null;
+  if (holePlayer !== player) return { error: 'NOT_YOUR_TURN', message: 'Wait for the other player to finish this hole.' };
   if (holeScore[playerIndex] !== null) return { error: 'INVALID_ACTION', message: 'You have already finished this level.' };
   const strokes = [...state.strokes];
   strokes[playerIndex] += 1;
@@ -178,7 +180,9 @@ export function applyMiniGolfShot(state, player, payload) {
   if (result.sunk || pickedUp) scores[state.holeIndex] = playerIndex === 0 ? [result.sunk ? strokes[0] : MAX_STROKES, holeScore[1]] : [holeScore[0], result.sunk ? strokes[1] : MAX_STROKES];
   const updatedState = { ...state, mapId: map.id, balls, strokes, scores, lastShot: { player, power: payload.power, sunk: result.sunk, pickedUp } };
   const completeHole = updatedState.scores[state.holeIndex]?.every(Number.isInteger);
-  if (!completeHole) return { state: updatedState, completed: false, nextPlayerMark: player === 1 ? 2 : 1 };
+  // Each player completes the full hole before the other player starts. This
+  // keeps a putt sequence coherent rather than swapping players after every shot.
+  if (!completeHole) return { state: updatedState, completed: false, nextPlayerMark: player };
 
   if (state.holeIndex === map.holes.length - 1) {
     const totals = [0, 1].map((index) => updatedState.scores.reduce((total, score) => total + score[index], 0));

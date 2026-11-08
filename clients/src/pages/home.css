@@ -121,6 +121,8 @@
 .themed-app .chat-list-item {
   background: color-mix(in srgb, var(--theme-surface) 92%, var(--theme-sidebar));
   border-bottom: 1px solid color-mix(in srgb, var(--theme-muted) 20%, transparent);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 84px;
 }
 
 .themed-app .chat-list-item:hover,
@@ -298,8 +300,15 @@
 .mini-golf-ball-label { fill: #fff; font-size: 24px; font-weight: 800; text-anchor: middle; paint-order: stroke; stroke: rgba(0, 0, 0, .58); stroke-width: 6px; pointer-events: none; }
 .mini-golf-hit-area { cursor: crosshair; touch-action: none; }
 .mini-golf-hit-area:active { cursor: grabbing; }
-.mini-golf-aim-pull { stroke: rgba(255, 255, 255, .8); stroke-width: 8; stroke-dasharray: 13 10; }
-.mini-golf-aim-shot { stroke: #fff; stroke-width: 7; stroke-dasharray: 18 13; opacity: .9; }
+.mini-golf-aim-guide { pointer-events: none; }
+.mini-golf-aim-shot-shadow { stroke: rgba(17, 29, 36, .36); stroke-width: 15; stroke-linecap: round; }
+.mini-golf-aim-shot { stroke: #fff; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 17 12; filter: drop-shadow(0 2px 1px rgba(0,0,0,.32)); }
+.mini-golf-aim-arrow { fill: #fff; filter: drop-shadow(0 2px 1px rgba(0,0,0,.32)); }
+.mini-golf-cue-stick { stroke: #5d321e; stroke-width: 15; stroke-linecap: round; filter: drop-shadow(0 3px 1px rgba(0,0,0,.28)); }
+.mini-golf-cue-grip { fill: #f4bd54; stroke: #fff3c7; stroke-width: 5; filter: drop-shadow(0 2px 2px rgba(0,0,0,.36)); }
+.mini-golf-power-meter rect:first-child { fill: rgba(16, 28, 31, .78); stroke: rgba(255,255,255,.8); stroke-width: 2; }
+.mini-golf-power-fill { fill: #f4bd54; }
+.mini-golf-power-meter text { fill: #fff; font-size: 11px; font-weight: 900; text-anchor: middle; paint-order: stroke; stroke: rgba(0,0,0,.45); stroke-width: 2px; }
 @keyframes mini-golf-active-ball { to { stroke-dashoffset: -28; } }
 .mini-golf-theme-neon { border-color: #a24fff; }
 .mini-golf-theme-neon .mini-golf-grass { fill: #201747; }
@@ -320,9 +329,9 @@
 .filler-cell { min-width: 0; border: 1px solid rgba(255,255,255,.25); }
 .filler-owner-1 { box-shadow: inset 0 0 0 3px #fff; }.filler-owner-2 { box-shadow: inset 0 0 0 3px #17202a; }
 .filler-coral { background:#f27672; }.filler-gold { background:#edc85f; }.filler-mint { background:#5bc79c; }.filler-sky { background:#64b7e8; }.filler-violet { background:#a184e8; }.filler-rose { background:#e987b7; }
-.filler-colors { display:flex; flex-wrap:wrap; gap:9px; justify-content:center; margin:14px 0; }.filler-choice { width:37px; height:37px; border:3px solid #fff; border-radius:50%; box-shadow:0 1px 4px rgba(0,0,0,.3); }.filler-choice:disabled { opacity:.35; }
+.filler-colors { display:flex; flex-wrap:wrap; gap:9px; justify-content:center; margin:14px 0; }.filler-choice { width:37px; height:37px; border:3px solid #fff; border-radius:50%; box-shadow:0 1px 4px rgba(0,0,0,.3); cursor:pointer; }.filler-choice:not(:disabled):hover { transform:scale(1.08); box-shadow:0 0 0 3px color-mix(in srgb, var(--theme-accent) 45%, transparent),0 2px 8px rgba(0,0,0,.35); }.filler-choice:disabled { cursor:not-allowed; opacity:.45; }
 .word-hunt-score { display:flex; justify-content:space-between; color:var(--theme-muted); font-size:12px; }.word-hunt-board { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; max-width:430px; margin:12px auto; }.word-hunt-board button { aspect-ratio:1; border-radius:14px; background:#2d9d8e; color:#fff; font-size:clamp(21px, 5vw, 34px); font-weight:800; }.word-hunt-board button.word-selected { background:#f0b74c; transform:translateY(-2px); }.word-controls,.physics-controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; }.word-controls button,.physics-controls button { border-radius:9px; background:#2d9d8e; color:#fff; padding:8px 11px; font-weight:700; }.word-controls button:disabled,.physics-controls button:disabled { opacity:.45; }
-.physics-board { width:100%; border:6px solid #344654; border-radius:18px; }.knockout-board { background:linear-gradient(135deg,#c9f3ff,#7fcce1); }.pool-board { background:#167e59; }.knockout-piece { stroke:#fff; stroke-width:5px; cursor:pointer; }.knockout-owner-1 { fill:#ee7a6d; }.knockout-owner-2 { fill:#5475d4; }.physics-selected { stroke:#ffd95d; stroke-width:8px; }.pool-ball { stroke:#fff; stroke-width:3px; }.pool-cue { fill:#fff; }.pool-solid { fill:#eb604e; }.pool-stripe { fill:#d8b641; }.pool-eight { fill:#1a1a1a; }.pool-pocket { fill:#15242c; }.physics-controls { margin-top:12px; }.physics-controls label { display:flex; gap:6px; align-items:center; font-size:12px; }.physics-controls input { accent-color:#2d9d8e; }
+.physics-board { width:100%; border:6px solid #344654; border-radius:18px; touch-action:none; user-select:none; }.knockout-board { background:linear-gradient(135deg,#a9e9fb,#5bacc8); }.pool-board { background:#167e59; }.knockout-island { fill:#e6fbff; stroke:#fff; stroke-width:8px; filter:drop-shadow(0 5px 5px rgba(0,60,95,.28)); }.knockout-piece { stroke:#fff; stroke-width:5px; cursor:grab; }.knockout-owner-1 { fill:#ee7a6d; }.knockout-owner-2 { fill:#5475d4; }.knockout-planned { stroke:#ffd95d; stroke-width:8px; }.knockout-planned-shot { stroke:#162e57; stroke-width:8px; stroke-dasharray:14 10; }.physics-aim-pull { stroke:rgba(14,34,53,.8); stroke-width:7px; stroke-dasharray:12 10; }.physics-aim-shot { stroke:#fff; stroke-width:8px; stroke-dasharray:17 11; }.pool-ball { stroke:#fff; stroke-width:3px; }.pool-cue { fill:#fff; }.pool-solid { fill:#eb604e; }.pool-stripe { fill:#d8b641; }.pool-eight { fill:#1a1a1a; }.pool-pocket { fill:#15242c; }.knockout-status,.knockout-controls { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin-bottom:9px; color:var(--theme-muted); font-size:12px; }.knockout-controls { justify-content:center; margin-top:12px; }.knockout-controls button { border-radius:9px; background:#2d9d8e; color:#fff; padding:8px 11px; font-weight:700; }.knockout-controls button:disabled { opacity:.45; }
 .mini-golf-score { margin: 12px 0; }
 .mini-golf-help { margin: 10px 0 0; text-align: center; }
 

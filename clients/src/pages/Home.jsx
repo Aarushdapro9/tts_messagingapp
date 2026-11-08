@@ -138,9 +138,18 @@ function Home() {
 
   useEffect(() => {
     if (!activeUser.id) return undefined
-    const syncChats = () => dispatch(fetchChats())
-    const interval = window.setInterval(syncChats, 30_000)
-    return () => window.clearInterval(interval)
+    const syncChats = () => {
+      if (document.visibilityState === 'visible') dispatch(fetchChats())
+    }
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') syncChats()
+    }
+    const interval = window.setInterval(syncChats, 45_000)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
   }, [activeUser.id, dispatch])
 
   const dismissCurrentAlert = async () => {

@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { BsEmojiSmile, BsFillEmojiSmileFill } from 'react-icons/bs'
 import { BiArrowBack } from 'react-icons/bi'
 import io from 'socket.io-client'
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
 import { toast } from 'react-toastify'
 import Model from '../components/Model'
 import MessageHistory from '../components/MessageHistory'
@@ -20,6 +18,13 @@ import { getChatName } from '../utils/logics'
 import './home.css'
 
 const GameScreen = lazy(() => import('../components/games/GameScreen'))
+const EmojiPicker = lazy(async () => {
+  const [{ default: Picker }, { default: data }] = await Promise.all([
+    import('@emoji-mart/react'),
+    import('@emoji-mart/data'),
+  ])
+  return { default: function DeferredEmojiPicker(props) { return <Picker data={data} {...props} /> } }
+})
 
 const ENDPOINT = process.env.REACT_APP_SERVER_URL || window.location.origin
 const expiryOptions = [
@@ -128,10 +133,18 @@ function Chat({ className }) {
     setLoading(true)
     refreshMessages().finally(() => setLoading(false))
     socketRef.current?.emit('join room', activeChat._id)
-    const sync = setInterval(() => {
-      refreshMessages()
-    }, 30_000)
-    return () => clearInterval(sync)
+    const syncMessages = () => {
+      if (document.visibilityState === 'visible') refreshMessages()
+    }
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') syncMessages()
+    }
+    const sync = setInterval(syncMessages, 45_000)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      clearInterval(sync)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
   }, [activeChat?._id, dispatch, refreshMessages])
 
   const sendCurrentMessage = async (event) => {
@@ -235,7 +248,7 @@ function Chat({ className }) {
     </div>
     <div className='chat-composer absolute left-3 right-3 bottom-3 md:left-4 md:right-auto md:bottom-4'>
       {showPoll && activeChat.isGroup && <form onSubmit={submitPoll} className='mb-2 rounded-lg border border-[#aabac8] bg-white p-3 shadow-lg'><div className='mb-2 flex justify-between'><b className='text-sm'>New poll</b><button type='button' onClick={() => setShowPoll(false)} className='text-xs text-[#687a70]'>Close</button></div><input value={pollQuestion} onChange={(event) => setPollQuestion(event.target.value)} placeholder='Question' className='mb-2 w-full rounded border p-2 text-sm' required />{pollOptions.map((option, index) => <input key={index} value={option} onChange={(event) => setPollOptions((current) => current.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} placeholder={`Option ${index + 1}`} className='mb-2 w-full rounded border p-2 text-sm' required />)}<div className='flex gap-2'><button type='button' onClick={() => setPollOptions((current) => current.length < 6 ? [...current, ''] : current)} className='text-xs text-[#319268]'>+ Option</button><button className='ml-auto rounded bg-[#319268] px-3 py-1 text-xs font-bold text-white'>Create poll</button></div></form>}
-      {showPicker && <Picker data={data} onEmojiSelect={(emoji) => setMessage((current) => current + emoji.native)} />}
+      {showPicker && <Suspense fallback={<div className='mb-2 rounded-lg bg-white p-3 text-xs text-[#687a70] shadow'>Loading emoji picker...</div>}><EmojiPicker onEmojiSelect={(emoji) => setMessage((current) => current + emoji.native)} /></Suspense>}
       {showSchedule && <div className='mb-2 flex items-center gap-2 rounded-lg border bg-white p-2 text-xs'><label htmlFor='scheduled-for'>Send at</label><input id='scheduled-for' type='datetime-local' min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)} value={scheduledFor} onChange={(event) => setScheduledFor(event.target.value)} className='min-w-0 flex-1' /><button type='button' onClick={() => setShowSchedule(false)} className='text-[#687a70]'>Cancel</button></div>}
       <form onSubmit={sendCurrentMessage} className='chat-input border border-[#aabac8] rounded-t-[10px] px-4 py-2 w-full md:w-[400px]'>
         <input onChange={onType} className='chat-message-field focus:outline-0 w-full text-sm' type='text' placeholder='Enter message' value={message} />
