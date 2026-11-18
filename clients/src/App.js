@@ -4,6 +4,7 @@ import Regsiter from './pages/Regsiter';
 import Home from './pages/Home';
 import Start from './components/Start';
 import Admin from './pages/Admin';
+import PublicGames from './pages/PublicGames';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route exact path="/register" element={<Regsiter />} />
           <Route exact path="/chats" element={<Home />} />
           <Route exact path="/admin" element={<Admin />} />
+          <Route exact path="/games" element={<PublicGames />} />
           <Route exact path="/" element={<Start />} />
         </Routes>
       </Router>

@@ -1,0 +1,111 @@
+<!doctype html>
+<!-- Credit to Junifer SGS for the HTML Launcher -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HTML Runner</title>
+<style>
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#000;color:#fff;font:14px/1.5 ui-monospace,Consolas,"Courier New",monospace}
+main{width:min(420px,92vw);border:1px solid #fff}
+header{background:#fff;color:#000;font-weight:700;padding:3px 12px}
+section{padding:16px 12px}
+p{margin:0 0 12px}
+.mut{color:#9a9a9a}
+#drop{border:1px dashed #fff;padding:26px 12px;text-align:center;cursor:pointer;margin-bottom:12px}
+#drop strong{display:block;font-weight:400}
+#drop span{color:#9a9a9a}
+#drop:hover,#drop:focus-visible,#drop.over{background:#fff;color:#000;outline:none}
+#drop:hover span,#drop:focus-visible span,#drop.over span{color:#333}
+#name{word-break:break-all;margin:0 0 12px;min-height:1.5em}
+button{font:inherit;color:#fff;background:#000;border:1px solid #fff;padding:8px 14px;cursor:pointer;width:100%}
+button:hover:not(:disabled),button:focus-visible{background:#fff;color:#000;outline:none}
+button:disabled{opacity:.4;cursor:not-allowed}
+#msg{margin:12px 0 0;min-height:1.5em}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+<main>
+  <header>~/html-runner</header>
+  <section>
+    <p>sgs@os:~$ ./run</p>
+    <p class="mut">Upload an HTML file and it runs in a new about:blank tab.</p>
+
+    <div id="drop" tabindex="0" role="button" aria-label="Choose an HTML file">
+      <strong>[ choose an html file ]</strong>
+      <span>or drag it here</span>
+    </div>
+    <input id="file" type="file" accept=".html,.htm,text/html">
+
+    <p id="name" class="mut">No file selected</p>
+    <button id="run" disabled>[ run in new tab ]</button>
+    <div id="msg" class="mut" role="status"></div>
+  </section>
+</main>
+
+<script>
+const drop = document.getElementById('drop');
+const input = document.getElementById('file');
+const nameEl = document.getElementById('name');
+const runBtn = document.getElementById('run');
+const msg = document.getElementById('msg');
+let currentFile = null;
+
+function setFile(f) {
+  msg.textContent = '';
+  if (!f) return;
+  if (!/\.html?$/i.test(f.name) && f.type !== 'text/html') {
+    currentFile = null;
+    runBtn.disabled = true;
+    nameEl.textContent = 'No file selected';
+    msg.textContent = 'That is not an HTML file. Choose a .html or .htm file.';
+    return;
+  }
+  currentFile = f;
+  nameEl.textContent = f.name;
+  runBtn.disabled = false;
+}
+
+drop.addEventListener('click', () => input.click());
+drop.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+});
+input.addEventListener('change', () => setFile(input.files[0]));
+
+['dragenter', 'dragover'].forEach(t => {
+  drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); });
+});
+['dragleave', 'drop'].forEach(t => {
+  drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); });
+});
+drop.addEventListener('drop', e => setFile(e.dataTransfer.files[0]));
+
+runBtn.addEventListener('click', () => {
+  if (!currentFile) return;
+  // Open the tab right away (inside the click) so pop-up blockers allow it
+  const w = window.open('about:blank', '_blank');
+  if (!w) {
+    msg.textContent = 'The new tab was blocked. Allow pop-ups for this page and try again.';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      w.document.open();
+      w.document.write(reader.result);
+      w.document.close();
+      msg.textContent = 'Launched.';
+    } catch (err) {
+      msg.textContent = 'Could not run the file: ' + err.message;
+    }
+  };
+  reader.onerror = () => {
+    w.close();
+    msg.textContent = 'Could not read that file.';
+  };
+  reader.readAsText(currentFile);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,4354 @@
+[
+  {
+    "id": "archive-cl12minibattles-html",
+    "name": "12 Minibattles",
+    "detail": "Single-player browser game",
+    "source": "cl12minibattles.html",
+    "icon": "12MI",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cl2doom-html",
+    "name": "2 Doom",
+    "detail": "Single-player browser game",
+    "source": "cl2doom.html",
+    "icon": "2DOO",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cl20smallmazes-html",
+    "name": "20 Small Mazes",
+    "detail": "Single-player browser game",
+    "source": "cl20smallmazes.html",
+    "icon": "20SM",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cl3dash-html",
+    "name": "3 Dash",
+    "detail": "Single-player browser game",
+    "source": "cl3dash.html",
+    "icon": "3DAS",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cl3dasheditor-html",
+    "name": "3 Dasheditor",
+    "detail": "Single-player browser game",
+    "source": "cl3dasheditor.html",
+    "icon": "3DAS",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cl3dpinballspacecadet-html",
+    "name": "3D Pinball for Windows - Space Cadet",
+    "detail": "Single-player browser game",
+    "source": "cl3dpinballspacecadet.html",
+    "icon": "3DPI",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cl500calibercontractz-html",
+    "name": "500 Calibercontractz",
+    "detail": "Single-player browser game",
+    "source": "cl500calibercontractz.html",
+    "icon": "500C",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cl99nightsitf-html",
+    "name": "99Days",
+    "detail": "Single-player browser game",
+    "source": "cl99nightsitf.html",
+    "icon": "99DA",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cladatewithdeath-html",
+    "name": "A Date with Death",
+    "detail": "Single-player browser game",
+    "source": "cladatewithdeath.html",
+    "icon": "ADAT",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cladayintheoffice-html",
+    "name": "A jam about time",
+    "detail": "Single-player browser game",
+    "source": "cladayintheoffice.html",
+    "icon": "AJAM",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cladventneon-html",
+    "name": "AdventNEON",
+    "detail": "Single-player browser game",
+    "source": "cladventneon.html",
+    "icon": "ADVE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cladventurecapatalist-html",
+    "name": "AdVenture Capitalist!",
+    "detail": "Single-player browser game",
+    "source": "clAdventureCapatalist.html",
+    "icon": "ADVE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clendacopia-html",
+    "name": "Adventure Game Studio",
+    "detail": "Single-player browser game",
+    "source": "clendacopia.html",
+    "icon": "ADVE",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clagameaboutballswithweapons-html",
+    "name": "Agameaboutballswithweapons",
+    "detail": "Single-player browser game",
+    "source": "clagameaboutballswithweapons.html",
+    "icon": "AGAM",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clagariolite-html",
+    "name": "Agariolite",
+    "detail": "Single-player browser game",
+    "source": "clagariolite.html",
+    "icon": "AGAR",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clagesofconflict-html",
+    "name": "Agesofconflict",
+    "detail": "Single-player browser game",
+    "source": "clagesofconflict.html",
+    "icon": "AGES",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clallocation-html",
+    "name": "Allocation",
+    "detail": "Single-player browser game",
+    "source": "clallocation.html",
+    "icon": "ALLO",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clamidstthesky-html",
+    "name": "Amidst the Clouds",
+    "detail": "Single-player browser game",
+    "source": "clamidstthesky.html",
+    "icon": "AMID",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clancientsins-html",
+    "name": "Ancient Sins",
+    "detail": "Single-player browser game",
+    "source": "clancientsins.html",
+    "icon": "ANCI",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clarcheryworldtour-html",
+    "name": "Archery World Tour",
+    "detail": "Single-player browser game",
+    "source": "clarcheryworldtour.html",
+    "icon": "ARCH",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clarchesspelago-html",
+    "name": "Archesspelago",
+    "detail": "Single-player browser game",
+    "source": "clarchesspelago.html",
+    "icon": "ARCH",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clarsonate-html",
+    "name": "ARSONATE",
+    "detail": "Single-player browser game",
+    "source": "clarsonate.html",
+    "icon": "ARSO",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clasdutydemands-html",
+    "name": "As Duty Demands",
+    "detail": "Single-player browser game",
+    "source": "clasdutydemands.html",
+    "icon": "ASDU",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clascent-html",
+    "name": "Ascent",
+    "detail": "Single-player browser game",
+    "source": "clascent.html",
+    "icon": "ASCE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clasmallworldcup-html",
+    "name": "Asmallworldcup",
+    "detail": "Single-player browser game",
+    "source": "clasmallworldcup.html",
+    "icon": "ASMA",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clasteroidsalt-html",
+    "name": "Asteroids Game in WebAssembly",
+    "detail": "Single-player browser game",
+    "source": "clasteroidsALT.html",
+    "icon": "ASTE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clwebfishing-html",
+    "name": "autumn_webfishing_main",
+    "detail": "Single-player browser game",
+    "source": "clwebfishing.html",
+    "icon": "AUTU",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clbabysniperinvietnam-html",
+    "name": "Babysniperinvietnam",
+    "detail": "Single-player browser game",
+    "source": "clbabysniperinvietnam.html",
+    "icon": "BABY",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clbackrooms-html",
+    "name": "Backrooms",
+    "detail": "Single-player browser game",
+    "source": "clbackrooms.html",
+    "icon": "BACK",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clbackrooms2d-html",
+    "name": "Backrooms 2 D",
+    "detail": "Single-player browser game",
+    "source": "clbackrooms2D.html",
+    "icon": "BACK",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clbaconmaydie-html",
+    "name": "Bacon May Die by SnoutUp",
+    "detail": "Single-player browser game",
+    "source": "clbaconmaydie.html",
+    "icon": "BACO",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clbadparenting-html",
+    "name": "Bad Parenting 1",
+    "detail": "Single-player browser game",
+    "source": "clbadparenting.html",
+    "icon": "BADP",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clraldiscrackhouse-html",
+    "name": "BALDI",
+    "detail": "Single-player browser game",
+    "source": "clraldiscrackhouse.html",
+    "icon": "BALD",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clbaldiepstein-html",
+    "name": "Baldiepstein",
+    "detail": "Single-player browser game",
+    "source": "clbaldiepstein.html",
+    "icon": "BALD",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clbaldisbasicsremaster-html",
+    "name": "Baldi's Basics Classic Remastered",
+    "detail": "Single-player browser game",
+    "source": "clbaldisbasicsremaster.html",
+    "icon": "BALD",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clbaldidecomp-html",
+    "name": "Baldi's Basics The Ultra Decompile",
+    "detail": "Single-player browser game",
+    "source": "clbaldidecomp.html",
+    "icon": "BALD",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clbaldisfunnewschoolultimate-html",
+    "name": "Baldi's Fun New School Plus Ultimate Edition",
+    "detail": "Single-player browser game",
+    "source": "clbaldisfunnewschoolultimate.html",
+    "icon": "BALD",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clballz-html",
+    "name": "BallZ | Unblocked on CCPorted",
+    "detail": "Single-player browser game",
+    "source": "clballz.html",
+    "icon": "BALL",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clbartblast-html",
+    "name": "BART BLAST (INDEV VERSION)",
+    "detail": "Single-player browser game",
+    "source": "clbartblast.html",
+    "icon": "BART",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clbas-html",
+    "name": "Bas",
+    "detail": "Single-player browser game",
+    "source": "clbas.html",
+    "icon": "BASP",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clbasketballsuperstars-html",
+    "name": "Basketballsuperstars",
+    "detail": "Single-player browser game",
+    "source": "clbasketballsuperstars.html",
+    "icon": "BASK",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clbatterup-html",
+    "name": "Batter Up!",
+    "detail": "Single-player browser game",
+    "source": "clbatterup.html",
+    "icon": "BATT",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clbattlekarts-html",
+    "name": "Battle Karts",
+    "detail": "Single-player browser game",
+    "source": "clbattlekarts.html",
+    "icon": "BATT",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clbergentruck201x-html",
+    "name": "BERGENTRUCK_201X",
+    "detail": "Single-player browser game",
+    "source": "clbergentruck201x.html",
+    "icon": "BERG",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clbfdibranches-html",
+    "name": "BFDI: Branches",
+    "detail": "Single-player browser game",
+    "source": "clBFDIBranches.html",
+    "icon": "BFDI",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clbigicetowertinysquare-html",
+    "name": "Bigicetowertinysquare",
+    "detail": "Single-player browser game",
+    "source": "clbigicetowertinysquare.html",
+    "icon": "BIGI",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clbioevil4-html",
+    "name": "Bio Evil 4",
+    "detail": "Single-player browser game",
+    "source": "clbioevil4.html",
+    "icon": "BIOE",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clbitplanes-html",
+    "name": "Bit Planes",
+    "detail": "Single-player browser game",
+    "source": "clbitplanes.html",
+    "icon": "BITP",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clblastronaut-html",
+    "name": "Blastronaut",
+    "detail": "Single-player browser game",
+    "source": "clblastronaut.html",
+    "icon": "BLAS",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clblazedrifter-html",
+    "name": "Blaze Drifter",
+    "detail": "Single-player browser game",
+    "source": "clblazedrifter.html",
+    "icon": "BLAZ",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clblockblast-html",
+    "name": "Block Blast Puzzle",
+    "detail": "Single-player browser game",
+    "source": "clblockblast.html",
+    "icon": "BLOC",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clblockcraftshooter-html",
+    "name": "Blockcraftshooter",
+    "detail": "Single-player browser game",
+    "source": "clblockcraftshooter.html",
+    "icon": "BLOC",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clblockydemolitionderby-html",
+    "name": "Blockydemolitionderby",
+    "detail": "Single-player browser game",
+    "source": "clblockydemolitionderby.html",
+    "icon": "BLOC",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clbobasimulator-html",
+    "name": "Boba Simulator",
+    "detail": "Single-player browser game",
+    "source": "clbobasimulator.html",
+    "icon": "BOBA",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clboomslingers-html",
+    "name": "Boomslingers",
+    "detail": "Single-player browser game",
+    "source": "clboomslingers.html",
+    "icon": "BOOM",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clbottlecracks-html",
+    "name": "Bottle Cracks",
+    "detail": "Single-player browser game",
+    "source": "clbottlecracks.html",
+    "icon": "BOTT",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clbounceback-html",
+    "name": "Bounce Back",
+    "detail": "Single-player browser game",
+    "source": "clbounceback.html",
+    "icon": "BOUN",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clbouncymotors-html",
+    "name": "Bouncymotors",
+    "detail": "Single-player browser game",
+    "source": "clbouncymotors.html",
+    "icon": "BOUN",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clbountyofone-html",
+    "name": "BountyOfOne",
+    "detail": "Single-player browser game",
+    "source": "clBountyOfOne.html",
+    "icon": "BOUN",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clbrawlsimulator3d-html",
+    "name": "Brawlsimulator 3 D",
+    "detail": "Single-player browser game",
+    "source": "clbrawlsimulator3d.html",
+    "icon": "BRAW",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clbrotato-html",
+    "name": "Brotato",
+    "detail": "Single-player browser game",
+    "source": "clbrotato.html",
+    "icon": "BROT",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clbtts-html",
+    "name": "Btts",
+    "detail": "Single-player browser game",
+    "source": "clbtts.html",
+    "icon": "BTTS",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clbuildnowgg-html",
+    "name": "Buildnowgg",
+    "detail": "Single-player browser game",
+    "source": "clbuildnowgg.html",
+    "icon": "BUIL",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clarcadevolley-html",
+    "name": "bum game",
+    "detail": "Single-player browser game",
+    "source": "clarcadevolley.html",
+    "icon": "BUMG",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clburgerandfrights-html",
+    "name": "Burger and Frights",
+    "detail": "Single-player browser game",
+    "source": "clburgerandfrights.html",
+    "icon": "BURG",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clcallofbattle-html",
+    "name": "Callofbattle",
+    "detail": "Single-player browser game",
+    "source": "clcallofbattle.html",
+    "icon": "CALL",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clcaptchaware-html",
+    "name": "CaptchaWare",
+    "detail": "Single-player browser game",
+    "source": "clcaptchaware.html",
+    "icon": "CAPT",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-capuchinsf-html",
+    "name": "Capuchin",
+    "detail": "Single-player browser game",
+    "source": "capuchinsf.html",
+    "icon": "CAPU",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clcarrampvspolicechase-html",
+    "name": "Carrampvspolicechase",
+    "detail": "Single-player browser game",
+    "source": "clcarrampvspolicechase.html",
+    "icon": "CARR",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clcavecrawler-html",
+    "name": "Cave Crawler",
+    "detail": "Single-player browser game",
+    "source": "clcavecrawler.html",
+    "icon": "CAVE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clcavestory-html",
+    "name": "Cave Story",
+    "detail": "Single-player browser game",
+    "source": "clcavestory.html",
+    "icon": "CAVE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clceleste-html",
+    "name": "Celeste",
+    "detail": "Single-player browser game",
+    "source": "clceleste.html",
+    "icon": "CELE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clceleste2-html",
+    "name": "Celeste 2",
+    "detail": "Single-player browser game",
+    "source": "clceleste2.html",
+    "icon": "CELE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clcelltosingularity-html",
+    "name": "Cells | UGS",
+    "detail": "Single-player browser game",
+    "source": "clCellToSingularity.html",
+    "icon": "CELL",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clcheeseisthereason-html",
+    "name": "Cheese is the reason",
+    "detail": "Single-player browser game",
+    "source": "clcheeseisthereason.html",
+    "icon": "CHEE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cheeserolling-html",
+    "name": "CheeseRolling",
+    "detail": "Single-player browser game",
+    "source": "cheeserolling.html",
+    "icon": "CHEE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clcheshireinachatroom-html",
+    "name": "Cheshireinachatroom",
+    "detail": "Single-player browser game",
+    "source": "clcheshireinachatroom.html",
+    "icon": "CHES",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clchickencs-html",
+    "name": "Chicken Cs",
+    "detail": "Single-player browser game",
+    "source": "clChickenCS.html",
+    "icon": "CHIC",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clchickenscream-html",
+    "name": "Chickenscream",
+    "detail": "Single-player browser game",
+    "source": "clchickenscream.html",
+    "icon": "CHIC",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clcircloo2-html",
+    "name": "circloO 2 Unblocked - ubg235 Poki",
+    "detail": "Single-player browser game",
+    "source": "clCircloO2.html",
+    "icon": "CIRC",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clclashofvikings-html",
+    "name": "Clash Of Vikings",
+    "detail": "Single-player browser game",
+    "source": "clclashofvikings.html",
+    "icon": "CLAS",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clclassof09-html",
+    "name": "Class of '09",
+    "detail": "Single-player browser game",
+    "source": "clclassof09.html",
+    "icon": "CLAS",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clbrawlstars-html",
+    "name": "Clicker",
+    "detail": "Single-player browser game",
+    "source": "clBrawlstars.html",
+    "icon": "CLIC",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cldrweedgaster-html",
+    "name": "Clickteam Fusion Developer 2.5+ HTML5 Runtime",
+    "detail": "Single-player browser game",
+    "source": "cldrweedgaster.html",
+    "icon": "CLIC",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clclimbforbrainrots-html",
+    "name": "Climbforbrainrots",
+    "detail": "Single-player browser game",
+    "source": "clclimbforbrainrots.html",
+    "icon": "CLIM",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clclusterrush-html",
+    "name": "Cluster Rush",
+    "detail": "Single-player browser game",
+    "source": "clclusterrush.html",
+    "icon": "CLUS",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clcoalllcdemo-html",
+    "name": "Coal LLC",
+    "detail": "Single-player browser game",
+    "source": "clcoalllcdemo.html",
+    "icon": "COAL",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clcoffeemaker-html",
+    "name": "Coffeemaker",
+    "detail": "Single-player browser game",
+    "source": "clcoffeemaker.html",
+    "icon": "COFF",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clcoldpines-html",
+    "name": "Cold Pines",
+    "detail": "Single-player browser game",
+    "source": "clcoldpines.html",
+    "icon": "COLD",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clcombopool-html",
+    "name": "Combopool",
+    "detail": "Single-player browser game",
+    "source": "clcombopool.html",
+    "icon": "COMB",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clcookieclicker-html",
+    "name": "Cookie Clicker",
+    "detail": "Single-player browser game",
+    "source": "clcookieclicker.html",
+    "icon": "COOK",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clsonic1mobile-html",
+    "name": "cool ixl work",
+    "detail": "Single-player browser game",
+    "source": "clsonic1mobile.html",
+    "icon": "COOL",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clcotlk-html",
+    "name": "Cotlk",
+    "detail": "Single-player browser game",
+    "source": "clcotlk.html",
+    "icon": "COTL",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clcountmastersstickmangames-html",
+    "name": "Countmastersstickmangames",
+    "detail": "Single-player browser game",
+    "source": "clcountmastersstickmangames.html",
+    "icon": "COUN",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clcrankit-html",
+    "name": "Crank It!",
+    "detail": "Single-player browser game",
+    "source": "clcrankit!.html",
+    "icon": "CRAN",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clcrazycattle3d-html",
+    "name": "CrazyCattle3D",
+    "detail": "Single-player browser game",
+    "source": "clcrazycattle3d.html",
+    "icon": "CRAZ",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clcrazychicken3d-html",
+    "name": "CrazyChicken3D Remaster",
+    "detail": "Single-player browser game",
+    "source": "clcrazychicken3D.html",
+    "icon": "CRAZ",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clcrazyplanelanding-html",
+    "name": "Crazyplanelanding",
+    "detail": "Single-player browser game",
+    "source": "clcrazyplanelanding.html",
+    "icon": "CRAZ",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clbreadskate-html",
+    "name": "Created with GameMaker",
+    "detail": "Single-player browser game",
+    "source": "clbreadskate.html",
+    "icon": "CREA",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clgenericfightermaybe-html",
+    "name": "Created with GameMaker Studio 2",
+    "detail": "Single-player browser game",
+    "source": "clgenericfightermaybe.html",
+    "icon": "CREA",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clgunknight-html",
+    "name": "Created with GameMaker: Studio",
+    "detail": "Single-player browser game",
+    "source": "clgunknight.html",
+    "icon": "CREA",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clcreaturecardidle-html",
+    "name": "Creature Card Idle",
+    "detail": "Single-player browser game",
+    "source": "clcreaturecardidle.html",
+    "icon": "CREA",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clbridgerace-html",
+    "name": "Crossy Road",
+    "detail": "Single-player browser game",
+    "source": "clbridgerace.html",
+    "icon": "CROS",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clcs1-6-html",
+    "name": "Cs 1.6",
+    "detail": "Single-player browser game",
+    "source": "clcs1.6.html",
+    "icon": "CS16",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clcs6-html",
+    "name": "Cs 6",
+    "detail": "Single-player browser game",
+    "source": "clcs6.html",
+    "icon": "CS6P",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clcsgoclicker-html",
+    "name": "CS:GO Clicker",
+    "detail": "Single-player browser game",
+    "source": "clcsgoclicker.html",
+    "icon": "CSGO",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clcustomersupport-html",
+    "name": "Customer Support WebPort",
+    "detail": "Single-player browser game",
+    "source": "clcustomersupport.html",
+    "icon": "CUST",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clcuttherope-html",
+    "name": "Cut the Rope",
+    "detail": "Single-player browser game",
+    "source": "clcuttherope.html",
+    "icon": "CUTT",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clthedude-html",
+    "name": "da dude boi",
+    "detail": "Single-player browser game",
+    "source": "clthedude.html",
+    "icon": "DADU",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cldanktomb-html",
+    "name": "Danktomb",
+    "detail": "Single-player browser game",
+    "source": "cldanktomb.html",
+    "icon": "DANK",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cldtm-html",
+    "name": "DanTheMan-Defold 1.1.12",
+    "detail": "Single-player browser game",
+    "source": "cldtm.html",
+    "icon": "DANT",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cldasharena-html",
+    "name": "Dasharena",
+    "detail": "Single-player browser game",
+    "source": "cldasharena.html",
+    "icon": "DASH",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cldashio-html",
+    "name": "Dashio",
+    "detail": "Single-player browser game",
+    "source": "cldashio.html",
+    "icon": "DASH",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cldatewithiraq-html",
+    "name": "date with iraq",
+    "detail": "Single-player browser game",
+    "source": "cldatewithiraq.html",
+    "icon": "DATE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cldeepestsword-html",
+    "name": "Deepest Sword",
+    "detail": "Single-player browser game",
+    "source": "cldeepestsword.html",
+    "icon": "DEEP",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cldeltatraveler-html",
+    "name": "DELTATRAVELER",
+    "detail": "Single-player browser game",
+    "source": "cldeltatraveler.html",
+    "icon": "DELT",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cldemonbluff-html",
+    "name": "Demon Bluff",
+    "detail": "Single-player browser game",
+    "source": "cldemonbluff.html",
+    "icon": "DEMO",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cldieinthedungeon-html",
+    "name": "Die in the Dungeon",
+    "detail": "Single-player browser game",
+    "source": "cldieinthedungeon.html",
+    "icon": "DIEI",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cldigoutofprison-html",
+    "name": "Dig Outof Prison",
+    "detail": "Single-player browser game",
+    "source": "clDigOutofPrison.html",
+    "icon": "DIGO",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cldimensionalincident-html",
+    "name": "Dimension incident",
+    "detail": "Single-player browser game",
+    "source": "cldimensionalincident.html",
+    "icon": "DIME",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cldiredecks-html",
+    "name": "dire dicks",
+    "detail": "Single-player browser game",
+    "source": "cldiredecks.html",
+    "icon": "DIRE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cldokidokiliteratureclub-html",
+    "name": "Doki Doki Literature Club! (Ren'Py Mod)",
+    "detail": "Single-player browser game",
+    "source": "cldokidokiliteratureclub.html",
+    "icon": "DOKI",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cldomeromantik-html",
+    "name": "Dome Romantik",
+    "detail": "Single-player browser game",
+    "source": "cldomeromantik.html",
+    "icon": "DOME",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clkanyezone-html",
+    "name": "Don't let Kanye into his zone: Kanye Zone",
+    "detail": "Single-player browser game",
+    "source": "clkanyezone.html",
+    "icon": "DONT",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cldoomemscripten-html",
+    "name": "DOOM",
+    "detail": "Single-player browser game",
+    "source": "cldoomemscripten.html",
+    "icon": "DOOM",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cldoomori-html",
+    "name": "Doomori",
+    "detail": "Single-player browser game",
+    "source": "cldoomori.html",
+    "icon": "DOOM",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cldoorscastle-html",
+    "name": "Doors Castle",
+    "detail": "Single-player browser game",
+    "source": "cldoorscastle.html",
+    "icon": "DOOR",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cldbsniper-html",
+    "name": "Double Barrel Sniper",
+    "detail": "Single-player browser game",
+    "source": "cldbsniper.html",
+    "icon": "DOUB",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cldrivemad-html",
+    "name": "Drive Mad",
+    "detail": "Single-player browser game",
+    "source": "cldrivemad.html",
+    "icon": "DRIV",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cldriverussia-html",
+    "name": "Driverussia",
+    "detail": "Single-player browser game",
+    "source": "cldriverussia.html",
+    "icon": "DRIV",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-dta6-html",
+    "name": "DTA6",
+    "detail": "Single-player browser game",
+    "source": "dta6.html",
+    "icon": "DTA6",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clducklifebattle-html",
+    "name": "Duck Life Battle",
+    "detail": "Single-player browser game",
+    "source": "clducklifebattle.html",
+    "icon": "DUCK",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cldud-html",
+    "name": "Dud",
+    "detail": "Single-player browser game",
+    "source": "cldud.html",
+    "icon": "DUDP",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cldukenukem3d-html",
+    "name": "Duke Nukem 3D",
+    "detail": "Single-player browser game",
+    "source": "cldukenukem3d.html",
+    "icon": "DUKE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cldukenukem2-html",
+    "name": "Dukenukem 2",
+    "detail": "Single-player browser game",
+    "source": "cldukenukem2.html",
+    "icon": "DUKE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cldunedash-html",
+    "name": "Dunedash",
+    "detail": "Single-player browser game",
+    "source": "cldunedash.html",
+    "icon": "DUNE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cldungeondeck-html",
+    "name": "Dungeon Deck",
+    "detail": "Single-player browser game",
+    "source": "cldungeondeck.html",
+    "icon": "DUNG",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cldungeonraid-html",
+    "name": "DungeonRaid",
+    "detail": "Single-player browser game",
+    "source": "cldungeonraid.html",
+    "icon": "DUNG",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cldungeonsanddegenerategambler-html",
+    "name": "Dungeons & Degenerate Gamblers",
+    "detail": "Single-player browser game",
+    "source": "cldungeonsanddegenerategambler.html",
+    "icon": "DUNG",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clduskchild-html",
+    "name": "Duskchild",
+    "detail": "Single-player browser game",
+    "source": "clduskchild.html",
+    "icon": "DUSK",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clpomgetsinternet-html",
+    "name": "EasyRPG Player",
+    "detail": "Single-player browser game",
+    "source": "clpomgetsinternet.html",
+    "icon": "EASY",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cledelweiss-html",
+    "name": "Edelweiss",
+    "detail": "Single-player browser game",
+    "source": "cledelweiss.html",
+    "icon": "EDEL",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cledyscarsimulator-html",
+    "name": "Edys Car Simulator",
+    "detail": "Single-player browser game",
+    "source": "cledyscarsimulator.html",
+    "icon": "EDYS",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clegg-html",
+    "name": "Egg",
+    "detail": "Single-player browser game",
+    "source": "clegg.html",
+    "icon": "EGGP",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-sm64coopdx-html",
+    "name": "Emscripten-Generated Code",
+    "detail": "Single-player browser game",
+    "source": "sm64coopdx.html",
+    "icon": "EMSC",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clangrybirdsepic-html",
+    "name": "Epic",
+    "detail": "Single-player browser game",
+    "source": "clangrybirdsepic.html",
+    "icon": "EPIC",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clescaperoad-html",
+    "name": "Escape Road",
+    "detail": "Single-player browser game",
+    "source": "clescaperoad.html",
+    "icon": "ESCA",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clescaperoad3-html",
+    "name": "Escape Road 3",
+    "detail": "Single-player browser game",
+    "source": "clescaperoad3.html",
+    "icon": "ESCA",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clescapeschoolduel-html",
+    "name": "Escape School Duel",
+    "detail": "Single-player browser game",
+    "source": "clescapeschoolduel.html",
+    "icon": "ESCA",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cleurovisionsim-html",
+    "name": "Euroaural Song Contest",
+    "detail": "Single-player browser game",
+    "source": "cleurovisionsim.html",
+    "icon": "EURO",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clevilglitch-html",
+    "name": "Evilglitch",
+    "detail": "Single-player browser game",
+    "source": "clevilglitch.html",
+    "icon": "EVIL",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clextremerun3d-html",
+    "name": "Extreme Run 3D",
+    "detail": "Single-player browser game",
+    "source": "clextremerun3d.html",
+    "icon": "EXTR",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clfearassessment-html",
+    "name": "Fear Assessment",
+    "detail": "Single-player browser game",
+    "source": "clfearassessment.html",
+    "icon": "FEAR",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clfeedthevoid-html",
+    "name": "Feed the Void",
+    "detail": "Single-player browser game",
+    "source": "clfeedthevoid.html",
+    "icon": "FEED",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clgravity-html",
+    "name": "Firecaster: Gravity",
+    "detail": "Single-player browser game",
+    "source": "clgravity.html",
+    "icon": "FIRE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clfisquarium-html",
+    "name": "Fisquarium",
+    "detail": "Single-player browser game",
+    "source": "clfisquarium.html",
+    "icon": "FISQ",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clfivenightsatbaldisredone-html",
+    "name": "Five Nights At Baldi's Redone",
+    "detail": "Single-player browser game",
+    "source": "clfivenightsatbaldisredone.html",
+    "icon": "FIVE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clfivenightsatepsteins-html",
+    "name": "Five Night's at BIG E",
+    "detail": "Single-player browser game",
+    "source": "clfivenightsatepsteins.html",
+    "icon": "FIVE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clfnac1-html",
+    "name": "Five Nights at Candy's 1",
+    "detail": "Single-player browser game",
+    "source": "clfnac1.html",
+    "icon": "FIVE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clfnac2-html",
+    "name": "Five Nights at Candy's 2",
+    "detail": "Single-player browser game",
+    "source": "clfnac2.html",
+    "icon": "FIVE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clfnaf-html",
+    "name": "Five Nights at Freddy's 1",
+    "detail": "Single-player browser game",
+    "source": "clFNAF.html",
+    "icon": "FIVE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clfnaf2-html",
+    "name": "Five Nights at Freddy's 2",
+    "detail": "Single-player browser game",
+    "source": "clFNAF2.html",
+    "icon": "FIVE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clfnaf3-html",
+    "name": "Five Nights at Freddy's 3",
+    "detail": "Single-player browser game",
+    "source": "clFNAF3.html",
+    "icon": "FIVE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clfnaf4-html",
+    "name": "Five Nights at Freddy's 4",
+    "detail": "Single-player browser game",
+    "source": "clFNAF4.html",
+    "icon": "FIVE",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clfnaf4halloween-html",
+    "name": "Five Nights at Freddy's 4 Halloween",
+    "detail": "Single-player browser game",
+    "source": "clfnaf4halloween.html",
+    "icon": "FIVE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clfnafps-html",
+    "name": "Five Nights at Freddy's Pizzeria Simulator",
+    "detail": "Single-player browser game",
+    "source": "clfnafps.html",
+    "icon": "FIVE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clfnafsl-html",
+    "name": "Five Nights at Freddy's Sister Location",
+    "detail": "Single-player browser game",
+    "source": "clfnafsl.html",
+    "icon": "FIVE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clfnafucn-html",
+    "name": "Five Nights at Freddy's UCN",
+    "detail": "Single-player browser game",
+    "source": "clfnafucn.html",
+    "icon": "FIVE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clfnafworldd-html",
+    "name": "Five Nights at Freddy's World",
+    "detail": "Single-player browser game",
+    "source": "clfnafworldd.html",
+    "icon": "FIVE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clfivenightsatshreks-html",
+    "name": "Five Nights at Shreks Hotel",
+    "detail": "Single-player browser game",
+    "source": "clfivenightsatshreks.html",
+    "icon": "FIVE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clfnaw-html",
+    "name": "Five Nights at Winston's",
+    "detail": "Single-player browser game",
+    "source": "clfnaw.html",
+    "icon": "FIVE",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clfivenightsatyoshis-html",
+    "name": "Five Night's At Yoshi's",
+    "detail": "Single-player browser game",
+    "source": "clfivenightsatyoshis.html",
+    "icon": "FIVE",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clfnaf3remastered-html",
+    "name": "FNAF 3 Remastered",
+    "detail": "Single-player browser game",
+    "source": "clfnaf3remastered.html",
+    "icon": "FNAF",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clfolderdungeon-html",
+    "name": "Folder Dungeon",
+    "detail": "Single-player browser game",
+    "source": "clfolderdungeon.html",
+    "icon": "FOLD",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clforknsausage-html",
+    "name": "ForkNSausage",
+    "detail": "Single-player browser game",
+    "source": "clforknsausage.html",
+    "icon": "FORK",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clplinko-html",
+    "name": "Free Plinko Game Online - Play & Win Instant Rewards",
+    "detail": "Single-player browser game",
+    "source": "clplinko.html",
+    "icon": "FREE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clfreegemas-html",
+    "name": "Freegemas",
+    "detail": "Single-player browser game",
+    "source": "clfreegemas.html",
+    "icon": "FREE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clfivenightsatfrickbears3-html",
+    "name": "Frickbears 3",
+    "detail": "Single-player browser game",
+    "source": "clfivenightsatfrickbears3.html",
+    "icon": "FRIC",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-fnf-clfnfgodot-html",
+    "name": "Friday Night Funkin'",
+    "detail": "Single-player browser game",
+    "source": "fnf/clfnfgodot.html",
+    "icon": "FRID",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clfromrusttoash-html",
+    "name": "Fromrusttoash",
+    "detail": "Single-player browser game",
+    "source": "clfromrusttoash.html",
+    "icon": "FROM",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clfunnymadracing-html",
+    "name": "Funny Mad Racing",
+    "detail": "Single-player browser game",
+    "source": "clfunnymadracing.html",
+    "icon": "FUNN",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clfunnyshooter2-html",
+    "name": "Funny Shooter 2",
+    "detail": "Single-player browser game",
+    "source": "clfunnyshooter2.html",
+    "icon": "FUNN",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clfunnybattle-html",
+    "name": "Funnybattle",
+    "detail": "Single-player browser game",
+    "source": "clfunnybattle.html",
+    "icon": "FUNN",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clfunnybattle2-html",
+    "name": "Funnybattle 2",
+    "detail": "Single-player browser game",
+    "source": "clfunnybattle2.html",
+    "icon": "FUNN",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clfused240-html",
+    "name": "Fused 240",
+    "detail": "Single-player browser game",
+    "source": "clfused240.html",
+    "icon": "FUSE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clgartenofbanban-html",
+    "name": "Gartenofbanban",
+    "detail": "Single-player browser game",
+    "source": "clgartenofbanban.html",
+    "icon": "GART",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clgdwave67-html",
+    "name": "Gdwave 67",
+    "detail": "Single-player browser game",
+    "source": "clgdwave67.html",
+    "icon": "GDWA",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clgeometrydashwave-html",
+    "name": "Geometry Dash Wave",
+    "detail": "Single-player browser game",
+    "source": "clGeometryDashWave.html",
+    "icon": "GEOM",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clgetawayshootoutv2-html",
+    "name": "Getawayshootoutv 2",
+    "detail": "Single-player browser game",
+    "source": "clgetawayshootoutv2.html",
+    "icon": "GETA",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clgetyoked-html",
+    "name": "Getyoked",
+    "detail": "Single-player browser game",
+    "source": "clgetyoked.html",
+    "icon": "GETY",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clglfighters-html",
+    "name": "GLFighters",
+    "detail": "Single-player browser game",
+    "source": "clglfighters.html",
+    "icon": "GLFI",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clwermhole-html",
+    "name": "GMTK2025",
+    "detail": "Single-player browser game",
+    "source": "clwermhole.html",
+    "icon": "GMTK",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clgotobed-html",
+    "name": "Go To Bed web port",
+    "detail": "Single-player browser game",
+    "source": "clgotobed.html",
+    "icon": "GOTO",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clgobble-html",
+    "name": "Gobble",
+    "detail": "Single-player browser game",
+    "source": "clgobble.html",
+    "icon": "GOBB",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clgoingballs-html",
+    "name": "Going Balls - UBG365",
+    "detail": "Single-player browser game",
+    "source": "clgoingballs.html",
+    "icon": "GOIN",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clgolddiggerfrvr-html",
+    "name": "Gold Digger FRVR - Deep Mining - Dig and Match Exploration",
+    "detail": "Single-player browser game",
+    "source": "clgolddiggerfrvr.html",
+    "icon": "GOLD",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clgolfsunday-html",
+    "name": "Golfsunday",
+    "detail": "Single-player browser game",
+    "source": "clgolfsunday.html",
+    "icon": "GOLF",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clchampionisland-html",
+    "name": "Google",
+    "detail": "Single-player browser game",
+    "source": "clchampionisland.html",
+    "icon": "GOOG",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clcheesechompers3d-html",
+    "name": "google.com",
+    "detail": "Single-player browser game",
+    "source": "clcheesechompers3d.html",
+    "icon": "GOOG",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clgooglebaseball-html",
+    "name": "Googlebaseball",
+    "detail": "Single-player browser game",
+    "source": "clgooglebaseball.html",
+    "icon": "GOOG",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clgorillatag-html",
+    "name": "gorilla tag web",
+    "detail": "Single-player browser game",
+    "source": "clgorillatag.html",
+    "icon": "GORI",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clgrandactionsimulator-ny-html",
+    "name": "Grandactionsimulator Ny",
+    "detail": "Single-player browser game",
+    "source": "clgrandactionsimulator-ny.html",
+    "icon": "GRAN",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clgrandescapeprison-html",
+    "name": "Grandescapeprison",
+    "detail": "Single-player browser game",
+    "source": "clgrandescapeprison.html",
+    "icon": "GRAN",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clgranny22-html",
+    "name": "Granny 2",
+    "detail": "Single-player browser game",
+    "source": "clgranny22.html",
+    "icon": "GRAN",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clgranny3-html",
+    "name": "Granny 3 by crax",
+    "detail": "Single-player browser game",
+    "source": "clgranny3.html",
+    "icon": "GRAN",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clgrannycreepy-html",
+    "name": "Granny Creepy House Unblocked - GNHUSTGames",
+    "detail": "Single-player browser game",
+    "source": "clgrannycreepy.html",
+    "icon": "GRAN",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clgrannyy-html",
+    "name": "Granny Original",
+    "detail": "Single-player browser game",
+    "source": "clgrannyy.html",
+    "icon": "GRAN",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clgrassmowing-html",
+    "name": "Grassmowing",
+    "detail": "Single-player browser game",
+    "source": "clgrassmowing.html",
+    "icon": "GRAS",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clgravitymod-html",
+    "name": "Gravitymod",
+    "detail": "Single-player browser game",
+    "source": "clgravitymod.html",
+    "icon": "GRAV",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clgreenergrassawaits-html",
+    "name": "Greener Grass Awaits",
+    "detail": "Single-player browser game",
+    "source": "clgreenergrassawaits.html",
+    "icon": "GREE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clgrn-html",
+    "name": "GRN Prototype",
+    "detail": "Single-player browser game",
+    "source": "clgrn.html",
+    "icon": "GRNP",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clgrowagarden-html",
+    "name": "Growagarden",
+    "detail": "Single-player browser game",
+    "source": "clgrowagarden.html",
+    "icon": "GROW",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clgrowmi-html",
+    "name": "Growmi",
+    "detail": "Single-player browser game",
+    "source": "clgrowmi.html",
+    "icon": "GROW",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clgrowyourgarden-html",
+    "name": "Growyourgarden",
+    "detail": "Single-player browser game",
+    "source": "clgrowyourgarden.html",
+    "icon": "GROW",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clgtamods-html",
+    "name": "Gtamods",
+    "detail": "Single-player browser game",
+    "source": "clgtamods.html",
+    "icon": "GTAM",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clnotyourpawn-html",
+    "name": "GTMK2022",
+    "detail": "Single-player browser game",
+    "source": "clnotyourpawn.html",
+    "icon": "GTMK",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clbadbodyguards-html",
+    "name": "guard",
+    "detail": "Single-player browser game",
+    "source": "clbadbodyguards.html",
+    "icon": "GUAR",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clguncho-html",
+    "name": "Guncho",
+    "detail": "Single-player browser game",
+    "source": "clguncho.html",
+    "icon": "GUNC",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clbuild-html",
+    "name": "gurt",
+    "detail": "Single-player browser game",
+    "source": "clbuild.html",
+    "icon": "GURT",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clbusterjam-html",
+    "name": "GXC Game",
+    "detail": "Single-player browser game",
+    "source": "clBusterJam.html",
+    "icon": "GXCG",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clhandshakes-html",
+    "name": "Handshakes",
+    "detail": "Single-player browser game",
+    "source": "clhandshakes.html",
+    "icon": "HAND",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clhardwaretycoon-html",
+    "name": "Hardware Tycoon",
+    "detail": "Single-player browser game",
+    "source": "clhardwaretycoon.html",
+    "icon": "HARD",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clharoldsbadday-html",
+    "name": "Haroldsbadday",
+    "detail": "Single-player browser game",
+    "source": "clHaroldsbadday.html",
+    "icon": "HARO",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clhauntedschool-html",
+    "name": "Hauntedschool",
+    "detail": "Single-player browser game",
+    "source": "clhauntedschool.html",
+    "icon": "HAUN",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clhillclimbracinglite-html",
+    "name": "HCR Lite 1.0",
+    "detail": "Single-player browser game",
+    "source": "clhillclimbracinglite.html",
+    "icon": "HCRL",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clhellron-html",
+    "name": "HellroN",
+    "detail": "Single-player browser game",
+    "source": "clhellron.html",
+    "icon": "HELL",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clhelltaker-html",
+    "name": "Helltaker",
+    "detail": "Single-player browser game",
+    "source": "clHelltaker.html",
+    "icon": "HELL",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clhelpnobrakes-html",
+    "name": "HELP NO BRAKE",
+    "detail": "Single-player browser game",
+    "source": "clhelpnobrakes.html",
+    "icon": "HELP",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clhero3flyingrobot-html",
+    "name": "Hero 3 Flyingrobot",
+    "detail": "Single-player browser game",
+    "source": "clhero3flyingrobot.html",
+    "icon": "HERO",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clhextris-html",
+    "name": "Hextris",
+    "detail": "Single-player browser game",
+    "source": "clhextris.html",
+    "icon": "HEXT",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clhighstakes-html",
+    "name": "Highstakes",
+    "detail": "Single-player browser game",
+    "source": "clhighstakes.html",
+    "icon": "HIGH",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clhighwayracer2-html",
+    "name": "Highway Racer 2",
+    "detail": "Single-player browser game",
+    "source": "clhighwayracer2.html",
+    "icon": "HIGH",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clhit8ox-html",
+    "name": "Hit 8 Ox",
+    "detail": "Single-player browser game",
+    "source": "clhit8ox.html",
+    "icon": "HIT8",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clhitstunfly-html",
+    "name": "HitStunFly",
+    "detail": "Single-player browser game",
+    "source": "clhitstunfly.html",
+    "icon": "HITS",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clhl2doom-html",
+    "name": "hl2doom",
+    "detail": "Single-player browser game",
+    "source": "clhl2doom.html",
+    "icon": "HL2D",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clholebattle-html",
+    "name": "Holebattle",
+    "detail": "Single-player browser game",
+    "source": "clholebattle.html",
+    "icon": "HOLE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clhorntale-html",
+    "name": "hollow-knight-reverso",
+    "detail": "Single-player browser game",
+    "source": "clhorntale.html",
+    "icon": "HOLL",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clhooked-html",
+    "name": "Hooked",
+    "detail": "Single-player browser game",
+    "source": "clhooked.html",
+    "icon": "HOOK",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clhotwax-html",
+    "name": "Hotwax",
+    "detail": "Single-player browser game",
+    "source": "clhotwax.html",
+    "icon": "HOTW",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clbfdia5b-html",
+    "name": "HTML5b - Battle for Dream Island",
+    "detail": "Single-player browser game",
+    "source": "clbfdia5b.html",
+    "icon": "HTML",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clhungryknight-html",
+    "name": "Hungry Knight",
+    "detail": "Single-player browser game",
+    "source": "clhungryknight.html",
+    "icon": "HUNG",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clhungrylamu2-html",
+    "name": "Hungry Lamu 2",
+    "detail": "Single-player browser game",
+    "source": "clhungrylamu2.html",
+    "icon": "HUNG",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clhungrylamu-html",
+    "name": "Hungrylamu",
+    "detail": "Single-player browser game",
+    "source": "clhungrylamu.html",
+    "icon": "HUNG",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clhyppersandbox-html",
+    "name": "Hyppersandbox",
+    "detail": "Single-player browser game",
+    "source": "clhyppersandbox.html",
+    "icon": "HYPP",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cliwbtg-html",
+    "name": "I WANNA BE THE GUY: THE GAME: THE MOVIE",
+    "detail": "Single-player browser game",
+    "source": "cliwbtg.html",
+    "icon": "IWAN",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clicedodo-html",
+    "name": "Ice Dodo - Play Online at Onionfist.com",
+    "detail": "Single-player browser game",
+    "source": "clicedodo.html",
+    "icon": "ICED",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clicefishing-html",
+    "name": "Ice fishing 3D",
+    "detail": "Single-player browser game",
+    "source": "clicefishing.html",
+    "icon": "ICEF",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clicypurplehead-html",
+    "name": "Icy Purple Head",
+    "detail": "Single-player browser game",
+    "source": "clicypurplehead.html",
+    "icon": "ICYP",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clidleminertycoon-html",
+    "name": "Idle Miner Tycoon",
+    "detail": "Single-player browser game",
+    "source": "clidleminertycoon.html",
+    "icon": "IDLE",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clintellisphere-html",
+    "name": "IntelliSphere",
+    "detail": "Single-player browser game",
+    "source": "clintellisphere.html",
+    "icon": "INTE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clintothedeepweb-html",
+    "name": "Into the Deep Web",
+    "detail": "Single-player browser game",
+    "source": "clintothedeepweb.html",
+    "icon": "INTO",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clintoruins-html",
+    "name": "Intoruins",
+    "detail": "Single-player browser game",
+    "source": "clintoruins.html",
+    "icon": "INTO",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clironsnout-html",
+    "name": "Iron Snout",
+    "detail": "Single-player browser game",
+    "source": "clironsnout.html",
+    "icon": "IRON",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clisthatagubby-html",
+    "name": "IS THAT A GUBBY",
+    "detail": "Single-player browser game",
+    "source": "clisthatagubby.html",
+    "icon": "ISTH",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clislander-html",
+    "name": "Islander",
+    "detail": "Single-player browser game",
+    "source": "clislander.html",
+    "icon": "ISLA",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clitgetssolonelyhere-html",
+    "name": "it-gets-so-lonely-here",
+    "detail": "Single-player browser game",
+    "source": "clitgetssolonelyhere.html",
+    "icon": "ITGE",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cljailbreakobbbobob-html",
+    "name": "Jailbreakobbbobob",
+    "detail": "Single-player browser game",
+    "source": "cljailbreakobbbobob.html",
+    "icon": "JAIL",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cljazzjackrabbit2-html",
+    "name": "JazzÂ² Resurrection",
+    "detail": "Single-player browser game",
+    "source": "cljazzjackrabbit2.html",
+    "icon": "JAZZ",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cljefflings-html",
+    "name": "Jefflings",
+    "detail": "Single-player browser game",
+    "source": "cljefflings.html",
+    "icon": "JEFF",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cljetskiracing-html",
+    "name": "Jetski Race",
+    "detail": "Single-player browser game",
+    "source": "cljetskiracing.html",
+    "icon": "JETS",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cljsvecx-html",
+    "name": "JSVecX: JavaScript port of VecX by raz0red.",
+    "detail": "Single-player browser game",
+    "source": "cljsvecx.html",
+    "icon": "JSVE",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cljungledeerhunting-html",
+    "name": "Jungledeerhunting",
+    "detail": "Single-player browser game",
+    "source": "cljungledeerhunting.html",
+    "icon": "JUNG",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cljustaplatformere-html",
+    "name": "just a level editor",
+    "detail": "Single-player browser game",
+    "source": "cljustaplatformerE.html",
+    "icon": "JUST",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cljustaplatformere2-html",
+    "name": "just a level editor 2",
+    "detail": "Single-player browser game",
+    "source": "cljustaplatformerE2.html",
+    "icon": "JUST",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cljustaplatformer-html",
+    "name": "just a platformer",
+    "detail": "Single-player browser game",
+    "source": "cljustaplatformer.html",
+    "icon": "JUST",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cljustfalllol-html",
+    "name": "Justfalllol",
+    "detail": "Single-player browser game",
+    "source": "cljustfalllol.html",
+    "icon": "JUST",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cljusthitthebutton-html",
+    "name": "Justhitthebutton",
+    "detail": "Single-player browser game",
+    "source": "cljusthitthebutton.html",
+    "icon": "JUST",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cljustoneboss-html",
+    "name": "Justoneboss",
+    "detail": "Single-player browser game",
+    "source": "cljustoneboss.html",
+    "icon": "JUST",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clkalikan-html",
+    "name": "Kalikan",
+    "detail": "Single-player browser game",
+    "source": "clkalikan.html",
+    "icon": "KALI",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clkarlson2d-html",
+    "name": "Karlson 2D",
+    "detail": "Single-player browser game",
+    "source": "clkarlson2d.html",
+    "icon": "KARL",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clkillover-html",
+    "name": "KILLOVER",
+    "detail": "Single-player browser game",
+    "source": "clkillover.html",
+    "icon": "KILL",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clkilltheiceagebabyadventure-html",
+    "name": "Killtheiceagebabyadventure",
+    "detail": "Single-player browser game",
+    "source": "clkilltheiceagebabyadventure.html",
+    "icon": "KILL",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clkimjonguntilepuzzle-html",
+    "name": "Kim Jong Un Tile Puzzle",
+    "detail": "Single-player browser game",
+    "source": "clkimjonguntilepuzzle.html",
+    "icon": "KIMJ",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clklifur-html",
+    "name": "Klifur",
+    "detail": "Single-player browser game",
+    "source": "clklifur.html",
+    "icon": "KLIF",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clknockknock-html",
+    "name": "Knock, Knock",
+    "detail": "Single-player browser game",
+    "source": "clknockknock.html",
+    "icon": "KNOC",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clkourio-html",
+    "name": "Kourio",
+    "detail": "Single-player browser game",
+    "source": "clkourio.html",
+    "icon": "KOUR",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clks2teams-html",
+    "name": "Ks 2 Teams",
+    "detail": "Single-player browser game",
+    "source": "clks2teams.html",
+    "icon": "KS2T",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clundertalelb-html",
+    "name": "LAST BREATH",
+    "detail": "Single-player browser game",
+    "source": "clundertalelb.html",
+    "icon": "LAST",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cllasthorizon-html",
+    "name": "Last Horizon",
+    "detail": "Single-player browser game",
+    "source": "cllasthorizon.html",
+    "icon": "LAST",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clleafblower-html",
+    "name": "Leaf Blower Revolution",
+    "detail": "Single-player browser game",
+    "source": "clleafblower.html",
+    "icon": "LEAF",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cllegionbreaker-html",
+    "name": "Legionbreaker",
+    "detail": "Single-player browser game",
+    "source": "cllegionbreaker.html",
+    "icon": "LEGI",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clletitconsume-html",
+    "name": "Let It Consume",
+    "detail": "Single-player browser game",
+    "source": "clletitconsume.html",
+    "icon": "LETI",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cllummm-html",
+    "name": "LevelUpMMM",
+    "detail": "Single-player browser game",
+    "source": "cllummm.html",
+    "icon": "LEVE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clleverwarriors-html",
+    "name": "Lever Warriors",
+    "detail": "Single-player browser game",
+    "source": "clleverwarriors.html",
+    "icon": "LEVE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cllittlerunmo-html",
+    "name": "Little Runmo - The Game 1.3",
+    "detail": "Single-player browser game",
+    "source": "cllittlerunmo.html",
+    "icon": "LITT",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cllobotemydash-html",
+    "name": "Lobotomy Dash Platformer",
+    "detail": "Single-player browser game",
+    "source": "clLobotemyDash.html",
+    "icon": "LOBO",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cllockthedoor-html",
+    "name": "Lockthedoor",
+    "detail": "Single-player browser game",
+    "source": "cllockthedoor.html",
+    "icon": "LOCK",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cllowknight-html",
+    "name": "Lowknight",
+    "detail": "Single-player browser game",
+    "source": "cllowknight.html",
+    "icon": "LOWK",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clluckyblocks-html",
+    "name": "Luckyblocks",
+    "detail": "Single-player browser game",
+    "source": "clluckyblocks.html",
+    "icon": "LUCK",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cllumberobby-html",
+    "name": "Lumberobby",
+    "detail": "Single-player browser game",
+    "source": "cllumberobby.html",
+    "icon": "LUMB",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clmadstuntcars2-html",
+    "name": "Madalin Stunt Cars 2 - Unblcoked Games 76",
+    "detail": "Single-player browser game",
+    "source": "clmadstuntcars2.html",
+    "icon": "MADA",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clidlebreakout-html",
+    "name": "Made by Kodiqi",
+    "detail": "Single-player browser game",
+    "source": "clidlebreakout.html",
+    "icon": "MADE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cldeadestate-html",
+    "name": "Made in GameMaker Studio 2",
+    "detail": "Single-player browser game",
+    "source": "cldeadestate.html",
+    "icon": "MADE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clmari0-html",
+    "name": "Mari0",
+    "detail": "Single-player browser game",
+    "source": "clmari0.html",
+    "icon": "MARI",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clmariovsluigi-html",
+    "name": "Mario VS Luigi",
+    "detail": "Single-player browser game",
+    "source": "clmariovsluigi.html",
+    "icon": "MARI",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clmegachess-html",
+    "name": "Megachess",
+    "detail": "Single-player browser game",
+    "source": "clmegachess.html",
+    "icon": "MEGA",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clmimic-html",
+    "name": "Mimic",
+    "detail": "Single-player browser game",
+    "source": "clmimic.html",
+    "icon": "MIMI",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clminecraftpocketedition-html",
+    "name": "Minecraft",
+    "detail": "Single-player browser game",
+    "source": "clminecraftpocketedition.html",
+    "icon": "MINE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clminecraftshooter-html",
+    "name": "Minecraftshooter",
+    "detail": "Single-player browser game",
+    "source": "clminecraftshooter.html",
+    "icon": "MINE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clminesweeperplus-html",
+    "name": "MinesweeperPlus",
+    "detail": "Single-player browser game",
+    "source": "clminesweeperplus.html",
+    "icon": "MINE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clminicrossword-html",
+    "name": "Mini Crossword",
+    "detail": "Single-player browser game",
+    "source": "clminicrossword.html",
+    "icon": "MINI",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clminiflips-html",
+    "name": "Mini Flips",
+    "detail": "Single-player browser game",
+    "source": "clminiflips.html",
+    "icon": "MINI",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clmoneyrush-html",
+    "name": "Moneyrush",
+    "detail": "Single-player browser game",
+    "source": "clmoneyrush.html",
+    "icon": "MONE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clmonkeymart-html",
+    "name": "Monkey Mart",
+    "detail": "Single-player browser game",
+    "source": "clmonkeymart.html",
+    "icon": "MONK",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clmonstertracks-html",
+    "name": "Monster Tracks",
+    "detail": "Single-player browser game",
+    "source": "clmonstertracks.html",
+    "icon": "MONS",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clmonsterderby-html",
+    "name": "Monster Truck Crash Bigfoot",
+    "detail": "Single-player browser game",
+    "source": "clmonsterderby.html",
+    "icon": "MONS",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clmrmine-html",
+    "name": "Mr.Mine",
+    "detail": "Single-player browser game",
+    "source": "clmrmine.html",
+    "icon": "MRMI",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clmadskillsmotocross2-html",
+    "name": "MSM2 0.111.00",
+    "detail": "Single-player browser game",
+    "source": "clmadskillsmotocross2.html",
+    "icon": "MSM2",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clmxoffroadmaster-html",
+    "name": "Mxoffroadmaster",
+    "detail": "Single-player browser game",
+    "source": "clmxoffroadmaster.html",
+    "icon": "MXOF",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clnetattack-html",
+    "name": "Net.Attack()",
+    "detail": "Single-player browser game",
+    "source": "clnetattack.html",
+    "icon": "NETA",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clneverendinglegacy-html",
+    "name": "NeverEnding Legacy",
+    "detail": "Single-player browser game",
+    "source": "clneverendinglegacy.html",
+    "icon": "NEVE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clnextdoor-html",
+    "name": "NextDoor",
+    "detail": "Single-player browser game",
+    "source": "clnextdoor.html",
+    "icon": "NEXT",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clngon-html",
+    "name": "n-gon",
+    "detail": "Single-player browser game",
+    "source": "clngon.html",
+    "icon": "NGON",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clgrannynightmare-html",
+    "name": "Night Mare",
+    "detail": "Single-player browser game",
+    "source": "clgrannynightmare.html",
+    "icon": "NIGH",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clnightcatsurvival-html",
+    "name": "Nightcatsurvival",
+    "detail": "Single-player browser game",
+    "source": "clnightcatsurvival.html",
+    "icon": "NIGH",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clnightclubshowdown-html",
+    "name": "nightclubShowdown",
+    "detail": "Single-player browser game",
+    "source": "clnightclubshowdown.html",
+    "icon": "NIGH",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clinsomniary-html",
+    "name": "nightdefense",
+    "detail": "Single-player browser game",
+    "source": "clinsomniary.html",
+    "icon": "NIGH",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clnimrods-html",
+    "name": "Nimrods",
+    "detail": "Single-player browser game",
+    "source": "clnimrods.html",
+    "icon": "NIMR",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clnzp-html",
+    "name": "NZ: Portable",
+    "detail": "Single-player browser game",
+    "source": "clnzp.html",
+    "icon": "NZPO",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clspeedperclick-html",
+    "name": "Obby",
+    "detail": "Single-player browser game",
+    "source": "clspeedperclick.html",
+    "icon": "OBBY",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clobby1jumpperclick-html",
+    "name": "Obby 1 Jumpperclick",
+    "detail": "Single-player browser game",
+    "source": "clobby1jumpperclick.html",
+    "icon": "OBBY",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clobby-99-will-lose-html",
+    "name": "Obby 99 Will Lose",
+    "detail": "Single-player browser game",
+    "source": "clobby-99-will-lose.html",
+    "icon": "OBBY",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clobbybike-html",
+    "name": "Obby on a bike",
+    "detail": "Single-player browser game",
+    "source": "clobbybike.html",
+    "icon": "OBBY",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clobbyrainbowtower-html",
+    "name": "Obby Rainbow Tower",
+    "detail": "Single-player browser game",
+    "source": "clobbyrainbowtower.html",
+    "icon": "OBBY",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clobbyonlyup-html",
+    "name": "Obby Robby: Only Up",
+    "detail": "Single-player browser game",
+    "source": "clobbyonlyup.html",
+    "icon": "OBBY",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clobbyslide-html",
+    "name": "Obby Slide",
+    "detail": "Single-player browser game",
+    "source": "clobbyslide.html",
+    "icon": "OBBY",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clobbyswing-html",
+    "name": "Obby Swing",
+    "detail": "Single-player browser game",
+    "source": "clobbyswing.html",
+    "icon": "OBBY",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clobbyfriends-html",
+    "name": "Obbyfriends",
+    "detail": "Single-player browser game",
+    "source": "clobbyfriends.html",
+    "icon": "OBBY",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clobbyyardsale-html",
+    "name": "ObbyYardSale",
+    "detail": "Single-player browser game",
+    "source": "clobbyyardsale.html",
+    "icon": "OBBY",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cloddbotout-html",
+    "name": "Odd Bot Out",
+    "detail": "Single-player browser game",
+    "source": "cloddbotout.html",
+    "icon": "ODDB",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clonenightasfreddy-html",
+    "name": "One Night As Fredbear",
+    "detail": "Single-player browser game",
+    "source": "clonenightasfreddy.html",
+    "icon": "ONEN",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clonebitadventure-html",
+    "name": "OneBit Adventure",
+    "detail": "Single-player browser game",
+    "source": "clonebitadventure.html",
+    "icon": "ONEB",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cloneshotold-html",
+    "name": "Oneshot Legacy",
+    "detail": "Single-player browser game",
+    "source": "cloneshotold.html",
+    "icon": "ONES",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clonlyup-html",
+    "name": "Onlyup",
+    "detail": "Single-player browser game",
+    "source": "clonlyup.html",
+    "icon": "ONLY",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cl-oo-html",
+    "name": "Ã–oo",
+    "detail": "Single-player browser game",
+    "source": "clÃ–oo.html",
+    "icon": "OOPP",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cljazzjackrabbit-html",
+    "name": "OpenJazz",
+    "detail": "Single-player browser game",
+    "source": "cljazzjackrabbit.html",
+    "icon": "OPEN",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cloppositeday-html",
+    "name": "Oppositeday",
+    "detail": "Single-player browser game",
+    "source": "cloppositeday.html",
+    "icon": "OPPO",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clorbofcreation-html",
+    "name": "Orb Of Creation",
+    "detail": "Single-player browser game",
+    "source": "clorbofcreation.html",
+    "icon": "ORBO",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clouthold-html",
+    "name": "Outhold",
+    "detail": "Single-player browser game",
+    "source": "clouthold.html",
+    "icon": "OUTH",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cloverburden-html",
+    "name": "Overburden",
+    "detail": "Single-player browser game",
+    "source": "cloverburden.html",
+    "icon": "OVER",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clovofixed-html",
+    "name": "OvO",
+    "detail": "Single-player browser game",
+    "source": "clovofixed.html",
+    "icon": "OVOP",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clovodimensions-html",
+    "name": "OvO Dimensions",
+    "detail": "Single-player browser game",
+    "source": "clovodimensions.html",
+    "icon": "OVOD",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clmanagod-html",
+    "name": "PassTheProjectBTP",
+    "detail": "Single-player browser game",
+    "source": "clmanagod.html",
+    "icon": "PASS",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clpereelous-html",
+    "name": "Pereelous",
+    "detail": "Single-player browser game",
+    "source": "clpereelous.html",
+    "icon": "PERE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clperfecthotel-html",
+    "name": "Perfect Hotel",
+    "detail": "Single-player browser game",
+    "source": "clperfecthotel.html",
+    "icon": "PERF",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clpetworld-html",
+    "name": "Pet World",
+    "detail": "Single-player browser game",
+    "source": "clpetworld.html",
+    "icon": "PETW",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clphasma-html",
+    "name": "Phasma",
+    "detail": "Single-player browser game",
+    "source": "clphasma.html",
+    "icon": "PHAS",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clpicodriller-html",
+    "name": "Picodriller",
+    "detail": "Single-player browser game",
+    "source": "clpicodriller.html",
+    "icon": "PICO",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clpicohot-html",
+    "name": "Picohot",
+    "detail": "Single-player browser game",
+    "source": "clpicohot.html",
+    "icon": "PICO",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clpicolife-html",
+    "name": "Picolife",
+    "detail": "Single-player browser game",
+    "source": "clpicolife.html",
+    "icon": "PICO",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clpiconightpunkin-html",
+    "name": "Piconightpunkin",
+    "detail": "Single-player browser game",
+    "source": "clpiconightpunkin.html",
+    "icon": "PICO",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clpiecesofcake-html",
+    "name": "Piecesofcake",
+    "detail": "Single-player browser game",
+    "source": "clpiecesofcake.html",
+    "icon": "PIEC",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clpingpongchaos-html",
+    "name": "Pingpongchaos",
+    "detail": "Single-player browser game",
+    "source": "clpingpongchaos.html",
+    "icon": "PING",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clpixelgun-html",
+    "name": "Pixel Gun Survival | MacVG",
+    "detail": "Single-player browser game",
+    "source": "clpixelgun.html",
+    "icon": "PIXE",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clpixelshooter-html",
+    "name": "Pixel Shooter 1",
+    "detail": "Single-player browser game",
+    "source": "clpixelshooter.html",
+    "icon": "PIXE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clpixelwarfare-html",
+    "name": "Pixelwarfare",
+    "detail": "Single-player browser game",
+    "source": "clpixelwarfare.html",
+    "icon": "PIXE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clsugaryspire-html",
+    "name": "Pizza Tower: Scoutdingo Mod",
+    "detail": "Single-player browser game",
+    "source": "clsugaryspire.html",
+    "icon": "PIZZ",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clplanetlife-html",
+    "name": "Planet Life",
+    "detail": "Single-player browser game",
+    "source": "clplanetlife.html",
+    "icon": "PLAN",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-pvzm-html",
+    "name": "Plants vs. Zombies - MODDED Official",
+    "detail": "Single-player browser game",
+    "source": "PVZM.html",
+    "icon": "PLAN",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clbasketballfrvr-html",
+    "name": "Play Basketball FRVR - Free Basketball Hoop Shooter",
+    "detail": "Single-player browser game",
+    "source": "clbasketballfrvr.html",
+    "icon": "PLAY",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clpogo3d-html",
+    "name": "pogo time",
+    "detail": "Single-player browser game",
+    "source": "clpogo3D.html",
+    "icon": "POGO",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clpokeacademylifeforever-html",
+    "name": "Pokemon Academy Life Forever",
+    "detail": "Single-player browser game",
+    "source": "clpokeacademylifeforever.html",
+    "icon": "POKE",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-fnf-clpokepasta-html",
+    "name": "Pokepasta Perdition - V. 1.5.1",
+    "detail": "Single-player browser game",
+    "source": "fnf/clpokepasta.html",
+    "icon": "POKE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clpolicepursuit2-html",
+    "name": "Policepursuit 2",
+    "detail": "Single-player browser game",
+    "source": "clpolicepursuit2.html",
+    "icon": "POLI",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clpolyold-html",
+    "name": "Polyold",
+    "detail": "Single-player browser game",
+    "source": "clpolyold.html",
+    "icon": "POLY",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clpolytrackworksnow-html",
+    "name": "Polytrackworksnow",
+    "detail": "Single-player browser game",
+    "source": "clpolytrackworksnow.html",
+    "icon": "POLY",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clporklike-html",
+    "name": "Porklike",
+    "detail": "Single-player browser game",
+    "source": "clporklike.html",
+    "icon": "PORK",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clportal2d-html",
+    "name": "Portal 2D",
+    "detail": "Single-player browser game",
+    "source": "clportal2d.html",
+    "icon": "PORT",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clporter-html",
+    "name": "Porter",
+    "detail": "Single-player browser game",
+    "source": "clporter.html",
+    "icon": "PORT",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clpossessquest-html",
+    "name": "Possess Quest",
+    "detail": "Single-player browser game",
+    "source": "clpossessquest.html",
+    "icon": "POSS",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clpostal-html",
+    "name": "POSTAL: Play FREE on the web",
+    "detail": "Single-player browser game",
+    "source": "clpostal.html",
+    "icon": "POST",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clprankcalltungtungtungsahurclicker-html",
+    "name": "Prank Call: Tung Tung Sahur",
+    "detail": "Single-player browser game",
+    "source": "clprankcalltungtungtungsahurclicker.html",
+    "icon": "PRAN",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clpraxisfighterx-html",
+    "name": "Praxisfighterx",
+    "detail": "Single-player browser game",
+    "source": "clpraxisfighterx.html",
+    "icon": "PRAX",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clprestigetree-html",
+    "name": "Prestigetree",
+    "detail": "Single-player browser game",
+    "source": "clprestigetree.html",
+    "icon": "PRES",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clpint-html",
+    "name": "Pretend It's Not There",
+    "detail": "Single-player browser game",
+    "source": "clpint.html",
+    "icon": "PRET",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clprocessortycoon-html",
+    "name": "Processortycoon",
+    "detail": "Single-player browser game",
+    "source": "clprocessortycoon.html",
+    "icon": "PROC",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clpullfrog-html",
+    "name": "Pullfrog",
+    "detail": "Single-player browser game",
+    "source": "clpullfrog.html",
+    "icon": "PULL",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clpuppethockey-html",
+    "name": "Puppet Hockey Battle",
+    "detail": "Single-player browser game",
+    "source": "clpuppethockey.html",
+    "icon": "PUPP",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clpushyourluck-html",
+    "name": "Pushyourluck",
+    "detail": "Single-player browser game",
+    "source": "clpushyourluck.html",
+    "icon": "PUSH",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clpvz2gardenless-html",
+    "name": "PvZ2 Gardendless Online | 0.6.0",
+    "detail": "Single-player browser game",
+    "source": "clpvz2gardenless.html",
+    "icon": "PVZ2",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clragdollarchers-html",
+    "name": "Ragdoll Archers",
+    "detail": "Single-player browser game",
+    "source": "clragdollarchers.html",
+    "icon": "RAGD",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clreacticore-html",
+    "name": "Reacticore",
+    "detail": "Single-player browser game",
+    "source": "clreacticore.html",
+    "icon": "REAC",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-classesmentexaminationque-html",
+    "name": "Reality",
+    "detail": "Single-player browser game",
+    "source": "classesmentexaminationque.html",
+    "icon": "REAL",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clrecoil-html",
+    "name": "Recoil Unblocked",
+    "detail": "Single-player browser game",
+    "source": "clrecoil.html",
+    "icon": "RECO",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clredalert-html",
+    "name": "red alert",
+    "detail": "Single-player browser game",
+    "source": "clredalert.html",
+    "icon": "REDA",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clredball4-html",
+    "name": "Red Ball 4",
+    "detail": "Single-player browser game",
+    "source": "clRedBall4.html",
+    "icon": "REDB",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clredtierunner-html",
+    "name": "Redtierunner",
+    "detail": "Single-player browser game",
+    "source": "clredtierunner.html",
+    "icon": "REDT",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-redvbluefix-html",
+    "name": "Redvbluefix",
+    "detail": "Single-player browser game",
+    "source": "redvbluefix.html",
+    "icon": "REDV",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clrepobad-html",
+    "name": "Repobad",
+    "detail": "Single-player browser game",
+    "source": "clrepobad.html",
+    "icon": "REPO",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clretrobowl-html",
+    "name": "Retro Bowl",
+    "detail": "Single-player browser game",
+    "source": "clretrobowl.html",
+    "icon": "RETR",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clretrobowlcollege-html",
+    "name": "Retro Bowl College",
+    "detail": "Single-player browser game",
+    "source": "clretrobowlcollege.html",
+    "icon": "RETR",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clretrohighway-html",
+    "name": "Retro Highway",
+    "detail": "Single-player browser game",
+    "source": "clretrohighway.html",
+    "icon": "RETR",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clrevolutionidle-html",
+    "name": "Revolution Idle X",
+    "detail": "Single-player browser game",
+    "source": "clrevolutionidle.html",
+    "icon": "REVO",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clrh-html",
+    "name": "Rhythm Hell",
+    "detail": "Single-player browser game",
+    "source": "clrh.html",
+    "icon": "RHYT",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clrisehigher-html",
+    "name": "Rise Higher | Seraph",
+    "detail": "Single-player browser game",
+    "source": "clrisehigher.html",
+    "icon": "RISE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clrocketgoalio-html",
+    "name": "RocketGoal | Ripped",
+    "detail": "Single-player browser game",
+    "source": "clrocketgoalio.html",
+    "icon": "ROCK",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clrodha-html",
+    "name": "Rodha",
+    "detail": "Single-player browser game",
+    "source": "clrodha.html",
+    "icon": "RODH",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clrollyvortex-html",
+    "name": "Rolly Vortex",
+    "detail": "Single-player browser game",
+    "source": "clrollyvortex.html",
+    "icon": "ROLL",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clrooftopsnipers-html",
+    "name": "Rooftopsnipers",
+    "detail": "Single-player browser game",
+    "source": "clrooftopsnipers.html",
+    "icon": "ROOF",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clroomclicker-html",
+    "name": "Room Clicker",
+    "detail": "Single-player browser game",
+    "source": "clroomclicker.html",
+    "icon": "ROOM",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clroulettehero-html",
+    "name": "Roulette Hero",
+    "detail": "Single-player browser game",
+    "source": "clroulettehero.html",
+    "icon": "ROUL",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clrouletteknight-html",
+    "name": "Roulette Knight for Ludum Dare 41",
+    "detail": "Single-player browser game",
+    "source": "clrouletteknight.html",
+    "icon": "ROUL",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clrussiansandbox-html",
+    "name": "russian sandbox lol",
+    "detail": "Single-player browser game",
+    "source": "clrussiansandbox.html",
+    "icon": "RUSS",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clrussianbuckshot-html",
+    "name": "Russianbuckshot",
+    "detail": "Single-player browser game",
+    "source": "clrussianbuckshot.html",
+    "icon": "RUSS",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clsabduel-html",
+    "name": "Sabduel",
+    "detail": "Single-player browser game",
+    "source": "clsabduel.html",
+    "icon": "SABD",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clsandboxcity-html",
+    "name": "Sandboxcity",
+    "detail": "Single-player browser game",
+    "source": "clsandboxcity.html",
+    "icon": "SAND",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clsanty-html",
+    "name": "Santy!",
+    "detail": "Single-player browser game",
+    "source": "clsanty.html",
+    "icon": "SANT",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clsatryn-html",
+    "name": "satryn",
+    "detail": "Single-player browser game",
+    "source": "clsatryn.html",
+    "icon": "SATR",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clsaulgoodmanrun-html",
+    "name": "Saulgoodmanrun",
+    "detail": "Single-player browser game",
+    "source": "clsaulgoodmanrun.html",
+    "icon": "SAUL",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clscalethedepths-html",
+    "name": "Scale the Depths",
+    "detail": "Single-player browser game",
+    "source": "clscalethedepths.html",
+    "icon": "SCAL",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clscaryshawarma-html",
+    "name": "Scary Shawarma 3D",
+    "detail": "Single-player browser game",
+    "source": "clscaryshawarma.html",
+    "icon": "SCAR",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clschoolboyrunaway-html",
+    "name": "SchoolBoy Runaway",
+    "detail": "Single-player browser game",
+    "source": "clschoolboyrunaway.html",
+    "icon": "SCHO",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clseamongrel-html",
+    "name": "Seamongrel",
+    "detail": "Single-player browser game",
+    "source": "clseamongrel.html",
+    "icon": "SEAM",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clshapetransform-html",
+    "name": "Shapetransform",
+    "detail": "Single-player browser game",
+    "source": "clshapetransform.html",
+    "icon": "SHAP",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clshiftatmidnight-html",
+    "name": "Shift at Midnight",
+    "detail": "Single-player browser game",
+    "source": "clshiftatmidnight.html",
+    "icon": "SHIF",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cl2dshooting-html",
+    "name": "Shooter 2D Online",
+    "detail": "Single-player browser game",
+    "source": "cl2Dshooting.html",
+    "icon": "SHOO",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clshredmill-html",
+    "name": "shredmill",
+    "detail": "Single-player browser game",
+    "source": "clshredmill.html",
+    "icon": "SHRE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clsideeffects-html",
+    "name": "Sideeffects",
+    "detail": "Single-player browser game",
+    "source": "clsideeffects.html",
+    "icon": "SIDE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clsiloshowdow-html",
+    "name": "Silhouette Showdown",
+    "detail": "Single-player browser game",
+    "source": "clsiloshowdow.html",
+    "icon": "SILH",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clsilkmelody-html",
+    "name": "SilkMelody",
+    "detail": "Single-player browser game",
+    "source": "clsilkmelody.html",
+    "icon": "SILK",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clsixwaystodie-html",
+    "name": "Six Ways To Suffer",
+    "detail": "Single-player browser game",
+    "source": "clsixwaystodie.html",
+    "icon": "SIXW",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clskinwalker-html",
+    "name": "Skinwalker",
+    "detail": "Single-player browser game",
+    "source": "clskinwalker.html",
+    "icon": "SKIN",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clskyriders-html",
+    "name": "Sky Riders",
+    "detail": "Single-player browser game",
+    "source": "clSkyRiders.html",
+    "icon": "SKYR",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clskyrace-3d-html",
+    "name": "Skyrace 3 D",
+    "detail": "Single-player browser game",
+    "source": "clskyrace-3d.html",
+    "icon": "SKYR",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clslendytubbies-html",
+    "name": "Slendytubbies2",
+    "detail": "Single-player browser game",
+    "source": "clslendytubbies.html",
+    "icon": "SLEN",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clanimalcrossing-html",
+    "name": "Slider",
+    "detail": "Single-player browser game",
+    "source": "clanimalcrossing.html",
+    "icon": "SLID",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clslipways-html",
+    "name": "Slipways",
+    "detail": "Single-player browser game",
+    "source": "clslipways.html",
+    "icon": "SLIP",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clslotornot-html",
+    "name": "Slot or Not",
+    "detail": "Single-player browser game",
+    "source": "clslotornot.html",
+    "icon": "SLOT",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clsmashkartsworking-html",
+    "name": "Smashkartsworking",
+    "detail": "Single-player browser game",
+    "source": "clsmashkartsworking.html",
+    "icon": "SMAS",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clsmb12-html",
+    "name": "SMB1 Web Gameplay",
+    "detail": "Single-player browser game",
+    "source": "clsmb12.html",
+    "icon": "SMB1",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clsmbremastered-html",
+    "name": "SMB1R",
+    "detail": "Single-player browser game",
+    "source": "clsmbremastered.html",
+    "icon": "SMB1",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clsnowroad-html",
+    "name": "Snow Road",
+    "detail": "Single-player browser game",
+    "source": "clsnowroad.html",
+    "icon": "SNOW",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clsnowballio-html",
+    "name": "Snowballio",
+    "detail": "Single-player browser game",
+    "source": "clsnowballio.html",
+    "icon": "SNOW",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clsnowboardobby-html",
+    "name": "Snowboardobby",
+    "detail": "Single-player browser game",
+    "source": "clsnowboardobby.html",
+    "icon": "SNOW",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clsodasimulator-html",
+    "name": "soda sim",
+    "detail": "Single-player browser game",
+    "source": "clsodasimulator.html",
+    "icon": "SODA",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clsolarsandbox-html",
+    "name": "solar sandbox",
+    "detail": "Single-player browser game",
+    "source": "clsolarsandbox.html",
+    "icon": "SOLA",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clsoniccdmobile-html",
+    "name": "Sonic CD",
+    "detail": "Single-player browser game",
+    "source": "clsoniccdmobile.html",
+    "icon": "SONI",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clsonicmaniaplus-html",
+    "name": "Sonic Mania",
+    "detail": "Single-player browser game",
+    "source": "clsonicmaniaplus.html",
+    "icon": "SONI",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clsonicroboblast2-html",
+    "name": "Sonic Robo Blast 2",
+    "detail": "Single-player browser game",
+    "source": "clsonicroboblast2.html",
+    "icon": "SONI",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clsonicrevert-html",
+    "name": "Sonicrevert",
+    "detail": "Single-player browser game",
+    "source": "clsonicrevert.html",
+    "icon": "SONI",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clspacewarsbattleground-html",
+    "name": "Space Wars Battleground",
+    "detail": "Single-player browser game",
+    "source": "clspacewarsbattleground.html",
+    "icon": "SPAC",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clspacewaves-html",
+    "name": "Space Waves",
+    "detail": "Single-player browser game",
+    "source": "clspacewaves.html",
+    "icon": "SPAC",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clspeedstars-html",
+    "name": "Speed Stars",
+    "detail": "Single-player browser game",
+    "source": "clspeedstars.html",
+    "icon": "SPEE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clstationmeltdown-html",
+    "name": "Station Meltdown",
+    "detail": "Single-player browser game",
+    "source": "clstationmeltdown.html",
+    "icon": "STAT",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clstationsaturn-html",
+    "name": "Station Saturn",
+    "detail": "Single-player browser game",
+    "source": "clstationsaturn.html",
+    "icon": "STAT",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clstealthmaster-html",
+    "name": "Stealth Master",
+    "detail": "Single-player browser game",
+    "source": "clstealthmaster.html",
+    "icon": "STEA",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clsteelsurge-html",
+    "name": "Steelsurge",
+    "detail": "Single-player browser game",
+    "source": "clsteelsurge.html",
+    "icon": "STEE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clsteepdescent-html",
+    "name": "Steepdescent",
+    "detail": "Single-player browser game",
+    "source": "clsteepdescent.html",
+    "icon": "STEE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clsd-thewar-html",
+    "name": "Stick Duel The War",
+    "detail": "Single-player browser game",
+    "source": "clsd-thewar.html",
+    "icon": "STIC",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clstickslasher-html",
+    "name": "Stick Slasher",
+    "detail": "Single-player browser game",
+    "source": "clstickslasher.html",
+    "icon": "STIC",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clstickwithit-html",
+    "name": "Stick With It",
+    "detail": "Single-player browser game",
+    "source": "clstickwithit.html",
+    "icon": "STIC",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clstickmangtacity-html",
+    "name": "Stickman Gta City",
+    "detail": "Single-player browser game",
+    "source": "clstickmangtacity.html",
+    "icon": "STIC",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clstickmankingdomclash-html",
+    "name": "Stickman Kingdom Clash",
+    "detail": "Single-player browser game",
+    "source": "clStickmanKingdomclash.html",
+    "icon": "STIC",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clstickmanandguns-html",
+    "name": "Stickmanandguns",
+    "detail": "Single-player browser game",
+    "source": "clstickmanandguns.html",
+    "icon": "STIC",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clstickmanclash-html",
+    "name": "Stickmanclash",
+    "detail": "Single-player browser game",
+    "source": "clstickmanclash.html",
+    "icon": "STIC",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clsuikapico-html",
+    "name": "Suikapico",
+    "detail": "Single-player browser game",
+    "source": "clsuikapico.html",
+    "icon": "SUIK",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clsummerrider-html",
+    "name": "Summerrider",
+    "detail": "Single-player browser game",
+    "source": "clsummerrider.html",
+    "icon": "SUMM",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clsuperdarkdeception-html",
+    "name": "Super Dark Deception",
+    "detail": "Single-player browser game",
+    "source": "clsuperdarkdeception.html",
+    "icon": "SUPE",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clsuperliquidsoccer-html",
+    "name": "Super Liquid Soccer",
+    "detail": "Single-player browser game",
+    "source": "clsuperliquidsoccer.html",
+    "icon": "SUPE",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clsm63redux-html",
+    "name": "Super Mario 63 Redux",
+    "detail": "Single-player browser game",
+    "source": "clsm63redux.html",
+    "icon": "SUPE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clsupercold-html",
+    "name": "SUPERCOLD",
+    "detail": "Single-player browser game",
+    "source": "clsupercold.html",
+    "icon": "SUPE",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clsuperdromebugs-html",
+    "name": "SuperDrome Bugs",
+    "detail": "Single-player browser game",
+    "source": "clsuperdromebugs.html",
+    "icon": "SUPE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clsuperhot-html",
+    "name": "SUPERHOT",
+    "detail": "Single-player browser game",
+    "source": "clsuperhot.html",
+    "icon": "SUPE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clsuperhotlinemiami-html",
+    "name": "Superhotlinemiami",
+    "detail": "Single-player browser game",
+    "source": "clsuperhotlinemiami.html",
+    "icon": "SUPE",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clsupitdept-html",
+    "name": "Supitdept",
+    "detail": "Single-player browser game",
+    "source": "clsupitdept.html",
+    "icon": "SUPI",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-supremeduelistfix-html",
+    "name": "Supreme Duelist",
+    "detail": "Single-player browser game",
+    "source": "supremeduelistfix.html",
+    "icon": "SUPR",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clsupremeduelist2019-html",
+    "name": "Supreme Duelist 2019",
+    "detail": "Single-player browser game",
+    "source": "clSupremeDuelist2019.html",
+    "icon": "SUPR",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clsurvivalracev2-html",
+    "name": "Survival Race",
+    "detail": "Single-player browser game",
+    "source": "clsurvivalracev2.html",
+    "icon": "SURV",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clsushiunroll-html",
+    "name": "SUSHI unROLL",
+    "detail": "Single-player browser game",
+    "source": "clsushiunroll.html",
+    "icon": "SUSH",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clswingforbrainrots-html",
+    "name": "Swingforbrainrots",
+    "detail": "Single-player browser game",
+    "source": "clswingforbrainrots.html",
+    "icon": "SWIN",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clswitch-html",
+    "name": "Switch!",
+    "detail": "Single-player browser game",
+    "source": "clswitch.html",
+    "icon": "SWIT",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clswitchblade-html",
+    "name": "Switchblade",
+    "detail": "Single-player browser game",
+    "source": "clswitchblade.html",
+    "icon": "SWIT",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clswordfight-html",
+    "name": "Swordfight",
+    "detail": "Single-player browser game",
+    "source": "clswordfight.html",
+    "icon": "SWOR",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clcatmario-html",
+    "name": "Syobon Action",
+    "detail": "Single-player browser game",
+    "source": "clcatmario.html",
+    "icon": "SYOB",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cltommorowandyesterday-html",
+    "name": "T&Y 3D",
+    "detail": "Single-player browser game",
+    "source": "cltommorowandyesterday.html",
+    "icon": "TY3D",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cltabletanks-html",
+    "name": "Table Tanks",
+    "detail": "Single-player browser game",
+    "source": "cltabletanks.html",
+    "icon": "TABL",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cltabletennisworldtour-html",
+    "name": "Table Tennis",
+    "detail": "Single-player browser game",
+    "source": "cltabletennisworldtour.html",
+    "icon": "TABL",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clcartoonnetworktabletennisultimatetournament-html",
+    "name": "Table Tennis Ultimate Tournament",
+    "detail": "Single-player browser game",
+    "source": "clCartoonNetworkTableTennisUltimateTournament.html",
+    "icon": "TABL",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cltacostand-html",
+    "name": "Tacostand",
+    "detail": "Single-player browser game",
+    "source": "cltacostand.html",
+    "icon": "TACO",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cltagcm-html",
+    "name": "Tagcm",
+    "detail": "Single-player browser game",
+    "source": "cltagcm.html",
+    "icon": "TAGC",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cltailofthedragon-html",
+    "name": "Tail of the Dragon",
+    "detail": "Single-player browser game",
+    "source": "cltailofthedragon.html",
+    "icon": "TAIL",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cltaisei-html",
+    "name": "Taisei Project â€” Web version (Experimental!)",
+    "detail": "Single-player browser game",
+    "source": "cltaisei.html",
+    "icon": "TAIS",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cltaproad-html",
+    "name": "Tap Road",
+    "detail": "Single-player browser game",
+    "source": "cltaproad.html",
+    "icon": "TAPR",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cltelephonetrouble-html",
+    "name": "TelephoneTrouble",
+    "detail": "Single-player browser game",
+    "source": "cltelephonetrouble.html",
+    "icon": "TELE",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clterra-html",
+    "name": "Terra",
+    "detail": "Single-player browser game",
+    "source": "clterra.html",
+    "icon": "TERR",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cldeadseat-html",
+    "name": "The Deadseat",
+    "detail": "Single-player browser game",
+    "source": "cldeadseat.html",
+    "icon": "THED",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clteod-html",
+    "name": "The End Of Disney",
+    "detail": "Single-player browser game",
+    "source": "clteod.html",
+    "icon": "THEE",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clsunandmoon-html",
+    "name": "The Sun And Moon by Daniel Linssen",
+    "detail": "Single-player browser game",
+    "source": "clsunandmoon.html",
+    "icon": "THES",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clthemaninthewindow-html",
+    "name": "TheManFromTheWindow",
+    "detail": "Single-player browser game",
+    "source": "clthemaninthewindow.html",
+    "icon": "THEM",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clthermomorph-html",
+    "name": "Thermomorph",
+    "detail": "Single-player browser game",
+    "source": "clthermomorph.html",
+    "icon": "THER",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cltheyarecoming-html",
+    "name": "Theyarecoming",
+    "detail": "Single-player browser game",
+    "source": "cltheyarecoming.html",
+    "icon": "THEY",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clthreegoblets-html",
+    "name": "Three Goblets",
+    "detail": "Single-player browser game",
+    "source": "clthreegoblets.html",
+    "icon": "THRE",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clthwack-html",
+    "name": "Thwack",
+    "detail": "Single-player browser game",
+    "source": "clthwack.html",
+    "icon": "THWA",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cltimeshooter2-html",
+    "name": "Time Shooter 2",
+    "detail": "Single-player browser game",
+    "source": "cltimeshooter2.html",
+    "icon": "TIME",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cltimeshooter3-html",
+    "name": "Time Shooter 3 SWAT",
+    "detail": "Single-player browser game",
+    "source": "cltimeshooter3.html",
+    "icon": "TIME",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cltoastarling-html",
+    "name": "Toastarling",
+    "detail": "Single-player browser game",
+    "source": "cltoastarling.html",
+    "icon": "TOAS",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clucds-html",
+    "name": "Top Speed Racing 3d - topVAZ",
+    "detail": "Single-player browser game",
+    "source": "clucds.html",
+    "icon": "TOPS",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cltopspeedracing3d-html",
+    "name": "Topspeedracing 3 D",
+    "detail": "Single-player browser game",
+    "source": "cltopspeedracing3d.html",
+    "icon": "TOPS",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cltowerwizard-html",
+    "name": "Tower Wizard",
+    "detail": "Single-player browser game",
+    "source": "cltowerwizard.html",
+    "icon": "TOWE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cltowerblocks-html",
+    "name": "Towerblocks",
+    "detail": "Single-player browser game",
+    "source": "cltowerblocks.html",
+    "icon": "TOWE",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cltrace-html",
+    "name": "Trace",
+    "detail": "Single-player browser game",
+    "source": "cltrace.html",
+    "icon": "TRAC",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cltralalerotralalaescapetungtungtungsahur-html",
+    "name": "Tralalerotralalaescapetungtungtungsahur",
+    "detail": "Single-player browser game",
+    "source": "cltralalerotralalaescapetungtungtungsahur.html",
+    "icon": "TRAL",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cltrappedwithjester-html",
+    "name": "Trapped with Jester",
+    "detail": "Single-player browser game",
+    "source": "cltrappedwithjester.html",
+    "icon": "TRAP",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cltrechoroustrials-html",
+    "name": "Treacherous Trials",
+    "detail": "Single-player browser game",
+    "source": "cltrechoroustrials.html",
+    "icon": "TREA",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cltreeshateyou-html",
+    "name": "Treeshateyou",
+    "detail": "Single-player browser game",
+    "source": "cltreeshateyou.html",
+    "icon": "TREE",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-cltsuzukimaze-html",
+    "name": "Tsuzuki Maze",
+    "detail": "Single-player browser game",
+    "source": "cltsuzukimaze.html",
+    "icon": "TSUZ",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cltubejumpers-html",
+    "name": "Tubejumpers",
+    "detail": "Single-player browser game",
+    "source": "cltubejumpers.html",
+    "icon": "TUBE",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clwackyflip-html",
+    "name": "Tung",
+    "detail": "Single-player browser game",
+    "source": "clwackyflip.html",
+    "icon": "TUNG",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cltungtunghorror-html",
+    "name": "Tung Sahur Horror",
+    "detail": "Single-player browser game",
+    "source": "cltungtunghorror.html",
+    "icon": "TUNG",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-cltungtungtungsahurobby-html",
+    "name": "Tungtungtungsahurobby",
+    "detail": "Single-player browser game",
+    "source": "cltungtungtungsahurobby.html",
+    "icon": "TUNG",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cltunnelrush-html",
+    "name": "Tunnel Rush 1",
+    "detail": "Single-player browser game",
+    "source": "cltunnelrush.html",
+    "icon": "TUNN",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cltwoball3d-html",
+    "name": "Twoball 3 D",
+    "detail": "Single-player browser game",
+    "source": "cltwoball3d.html",
+    "icon": "TWOB",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cluckyblockobbyeuophratesriver-html",
+    "name": "Uckyblockobby Euophratesriver",
+    "detail": "Single-player browser game",
+    "source": "cluckyblockobbyEUOPHRATESRIVER.html",
+    "icon": "UCKY",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clufoswampoddysey-html",
+    "name": "Ufoswampoddysey",
+    "detail": "Single-player browser game",
+    "source": "clufoswampoddysey.html",
+    "icon": "UFOS",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clultimatecardrivingsimulator-html",
+    "name": "Ultimate Car Driving Game",
+    "detail": "Single-player browser game",
+    "source": "clUltimatecardrivingsimulator.html",
+    "icon": "ULTI",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clultrakill-html",
+    "name": "ULTRAKILL",
+    "detail": "Single-player browser game",
+    "source": "clultrakill.html",
+    "icon": "ULTR",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cluncannycatgolf-html",
+    "name": "Uncanny Cat Golf",
+    "detail": "Single-player browser game",
+    "source": "cluncannycatgolf.html",
+    "icon": "UNCA",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clundertaleyellow-html",
+    "name": "UNDERTALE Yellow",
+    "detail": "Single-player browser game",
+    "source": "clundertaleyellow.html",
+    "icon": "UNDE",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clunitresdreams-html",
+    "name": "UNITRES - Tech Demo",
+    "detail": "Single-player browser game",
+    "source": "clunitresdreams.html",
+    "icon": "UNIT",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-cluno-html",
+    "name": "Uno",
+    "detail": "Single-player browser game",
+    "source": "cluno.html",
+    "icon": "UNOP",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cluntime-html",
+    "name": "Untime",
+    "detail": "Single-player browser game",
+    "source": "cluntime.html",
+    "icon": "UNTI",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clupslash-html",
+    "name": "UpSlash",
+    "detail": "Single-player browser game",
+    "source": "clupslash.html",
+    "icon": "UPSL",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-cluvuvwevwevweonyetenvewveugwemubwemossas-html",
+    "name": "UvuvwevwevweOnyetenvewv",
+    "detail": "Single-player browser game",
+    "source": "clUvuvwevwevweOnyetenvewveUgwemubwemOssas.html",
+    "icon": "UVUV",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-cluzg-html",
+    "name": "UZG",
+    "detail": "Single-player browser game",
+    "source": "clUZG.html",
+    "icon": "UZGP",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-cltiberiandawn-html",
+    "name": "Vanilla Conquer",
+    "detail": "Single-player browser game",
+    "source": "cltiberiandawn.html",
+    "icon": "VANI",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clvillager-html",
+    "name": "Villager",
+    "detail": "Single-player browser game",
+    "source": "clvillager.html",
+    "icon": "VILL",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clvincentmansionofthedead-html",
+    "name": "Vincentmansionofthedead",
+    "detail": "Single-player browser game",
+    "source": "clvincentmansionofthedead.html",
+    "icon": "VINC",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clvortex-html",
+    "name": "Vortex",
+    "detail": "Single-player browser game",
+    "source": "clvortex.html",
+    "icon": "VORT",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-cltimewarriors-html",
+    "name": "warriors 23.0",
+    "detail": "Single-player browser game",
+    "source": "cltimewarriors.html",
+    "icon": "WARR",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clwartheknight-html",
+    "name": "Wartheknight",
+    "detail": "Single-player browser game",
+    "source": "clwartheknight.html",
+    "icon": "WART",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clwavedash-html",
+    "name": "Wave Dash",
+    "detail": "Single-player browser game",
+    "source": "clwavedash.html",
+    "icon": "WAVE",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clwaveroad3d-html",
+    "name": "Waveroad 3 D",
+    "detail": "Single-player browser game",
+    "source": "clwaveroad3d.html",
+    "icon": "WAVE",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clfluidism-html",
+    "name": "WebGL Fluid Simulation",
+    "detail": "Single-player browser game",
+    "source": "clfluidism.html",
+    "icon": "WEBG",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clwitchcrafttd-html",
+    "name": "Witchcrafttd",
+    "detail": "Single-player browser game",
+    "source": "clwitchcrafttd.html",
+    "icon": "WITC",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clwolfenstein-html",
+    "name": "Wolfenstein 3D",
+    "detail": "Single-player browser game",
+    "source": "clwolfenstein.html",
+    "icon": "WOLF",
+    "palette": "violet"
+  },
+  {
+    "id": "archive-clwoodworm-html",
+    "name": "Woodworm",
+    "detail": "Single-player browser game",
+    "source": "clwoodworm.html",
+    "icon": "WOOD",
+    "palette": "sky"
+  },
+  {
+    "id": "archive-clwrestlebros-html",
+    "name": "Wrestle Bros &#127918; Play Now on the Official Site",
+    "detail": "Single-player browser game",
+    "source": "clwrestlebros.html",
+    "icon": "WRES",
+    "palette": "mint"
+  },
+  {
+    "id": "archive-clhalflife-html",
+    "name": "Xash",
+    "detail": "Single-player browser game",
+    "source": "clhalflife.html",
+    "icon": "XASH",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clxor-html",
+    "name": "Xor",
+    "detail": "Single-player browser game",
+    "source": "clxor.html",
+    "icon": "XORP",
+    "palette": "rose"
+  },
+  {
+    "id": "archive-clyouvs100skibidi-html",
+    "name": "You vs 100 Skibidi Toilets Unblocked",
+    "detail": "Single-player browser game",
+    "source": "clyouvs100skibidi.html",
+    "icon": "YOUV",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clbasketbattle-html",
+    "name": "YT Game Wrapper WebGL Template",
+    "detail": "Single-player browser game",
+    "source": "clbasketbattle.html",
+    "icon": "YTGA",
+    "palette": "lime"
+  },
+  {
+    "id": "archive-clyumenikki-html",
+    "name": "Yume Nikki",
+    "detail": "Single-player browser game",
+    "source": "clyumenikki.html",
+    "icon": "YUME",
+    "palette": "gold"
+  },
+  {
+    "id": "archive-clzombotronreboot-html",
+    "name": "Zombotron",
+    "detail": "Single-player browser game",
+    "source": "clzombotronreboot.html",
+    "icon": "ZOMB",
+    "palette": "coral"
+  },
+  {
+    "id": "archive-clzrist-html",
+    "name": "Zrist",
+    "detail": "Single-player browser game",
+    "source": "clzrist.html",
+    "icon": "ZRIS",
+    "palette": "violet"
+  }
+]

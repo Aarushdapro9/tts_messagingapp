@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Pokemon Emerald</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet">
+  <style>
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #000; }
+    #game { width: 100vw; height: 100vh; }
+    #startButton { display: block; width: 220px; margin: calc(50vh - 30px) auto; padding: 16px; border: 0; border-radius: 8px; background: #4caf50; box-shadow: 0 0 10px 2px #000; color: #fff; cursor: pointer; font: 16px 'Press Start 2P', monospace; }
+  </style>
+</head>
+<body>
+  <div id="game" hidden></div>
+  <button id="startButton" type="button">PLAY</button>
+  <script>
+    document.getElementById('startButton').addEventListener('click', function () {
+      document.getElementById('game').hidden = false;
+      this.hidden = true;
+      window.EJS_player = '#game';
+      window.EJS_core = 'gba';
+      window.EJS_color = '#000000';
+      window.EJS_startOnLoaded = true;
+      window.EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/bubblfan/emu@master/';
+      window.EJS_gameUrl = 'https://cdn.jsdelivr.net/gh/a456pur/seraph@81f551ca0aa8e3d6018d32d8ac5904ac9bc78f76/games/pokemonemerald/pokemonemerald.gba';
+      var loader = document.createElement('script');
+      loader.src = 'https://cdn.jsdelivr.net/gh/bubblfan/emu@master/loader.js';
+      document.body.appendChild(loader);
+    });
+  </script>
+</body>
+</html>
