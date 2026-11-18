@@ -4,6 +4,7 @@ import Regsiter from './pages/Regsiter';
 import Home from './pages/Home';
 import Start from './components/Start';
 import Admin from './pages/Admin';
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route exact path="/" element={<Start />} />
         </Routes>
       </Router>
+      <Analytics />
     </div>
   );
 }
